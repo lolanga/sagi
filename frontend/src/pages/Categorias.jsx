@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import Modal from '../components/Modal'
 import '../styles/categorias.css'
 
 const tiposCampo = ['texto', 'numero', 'fecha', 'select', 'textarea']
@@ -12,6 +13,8 @@ export default function Categorias() {
   const [selected, setSelected] = useState(null)
   const [nuevoCampo, setNuevoCampo] = useState({ nombre: '', tipo: 'texto', opciones: '' })
   const [nuevoTipo, setNuevoTipo] = useState('')
+  const [editandoTipo, setEditandoTipo] = useState(null)
+  const [nombreEdit, setNombreEdit] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -83,11 +86,23 @@ export default function Categorias() {
     }
   }
 
-  const renombrarTipo = async (tipo) => {
-    const nombre = window.prompt('Nuevo nombre del elemento:', tipo.nombre)
-    if (!nombre || nombre.trim() === tipo.nombre) return
-    await api.put(`/tipos-item/${tipo.id}`, { nombre: nombre.trim() })
-    cargar()
+  const renombrarTipo = async (e) => {
+    e.preventDefault()
+    setError('')
+    if (!editandoTipo || !nombreEdit.trim()) return
+    try {
+      await api.put(`/tipos-item/${editandoTipo.id}`, { nombre: nombreEdit.trim() })
+      setEditandoTipo(null)
+      setNombreEdit('')
+      cargar()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al renombrar elemento')
+    }
+  }
+
+  const abrirEdicionTipo = (tipo) => {
+    setNombreEdit(tipo.nombre)
+    setEditandoTipo(tipo)
   }
 
   const eliminarTipo = async (tipo) => {
@@ -260,7 +275,7 @@ export default function Categorias() {
                                 </td>
                                 <td>{tipo.nombre}</td>
                                 <td className="row-actions">
-                                  <button className="btn-link" onClick={() => renombrarTipo(tipo)}>
+                                  <button className="btn-link" onClick={() => abrirEdicionTipo(tipo)}>
                                     Renombrar
                                   </button>
                                   <button className="btn-link btn-link-danger" onClick={() => eliminarTipo(tipo)}>
@@ -280,6 +295,30 @@ export default function Categorias() {
           )}
         </section>
       </main>
+
+      <Modal open={Boolean(editandoTipo)} title={`Renombrar elemento — ${editandoTipo?.nombre ?? ''}`} onClose={() => setEditandoTipo(null)}>
+        <form onSubmit={renombrarTipo} className="item-form">
+          <div className="field">
+            <label htmlFor="nombre-elemento">Nuevo nombre *</label>
+            <input
+              id="nombre-elemento"
+              type="text"
+              value={nombreEdit}
+              onChange={(e) => setNombreEdit(e.target.value)}
+              placeholder="Ej. Silla de oficina"
+              autoFocus
+              required
+            />
+          </div>
+          {error && <p className="form-error">{error}</p>}
+          <div className="form-actions">
+            <button type="button" className="btn btn-secondary" onClick={() => setEditandoTipo(null)}>
+              Cancelar
+            </button>
+            <button type="submit" className="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

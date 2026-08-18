@@ -22,3 +22,22 @@
   color: var(--color-muted);
   font-size: 13px;
 }
+
+.lista-categorias {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+}
+
+.lista-categorias-header {
+  padding: 16px 20px 0;
+}
+
+.lista-categorias-header h3 {
+  font-size: 16px;
+}
+
+.lista-categorias .table {
+  border: none;
+  box-shadow: none;
+}

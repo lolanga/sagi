@@ -81,7 +81,7 @@ button {
 
 .sidebar {
   width: 230px;
-  background-color: var(--color-primary-dark);
+  background-color: #131722;
   color: var(--color-white);
   padding: 16px 0;
   flex-shrink: 0;
