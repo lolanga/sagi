@@ -69,6 +69,15 @@ button {
   background-color: var(--color-secondary);
 }
 
+.btn-danger {
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
+
+.btn-danger:hover {
+  filter: brightness(1.1);
+}
+
 .btn-block {
   width: 100%;
 }
@@ -135,6 +144,23 @@ button {
 
 .topbar h1 {
   font-size: 20px;
+}
+
+.btn-back {
+  display: inline-block;
+  font-size: 13px;
+  color: var(--color-muted);
+  margin-bottom: 6px;
+}
+
+.btn-back:hover {
+  color: var(--color-primary);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .topbar-user {

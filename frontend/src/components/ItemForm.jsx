@@ -32,14 +32,20 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
       return
     }
     setLoading(true)
-    api
-      .get(`/categorias/${categoriaId}/campos`, { params: tipoItemId ? { tipo_item_id: tipoItemId } : {} })
-      .then((res) => {
-        const activos = (res.data.campos || []).filter((c) => c.activo)
-        setCampos(activos)
-      })
-      .catch(() => setCampos([]))
-      .finally(() => setLoading(false))
+
+    if (tipoItemId) {
+      api
+        .get(`/categorias/${categoriaId}/campos`, { params: { tipo_item_id: tipoItemId } })
+        .then((res) => {
+          const activos = (res.data.campos || []).filter((c) => c.activo)
+          setCampos(activos)
+        })
+        .catch(() => setCampos([]))
+        .finally(() => setLoading(false))
+    } else {
+      setCampos([])
+      setLoading(false)
+    }
 
     api
       .get(`/categorias/${categoriaId}/tipos`)
@@ -185,7 +191,10 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
           <select
             id="tipo-item"
             value={tipoItemId}
-            onChange={(e) => setTipoItemId(e.target.value)}
+            onChange={(e) => {
+              setTipoItemId(e.target.value)
+              setValores({})
+            }}
             required={tipos.length > 0}
           >
             <option value="">{tipos.length > 0 ? 'Seleccionar elemento...' : 'Sin elementos definidos'}</option>
@@ -226,10 +235,12 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
       {categoriaId && (
         <fieldset className="campos-dinamicos">
           <legend>Campos específicos de la categoría</legend>
-          {loading ? (
+          {!tipoItemId ? (
+            <p className="muted">Selecciona un elemento para ver sus campos específicos.</p>
+          ) : loading ? (
             <p className="muted">Cargando campos...</p>
           ) : campos.length === 0 ? (
-            <p className="muted">Esta categoría no tiene campos definidos.</p>
+            <p className="muted">Este elemento no tiene campos definidos.</p>
           ) : (
             <div className="form-grid">{campos.map(renderCampo)}</div>
           )}

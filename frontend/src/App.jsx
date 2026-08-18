@@ -4,6 +4,9 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Inventario from './pages/Inventario'
 import Categorias from './pages/Categorias'
+import Movimientos from './pages/Movimientos'
+import Reportes from './pages/Reportes'
+import Alertas from './pages/Alertas'
 import './index.css'
 
 function ProtectedRoute({ children }) {
@@ -39,6 +42,30 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Categorias />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/movimientos"
+            element={
+              <ProtectedRoute>
+                <Movimientos />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/reportes"
+            element={
+              <ProtectedRoute>
+                <Reportes />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/alertas"
+            element={
+              <ProtectedRoute>
+                <Alertas />
               </ProtectedRoute>
             }
           />

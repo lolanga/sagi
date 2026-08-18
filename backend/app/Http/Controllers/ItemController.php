@@ -167,6 +167,26 @@ class ItemController extends Controller
         return response()->json(['item' => $item]);
     }
 
+    public function destroy(Request $request, Item $item): JsonResponse
+    {
+        $user = $request->user();
+
+        DB::transaction(function () use ($item, $user) {
+            Auditoria::create([
+                'user_id' => $user->id,
+                'accion' => 'eliminar',
+                'entidad' => 'item',
+                'entidad_id' => $item->id,
+                'detalle' => ['codigo' => $item->codigo_unico],
+            ]);
+
+            $item->movimientos()->delete();
+            $item->delete();
+        });
+
+        return response()->json(['message' => 'Ítem eliminado']);
+    }
+
     private function generarCodigoUnico(): string
     {
         $ultimo = Item::orderByDesc('codigo_unico')->value('codigo_unico');

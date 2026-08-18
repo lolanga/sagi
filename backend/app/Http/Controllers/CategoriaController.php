@@ -25,6 +25,8 @@ class CategoriaController extends Controller
 
         if ($request->filled('tipo_item_id')) {
             $query->where('tipo_item_id', $request->integer('tipo_item_id'));
+        } else {
+            $query->whereNull('tipo_item_id');
         }
 
         return response()->json(['campos' => $query->orderBy('orden')->get()]);

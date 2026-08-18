@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import Modal from '../components/Modal'
+import Layout from '../components/Layout'
 import '../styles/categorias.css'
 
 const tiposCampo = ['texto', 'numero', 'fecha', 'select', 'textarea']
 
 export default function Categorias() {
-  const { user } = useAuth()
   const [categorias, setCategorias] = useState([])
   const [selected, setSelected] = useState(null)
   const [nuevoCampo, setNuevoCampo] = useState({ nombre: '', tipo: 'texto', opciones: '' })
@@ -129,28 +127,10 @@ export default function Categorias() {
   )
 
   return (
-    <div className="layout">
-      <aside className="sidebar">
-        <div className="sidebar-logo">SAGI</div>
-        <nav className="sidebar-nav">
-          <Link to="/" className="nav-item">Dashboard</Link>
-          <Link to="/inventario" className="nav-item">Inventario</Link>
-          <Link to="/categorias" className="nav-item active">Categorías</Link>
-        </nav>
-      </aside>
-
-      <main className="main">
-        <header className="topbar">
-          <div>
-            <h1>Administración de categorías</h1>
-            <p className="topbar-user">{user?.name} · {user?.rol?.nombre}</p>
-          </div>
-        </header>
-
-        <section className="content">
-          {loading ? (
-            <p className="muted">Cargando...</p>
-          ) : (
+    <Layout title="Administración de categorías" back="/inventario">
+      {loading ? (
+        <p className="muted">Cargando...</p>
+      ) : (
             <div className="categorias-grid">
               <div className="categorias-list">
                 <h3>Categorías</h3>
@@ -312,8 +292,6 @@ export default function Categorias() {
               )}
             </div>
           )}
-        </section>
-      </main>
 
       <Modal open={Boolean(editandoTipo)} title={`Renombrar elemento — ${editandoTipo?.nombre ?? ''}`} onClose={() => setEditandoTipo(null)}>
         <form onSubmit={renombrarTipo} className="item-form">
@@ -338,6 +316,6 @@ export default function Categorias() {
           </div>
         </form>
       </Modal>
-    </div>
+    </Layout>
   )
 }

@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import Modal from '../components/Modal'
 import ItemForm from '../components/ItemForm'
+import Layout from '../components/Layout'
 import '../styles/inventario.css'
 
 export default function Inventario() {
@@ -16,6 +17,8 @@ export default function Inventario() {
   const [categoriaId, setCategoriaId] = useState('')
   const [showAlta, setShowAlta] = useState(false)
   const [editando, setEditando] = useState(null)
+  const [eliminando, setEliminando] = useState(null)
+  const [error, setError] = useState('')
 
   const puedeEditar = ['admin', 'jefe', 'carga'].includes(user?.rol?.slug)
 
@@ -46,6 +49,17 @@ export default function Inventario() {
     return () => clearTimeout(timeout)
   }, [cargarItems])
 
+  const confirmarEliminar = async () => {
+    setError('')
+    try {
+      await api.delete(`/items/${eliminando.id}`)
+      setEliminando(null)
+      cargarItems()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al eliminar el ítem')
+    }
+  }
+
   const formatValores = (item) => {
     const campos = categorias
       .find((c) => c.id === item.categoria_id)
@@ -62,102 +76,88 @@ export default function Inventario() {
   }
 
   return (
-    <div className="layout">
-      <aside className="sidebar">
-        <div className="sidebar-logo">SAGI</div>
-        <nav className="sidebar-nav">
-          <Link to="/" className="nav-item">Dashboard</Link>
-          <Link to="/inventario" className="nav-item active">Inventario</Link>
-        </nav>
-      </aside>
-
-      <main className="main">
-        <header className="topbar">
-          <div>
-            <h1>Inventario</h1>
-            <p className="topbar-user">
-              {user?.name} · {user?.rol?.nombre} · {user?.area?.nombre}
-            </p>
-          </div>
-          <div className="topbar-actions">
-            {user?.rol?.slug === 'admin' && (
-              <Link to="/categorias" className="btn btn-secondary">Categorías</Link>
-            )}
-            {puedeEditar && (
-              <button className="btn btn-primary" onClick={() => setShowAlta(true)}>
-                + Registrar alta
-              </button>
-            )}
-          </div>
-        </header>
-
-        <section className="content">
-          <div className="filters-bar">
-            <input
-              className="search-input"
-              type="text"
-              placeholder="Ej. SAGI-000001 o escritorio"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <select
-              className="filter-select"
-              value={categoriaId}
-              onChange={(e) => setCategoriaId(e.target.value)}
-            >
-              <option value="">Todas las categorías</option>
-              {categorias
-                .filter((c) => !c.es_transitoria)
-                .map((c) => (
-                  <option key={c.id} value={c.id}>{c.codigo} – {c.nombre}</option>
-                ))}
-            </select>
-            <span className="result-count">{total} ítems</span>
-          </div>
-
-          {loading ? (
-            <p className="muted">Cargando...</p>
-          ) : items.length === 0 ? (
-            <div className="placeholder">
-              <h2>Sin resultados</h2>
-              <p>No hay ítems que coincidan con la búsqueda. Registra un alta para comenzar.</p>
-            </div>
-          ) : (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Código</th>
-                  <th>Categoría</th>
-                  <th>Detalle</th>
-                  <th>Estado</th>
-                  <th>Cant.</th>
-                  <th>Responsable</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => (
-                  <tr key={item.id}>
-                    <td><strong>{item.codigo_unico}</strong></td>
-                    <td>{item.categoria?.codigo}</td>
-                    <td>{formatValores(item)}</td>
-                    <td>
-                      <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
-                    </td>
-                    <td>{item.cantidad}</td>
-                    <td>{item.responsable?.name}</td>
-                    <td>
-                      {puedeEditar && (
-                        <button className="btn-link" onClick={() => setEditando(item)}>Editar</button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    <Layout
+      title="Inventario"
+      actions={
+        <>
+          {user?.rol?.slug === 'admin' && (
+            <Link to="/categorias" className="btn btn-secondary">Categorías</Link>
           )}
-        </section>
-      </main>
+          {puedeEditar && (
+            <button className="btn btn-primary" onClick={() => setShowAlta(true)}>
+              + Registrar alta
+            </button>
+          )}
+        </>
+      }
+    >
+      <div className="filters-bar">
+        <input
+          className="search-input"
+          type="text"
+          placeholder="Ej. SAGI-000001 o escritorio"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select
+          className="filter-select"
+          value={categoriaId}
+          onChange={(e) => setCategoriaId(e.target.value)}
+        >
+          <option value="">Todas las categorías</option>
+          {categorias
+            .filter((c) => !c.es_transitoria)
+            .map((c) => (
+              <option key={c.id} value={c.id}>{c.codigo} – {c.nombre}</option>
+            ))}
+        </select>
+        <span className="result-count">{total} ítems</span>
+      </div>
+
+      {loading ? (
+        <p className="muted">Cargando...</p>
+      ) : items.length === 0 ? (
+        <div className="placeholder">
+          <h2>Sin resultados</h2>
+          <p>No hay ítems que coincidan con la búsqueda. Registra un alta para comenzar.</p>
+        </div>
+      ) : (
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Categoría</th>
+              <th>Detalle</th>
+              <th>Estado</th>
+              <th>Cant.</th>
+              <th>Responsable</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.id}>
+                <td><strong>{item.codigo_unico}</strong></td>
+                <td>{item.categoria?.codigo}</td>
+                <td>{formatValores(item)}</td>
+                <td>
+                  <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
+                </td>
+                <td>{item.cantidad}</td>
+                <td>{item.responsable?.name}</td>
+                <td>
+                  {puedeEditar && (
+                    <div className="row-actions">
+                      <button className="btn-link" onClick={() => setEditando(item)}>Editar</button>
+                      <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)}>Eliminar</button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <Modal open={showAlta} title="Registrar alta de ítem" onClose={() => setShowAlta(false)} wide>
         <ItemForm
@@ -173,6 +173,7 @@ export default function Inventario() {
       <Modal open={Boolean(editando)} title={`Editar ítem ${editando?.codigo_unico ?? ''}`} onClose={() => setEditando(null)} wide>
         {editando && (
           <ItemForm
+            key={editando.id}
             categorias={categorias}
             item={editando}
             onSaved={() => {
@@ -183,6 +184,22 @@ export default function Inventario() {
           />
         )}
       </Modal>
-    </div>
+
+      <Modal open={Boolean(eliminando)} title={`Eliminar ítem ${eliminando?.codigo_unico ?? ''}`} onClose={() => setEliminando(null)}>
+        <p className="muted">
+          ¿Seguro que deseas eliminar el ítem <strong>{eliminando?.codigo_unico}</strong>?
+          Esta acción no se puede deshacer y eliminará sus movimientos asociados.
+        </p>
+        {error && <p className="form-error">{error}</p>}
+        <div className="form-actions">
+          <button type="button" className="btn btn-secondary" onClick={() => setEliminando(null)}>
+            Cancelar
+          </button>
+          <button type="button" className="btn btn-danger" onClick={confirmarEliminar}>
+            Eliminar
+          </button>
+        </div>
+      </Modal>
+    </Layout>
   )
 }
