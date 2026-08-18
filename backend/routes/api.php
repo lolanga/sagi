@@ -26,6 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Sedes y Unidades de destino
     Route::get('/sedes', [SedeController::class, 'index']);
+    Route::post('/sedes', [SedeController::class, 'store'])->middleware('rol:admin');
+    Route::put('/sedes/{sede}', [SedeController::class, 'update'])->middleware('rol:admin');
+    Route::delete('/sedes/{sede}', [SedeController::class, 'destroy'])->middleware('rol:admin');
     Route::get('/unidades', [UnidadController::class, 'index']);
     Route::post('/unidades', [UnidadController::class, 'store'])->middleware('rol:admin');
     Route::put('/unidades/{unidad}', [UnidadController::class, 'update'])->middleware('rol:admin');

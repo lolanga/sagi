@@ -17,6 +17,13 @@ function ProtectedRoute({ children }) {
   return children
 }
 
+function RoleRoute({ roles, children }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" replace />
+  if (!roles.includes(user.rol?.slug)) return <Navigate to="/" replace />
+  return children
+}
+
 export default function App() {
   return (
     <AuthProvider>
@@ -42,17 +49,17 @@ export default function App() {
           <Route
             path="/categorias"
             element={
-              <ProtectedRoute>
+              <RoleRoute roles={['admin']}>
                 <Categorias />
-              </ProtectedRoute>
+              </RoleRoute>
             }
           />
           <Route
             path="/unidades"
             element={
-              <ProtectedRoute>
+              <RoleRoute roles={['admin']}>
                 <Unidades />
-              </ProtectedRoute>
+              </RoleRoute>
             }
           />
           <Route
