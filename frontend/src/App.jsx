@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Inventario from './pages/Inventario'
+import Categorias from './pages/Categorias'
 import './index.css'
 
 function ProtectedRoute({ children }) {
@@ -30,6 +31,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Inventario />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categorias"
+            element={
+              <ProtectedRoute>
+                <Categorias />
               </ProtectedRoute>
             }
           />

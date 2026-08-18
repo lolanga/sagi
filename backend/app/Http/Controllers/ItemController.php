@@ -2,18 +2,164 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Auditoria;
+use App\Models\Categoria;
 use App\Models\Item;
+use App\Models\Movimiento;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ItemController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $items = Item::with(['categoria', 'responsable', 'area'])
-            ->orderByDesc('created_at')
-            ->paginate(25);
+        $query = Item::with(['categoria', 'responsable', 'area'])
+            ->orderByDesc('created_at');
+
+        if ($request->filled('search')) {
+            $termino = $request->string('search');
+            $query->where(function ($q) use ($termino) {
+                $q->where('codigo_unico', 'like', "%{$termino}%")
+                    ->orWhereRaw("CAST(valores_dinamicos AS CHAR) LIKE ?", ["%{$termino}%"]);
+            });
+        }
+
+        if ($request->filled('categoria_id')) {
+            $query->where('categoria_id', $request->integer('categoria_id'));
+        }
+
+        if ($request->filled('estado_conservacion')) {
+            $query->where('estado_conservacion', $request->string('estado_conservacion'));
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->string('estado'));
+        }
+
+        if ($request->filled('area_id')) {
+            $query->where('area_id', $request->integer('area_id'));
+        }
+
+        $items = $query->paginate(25)->withQueryString();
 
         return response()->json($items);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'categoria_id' => ['required', Rule::exists('categorias', 'id')->where(fn ($q) => $q->where('es_transitoria', false))],
+            'estado_conservacion' => ['required', Rule::in(['Muy bueno', 'Bueno', 'Regular', 'Malo'])],
+            'cantidad' => 'required|integer|min:1',
+            'motivo_alta' => 'required|string',
+            'valores' => 'nullable|array',
+        ]);
+
+        $categoria = Categoria::findOrFail($validated['categoria_id']);
+        $user = $request->user();
+
+        // Validar campos dinámicos requeridos
+        $campos = $categoria->camposDinamicos()->where('activo', true)->get();
+        $valores = $validated['valores'] ?? [];
+        foreach ($campos->where('requerido', true) as $campo) {
+            if (empty($valores[$campo->id])) {
+                return response()->json([
+                    'message' => "El campo '{$campo->nombre}' es obligatorio",
+                    'errors' => ['valores' => ["El campo '{$campo->nombre}' es obligatorio"]],
+                ], 422);
+            }
+        }
+
+        DB::transaction(function () use (&$item, $request, $categoria, $user, $valores, $validated) {
+            $codigo = $this->generarCodigoUnico();
+
+            // El ítem ingresa en A7 (Altas) y se traslada a su categoría real en el alta
+            $item = Item::create([
+                'codigo_unico' => $codigo,
+                'categoria_id' => Categoria::where('codigo', 'A7')->value('id'),
+                'responsable_id' => $user->id,
+                'area_id' => $user->area_id,
+                'estado_conservacion' => $validated['estado_conservacion'],
+                'cantidad' => $validated['cantidad'],
+                'fecha_alta' => now()->toDateString(),
+                'valores_dinamicos' => $valores,
+                'estado' => 'activo',
+            ]);
+
+            $alta = Movimiento::create([
+                'item_id' => $item->id,
+                'tipo' => 'alta',
+                'area_origen_id' => $user->area_id,
+                'area_destino_id' => null,
+                'motivo' => $validated['motivo_alta'],
+                'estado' => 'aprobado',
+                'solicitante_id' => $user->id,
+                'validador_id' => null,
+                'fecha_validacion' => now(),
+            ]);
+
+            // Traslado automático de A7 a la categoría real
+            $item->update(['categoria_id' => $categoria->id]);
+
+            Auditoria::create([
+                'user_id' => $user->id,
+                'accion' => 'crear',
+                'entidad' => 'item',
+                'entidad_id' => $item->id,
+                'detalle' => ['codigo' => $codigo, 'categoria' => $categoria->codigo, 'movimiento_id' => $alta->id],
+            ]);
+        });
+
+        $item->load(['categoria', 'responsable', 'area']);
+
+        return response()->json(['item' => $item], 201);
+    }
+
+    public function show(Item $item): JsonResponse
+    {
+        $item->load(['categoria', 'responsable', 'area', 'movimientos.solicitante', 'movimientos.validador', 'movimientos.areaOrigen', 'movimientos.areaDestino']);
+
+        return response()->json(['item' => $item]);
+    }
+
+    public function update(Request $request, Item $item): JsonResponse
+    {
+        $validated = $request->validate([
+            'categoria_id' => ['sometimes', Rule::exists('categorias', 'id')->where(fn ($q) => $q->where('es_transitoria', false))],
+            'estado_conservacion' => ['sometimes', Rule::in(['Muy bueno', 'Bueno', 'Regular', 'Malo'])],
+            'cantidad' => 'sometimes|integer|min:1',
+            'valores' => 'nullable|array',
+        ]);
+
+        $user = $request->user();
+        $antes = $item->only(['categoria_id', 'estado_conservacion', 'cantidad', 'valores_dinamicos']);
+
+        $item->update($validated);
+
+        Auditoria::create([
+            'user_id' => $user->id,
+            'accion' => 'editar',
+            'entidad' => 'item',
+            'entidad_id' => $item->id,
+            'detalle' => ['antes' => $antes, 'despues' => $item->only(['categoria_id', 'estado_conservacion', 'cantidad', 'valores_dinamicos'])],
+        ]);
+
+        $item->load(['categoria', 'responsable', 'area']);
+
+        return response()->json(['item' => $item]);
+    }
+
+    private function generarCodigoUnico(): string
+    {
+        $ultimo = Item::orderByDesc('codigo_unico')->value('codigo_unico');
+        $nro = 1;
+
+        if ($ultimo && preg_match('/(\d+)$/', $ultimo, $m)) {
+            $nro = (int) $m[1] + 1;
+        }
+
+        return 'SAGI-' . str_pad((string) $nro, 6, '0', STR_PAD_LEFT);
     }
 }

@@ -8,6 +8,7 @@ const menuItems = [
   { to: '/movimientos', label: 'Movimientos', icon: '🔄', roles: ['admin', 'jefe', 'carga'] },
   { to: '/reportes', label: 'Reportes', icon: '📈', roles: ['admin', 'jefe'] },
   { to: '/alertas', label: 'Alertas', icon: '🔔', roles: ['admin', 'jefe', 'carga'] },
+  { to: '/categorias', label: 'Categorías', icon: '⚙️', roles: ['admin'] },
 ]
 
 function hasAccess(user, roles) {

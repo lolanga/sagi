@@ -1,21 +1,62 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import Modal from '../components/Modal'
+import ItemForm from '../components/ItemForm'
 import '../styles/inventario.css'
 
 export default function Inventario() {
   const { user } = useAuth()
   const [items, setItems] = useState([])
+  const [categorias, setCategorias] = useState([])
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [categoriaId, setCategoriaId] = useState('')
+  const [showAlta, setShowAlta] = useState(false)
+  const [editando, setEditando] = useState(null)
+
+  const puedeEditar = ['admin', 'jefe', 'carga'].includes(user?.rol?.slug)
+
+  const cargarItems = useCallback(() => {
+    const params = new URLSearchParams()
+    if (search) params.set('search', search)
+    if (categoriaId) params.set('categoria_id', categoriaId)
+    setLoading(true)
+    api
+      .get(`/items?${params.toString()}`)
+      .then((res) => {
+        setItems(res.data.data || [])
+        setTotal(res.data.total || 0)
+      })
+      .catch(() => {
+        setItems([])
+        setTotal(0)
+      })
+      .finally(() => setLoading(false))
+  }, [search, categoriaId])
 
   useEffect(() => {
-    api
-      .get('/items')
-      .then((res) => setItems(res.data.data || []))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false))
+    api.get('/categorias').then((res) => setCategorias(res.data.categorias || []))
   }, [])
+
+  useEffect(() => {
+    const timeout = setTimeout(cargarItems, 300)
+    return () => clearTimeout(timeout)
+  }, [cargarItems])
+
+  const formatValores = (item) => {
+    const campos = categorias
+      .find((c) => c.id === item.categoria_id)
+      ?.campos_dinamicos?.filter((c) => c.activo)
+    if (!campos || campos.length === 0) return '-'
+    return campos
+      .slice(0, 2)
+      .map((c) => item.valores_dinamicos?.[String(c.id)] ?? '')
+      .filter(Boolean)
+      .join(' · ') || '-'
+  }
 
   return (
     <div className="layout">
@@ -35,18 +76,48 @@ export default function Inventario() {
               {user?.name} · {user?.rol?.nombre} · {user?.area?.nombre}
             </p>
           </div>
+          <div className="topbar-actions">
+            {user?.rol?.slug === 'admin' && (
+              <Link to="/categorias" className="btn btn-secondary">⚙️ Categorías</Link>
+            )}
+            {puedeEditar && (
+              <button className="btn btn-primary" onClick={() => setShowAlta(true)}>
+                + Registrar alta
+              </button>
+            )}
+          </div>
         </header>
 
         <section className="content">
+          <div className="filters-bar">
+            <input
+              className="search-input"
+              type="text"
+              placeholder="Buscar por código único o nombre..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <select
+              className="filter-select"
+              value={categoriaId}
+              onChange={(e) => setCategoriaId(e.target.value)}
+            >
+              <option value="">Todas las categorías</option>
+              {categorias
+                .filter((c) => !c.es_transitoria)
+                .map((c) => (
+                  <option key={c.id} value={c.id}>{c.codigo} – {c.nombre}</option>
+                ))}
+            </select>
+            <span className="result-count">{total} ítems</span>
+          </div>
+
           {loading ? (
-            <p>Cargando...</p>
+            <p className="muted">Cargando...</p>
           ) : items.length === 0 ? (
             <div className="placeholder">
-              <h2>Módulo en construcción</h2>
-              <p>
-                El registro de ítems, el formulario dinámico por categoría y la búsqueda rápida
-                se implementarán en la Fase 2.
-              </p>
+              <h2>Sin resultados</h2>
+              <p>No hay ítems que coincidan con la búsqueda. Registra un alta para comenzar.</p>
             </div>
           ) : (
             <table className="table">
@@ -54,19 +125,29 @@ export default function Inventario() {
                 <tr>
                   <th>Código</th>
                   <th>Categoría</th>
-                  <th>Responsable</th>
+                  <th>Detalle</th>
                   <th>Estado</th>
-                  <th>Cantidad</th>
+                  <th>Cant.</th>
+                  <th>Responsable</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {items.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.codigo_unico}</td>
-                    <td>{item.categoria?.nombre}</td>
-                    <td>{item.responsable?.name}</td>
-                    <td>{item.estado_conservacion}</td>
+                    <td><strong>{item.codigo_unico}</strong></td>
+                    <td>{item.categoria?.codigo}</td>
+                    <td>{formatValores(item)}</td>
+                    <td>
+                      <span className={`badge badge-${item.estado}`}>{item.estado_conservacion}</span>
+                    </td>
                     <td>{item.cantidad}</td>
+                    <td>{item.responsable?.name}</td>
+                    <td>
+                      {puedeEditar && (
+                        <button className="btn-link" onClick={() => setEditando(item)}>Editar</button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -74,6 +155,31 @@ export default function Inventario() {
           )}
         </section>
       </main>
+
+      <Modal open={showAlta} title="Registrar alta de ítem" onClose={() => setShowAlta(false)} wide>
+        <ItemForm
+          categorias={categorias}
+          onSaved={() => {
+            setShowAlta(false)
+            cargarItems()
+          }}
+          onCancel={() => setShowAlta(false)}
+        />
+      </Modal>
+
+      <Modal open={Boolean(editando)} title={`Editar ítem ${editando?.codigo_unico ?? ''}`} onClose={() => setEditando(null)} wide>
+        {editando && (
+          <ItemForm
+            categorias={categorias}
+            item={editando}
+            onSaved={() => {
+              setEditando(null)
+              cargarItems()
+            }}
+            onCancel={() => setEditando(null)}
+          />
+        )}
+      </Modal>
     </div>
   )
 }

@@ -1,19 +1,65 @@
-.inventario-actions {
+.topbar-actions {
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
 }
 
-.search-input {
+.filters-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-select {
   padding: 9px 12px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   font-size: 14px;
-  width: 100%;
-  max-width: 340px;
 }
 
-.search-input:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: -1px;
+.result-count {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-activo {
+  background-color: #e3f2e7;
+  color: var(--color-success);
+}
+
+.badge-pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.badge-baja {
+  background-color: #fdecea;
+  color: var(--color-danger);
+}
+
+.badge-Muy-bueno { background-color: #e3f2e7; color: var(--color-success); }
+.badge-Bueno { background-color: #e7f0fb; color: var(--color-primary); }
+.badge-Regular { background-color: #fff3cd; color: #856404; }
+.badge-Malo { background-color: #fdecea; color: var(--color-danger); }
+
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 2px 4px;
+}
+
+.btn-link-danger {
+  color: var(--color-danger);
 }
