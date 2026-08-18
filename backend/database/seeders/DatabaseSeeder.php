@@ -6,6 +6,7 @@ use App\Models\Area;
 use App\Models\CampoDinamico;
 use App\Models\Categoria;
 use App\Models\Rol;
+use App\Models\TipoItem;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -16,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->seedRoles();
         $this->seedAreas();
         $this->seedCategorias();
+        $this->seedTiposItems();
         $this->seedUsuarios();
     }
 
@@ -146,6 +148,32 @@ class DatabaseSeeder extends Seeder
                         'activo' => true,
                         'orden' => $orden,
                     ]
+                );
+            }
+        }
+    }
+
+    private function seedTiposItems(): void
+    {
+        $tipos = [
+            'A1' => ['Mesa', 'Silla', 'Sillón', 'Estantería', 'Escritorio', 'Archivador', 'Útil'],
+            'A2' => ['Ventilador', 'Aire acondicionado', 'Heladera', 'Microondas', 'Plancha', 'Termo eléctrico'],
+            'A3' => ['Radio', 'Handy', 'Teléfono', 'PC de escritorio', 'Notebook', 'Monitor', 'Impresora', 'Cámara', 'Router', 'Switch'],
+            'A4' => ['Pistola', 'Revólver', 'Escopeta', 'Munición 9mm', 'Munición .38', 'Chaleco antibalas', 'Casco', 'Escudo', 'Máscara antigás'],
+            'A5' => ['Taladro', 'Amoladora', 'Soldadora', 'Compresora', 'Generador', 'Juego de herramientas'],
+            'A6' => ['Auto', 'Camioneta', 'Moto', 'Camión', 'Bicicleta'],
+        ];
+
+        foreach ($tipos as $codigo => $nombres) {
+            $categoria = Categoria::where('codigo', $codigo)->first();
+            if (!$categoria) {
+                continue;
+            }
+
+            foreach ($nombres as $orden => $nombre) {
+                TipoItem::firstOrCreate(
+                    ['categoria_id' => $categoria->id, 'nombre' => $nombre],
+                    ['orden' => $orden]
                 );
             }
         }

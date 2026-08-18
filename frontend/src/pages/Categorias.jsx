@@ -11,6 +11,7 @@ export default function Categorias() {
   const [categorias, setCategorias] = useState([])
   const [selected, setSelected] = useState(null)
   const [nuevoCampo, setNuevoCampo] = useState({ nombre: '', tipo: 'texto', opciones: '' })
+  const [nuevoTipo, setNuevoTipo] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -58,6 +59,53 @@ export default function Categorias() {
     await api.delete(`/campos-dinamicos/${campo.id}`)
     cargar()
   }
+
+  const moverCampo = async (campo, direccion) => {
+    try {
+      await api.post(`/campos-dinamicos/${campo.id}/mover`, { direccion })
+      cargar()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al reordenar campo')
+    }
+  }
+
+  const agregarTipo = async (e) => {
+    e.preventDefault()
+    setError('')
+    if (!selected || !nuevoTipo.trim()) return
+
+    try {
+      await api.post(`/categorias/${selected.id}/tipos`, { nombre: nuevoTipo.trim() })
+      setNuevoTipo('')
+      cargar()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al agregar elemento')
+    }
+  }
+
+  const renombrarTipo = async (tipo) => {
+    const nombre = window.prompt('Nuevo nombre del elemento:', tipo.nombre)
+    if (!nombre || nombre.trim() === tipo.nombre) return
+    await api.put(`/tipos-item/${tipo.id}`, { nombre: nombre.trim() })
+    cargar()
+  }
+
+  const eliminarTipo = async (tipo) => {
+    if (!window.confirm(`¿Eliminar el elemento "${tipo.nombre}"?`)) return
+    await api.delete(`/tipos-item/${tipo.id}`)
+    cargar()
+  }
+
+  const moverTipo = async (tipo, direccion) => {
+    try {
+      await api.post(`/tipos-item/${tipo.id}/mover`, { direccion })
+      cargar()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al reordenar elemento')
+    }
+  }
+
+  const ordenar = (lista) => [...(lista || [])].sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
 
   return (
     <div className="layout">
@@ -131,12 +179,13 @@ export default function Categorias() {
 
                   {error && <p className="form-error">{error}</p>}
 
-                  {selected.campos_dinamicos?.length === 0 ? (
+                  {ordenar(selected.campos_dinamicos).length === 0 ? (
                     <p className="muted">Sin campos definidos.</p>
                   ) : (
                     <table className="table">
                       <thead>
                         <tr>
+                          <th>#</th>
                           <th>Campo</th>
                           <th>Tipo</th>
                           <th>Requerido</th>
@@ -145,25 +194,86 @@ export default function Categorias() {
                         </tr>
                       </thead>
                       <tbody>
-                        {selected.campos_dinamicos.map((campo) => (
-                          <tr key={campo.id} className={campo.activo ? '' : 'row-inactivo'}>
-                            <td>{campo.nombre}</td>
-                            <td>{campo.tipo}{campo.opciones?.length ? ` (${campo.opciones.join(', ')})` : ''}</td>
-                            <td>{campo.requerido ? 'Sí' : 'No'}</td>
-                            <td>{campo.activo ? 'Sí' : 'No'}</td>
-                            <td className="row-actions">
-                              <button className="btn-link" onClick={() => toggleCampo(campo)}>
-                                {campo.activo ? 'Desactivar' : 'Activar'}
-                              </button>
-                              <button className="btn-link btn-link-danger" onClick={() => eliminarCampo(campo)}>
-                                Eliminar
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
+                        {ordenar(selected.campos_dinamicos).map((campo, i) => {
+                          const total = selected.campos_dinamicos.length
+                          return (
+                            <tr key={campo.id} className={campo.activo ? '' : 'row-inactivo'}>
+                              <td className="orden-col">
+                                <div className="orden-buttons">
+                                  <button className="btn-icon" disabled={i === 0} onClick={() => moverCampo(campo, 'up')} title="Subir">↑</button>
+                                  <button className="btn-icon" disabled={i === total - 1} onClick={() => moverCampo(campo, 'down')} title="Bajar">↓</button>
+                                </div>
+                              </td>
+                              <td>{campo.nombre}</td>
+                              <td>{campo.tipo}{campo.opciones?.length ? ` (${campo.opciones.join(', ')})` : ''}</td>
+                              <td>{campo.requerido ? 'Sí' : 'No'}</td>
+                              <td>{campo.activo ? 'Sí' : 'No'}</td>
+                              <td className="row-actions">
+                                <button className="btn-link" onClick={() => toggleCampo(campo)}>
+                                  {campo.activo ? 'Desactivar' : 'Activar'}
+                                </button>
+                                <button className="btn-link btn-link-danger" onClick={() => eliminarCampo(campo)}>
+                                  Eliminar
+                                </button>
+                              </td>
+                            </tr>
+                          )
+                        })}
                       </tbody>
                     </table>
                   )}
+
+                  <div className="elementos-section">
+                    <h4>Elementos de la categoría</h4>
+                    <form onSubmit={agregarTipo} className="nuevo-campo-form">
+                      <input
+                        type="text"
+                        placeholder="Nombre del elemento (ej. Escritorio, Silla)"
+                        value={nuevoTipo}
+                        onChange={(e) => setNuevoTipo(e.target.value)}
+                        required
+                      />
+                      <button type="submit" className="btn btn-primary">+ Agregar</button>
+                    </form>
+
+                    {ordenar(selected.tipos_items).length === 0 ? (
+                      <p className="muted">Sin elementos definidos.</p>
+                    ) : (
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Elemento</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {ordenar(selected.tipos_items).map((tipo, i) => {
+                            const total = selected.tipos_items.length
+                            return (
+                              <tr key={tipo.id}>
+                                <td className="orden-col">
+                                  <div className="orden-buttons">
+                                    <button className="btn-icon" disabled={i === 0} onClick={() => moverTipo(tipo, 'up')} title="Subir">↑</button>
+                                    <button className="btn-icon" disabled={i === total - 1} onClick={() => moverTipo(tipo, 'down')} title="Bajar">↓</button>
+                                  </div>
+                                </td>
+                                <td>{tipo.nombre}</td>
+                                <td className="row-actions">
+                                  <button className="btn-link" onClick={() => renombrarTipo(tipo)}>
+                                    Renombrar
+                                  </button>
+                                  <button className="btn-link btn-link-danger" onClick={() => eliminarTipo(tipo)}>
+                                    Eliminar
+                                  </button>
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

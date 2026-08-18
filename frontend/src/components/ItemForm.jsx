@@ -6,11 +6,13 @@ const estadosConservacion = ['Muy bueno', 'Bueno', 'Regular', 'Malo']
 
 export default function ItemForm({ categorias, item, onSaved, onCancel }) {
   const [categoriaId, setCategoriaId] = useState(item?.categoria_id ?? '')
+  const [tipoItemId, setTipoItemId] = useState(item?.tipo_item_id ?? '')
   const [estadoConservacion, setEstadoConservacion] = useState(item?.estado_conservacion ?? 'Muy bueno')
   const [cantidad, setCantidad] = useState(item?.cantidad ?? 1)
   const [motivoAlta, setMotivoAlta] = useState('')
   const [valores, setValores] = useState({})
   const [campos, setCampos] = useState([])
+  const [tipos, setTipos] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -36,6 +38,11 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
       })
       .catch(() => setCampos([]))
       .finally(() => setLoading(false))
+
+    api
+      .get(`/categorias/${categoriaId}/tipos`)
+      .then((res) => setTipos(res.data.tipos || []))
+      .catch(() => setTipos([]))
   }, [categoriaId])
 
   const renderCampo = (campo) => {
@@ -104,6 +111,7 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
     try {
       const payload = {
         categoria_id: Number(categoriaId),
+        tipo_item_id: tipoItemId ? Number(tipoItemId) : null,
         estado_conservacion: estadoConservacion,
         cantidad: Number(cantidad),
         valores,
@@ -164,6 +172,22 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
             ))}
           </select>
         </div>
+
+        {tipos.length > 0 && (
+          <div className="field">
+            <label htmlFor="tipo-item">Elemento</label>
+            <select
+              id="tipo-item"
+              value={tipoItemId}
+              onChange={(e) => setTipoItemId(e.target.value)}
+            >
+              <option value="">Seleccionar elemento...</option>
+              {tipos.map((t) => (
+                <option key={t.id} value={t.id}>{t.nombre}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="field">
           <label htmlFor="cantidad">Cantidad *</label>

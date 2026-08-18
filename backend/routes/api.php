@@ -17,12 +17,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/items/{item}', [ItemController::class, 'show']);
     Route::put('/items/{item}', [ItemController::class, 'update'])->middleware('rol:admin,jefe,carga');
 
-    // Categorías y campos dinámicos
+    // Categorías, campos dinámicos y elementos
     Route::get('/categorias', [CategoriaController::class, 'index']);
     Route::get('/categorias/{categoria}/campos', [CategoriaController::class, 'campos']);
+    Route::get('/categorias/{categoria}/tipos', [CategoriaController::class, 'tipos']);
     Route::post('/categorias/{categoria}/campos', [CategoriaController::class, 'storeCampo'])->middleware('rol:admin');
     Route::put('/campos-dinamicos/{campo}', [CategoriaController::class, 'updateCampo'])->middleware('rol:admin');
     Route::delete('/campos-dinamicos/{campo}', [CategoriaController::class, 'destroyCampo'])->middleware('rol:admin');
+    Route::post('/campos-dinamicos/{campo}/mover', [CategoriaController::class, 'moverCampo'])->middleware('rol:admin');
+    Route::post('/categorias/{categoria}/tipos', [CategoriaController::class, 'storeTipo'])->middleware('rol:admin');
+    Route::put('/tipos-item/{tipo}', [CategoriaController::class, 'updateTipo'])->middleware('rol:admin');
+    Route::delete('/tipos-item/{tipo}', [CategoriaController::class, 'destroyTipo'])->middleware('rol:admin');
+    Route::post('/tipos-item/{tipo}/mover', [CategoriaController::class, 'moverTipo'])->middleware('rol:admin');
     Route::post('/categorias', [CategoriaController::class, 'store'])->middleware('rol:admin');
     Route::put('/categorias/{categoria}', [CategoriaController::class, 'update'])->middleware('rol:admin');
     Route::delete('/categorias/{categoria}', [CategoriaController::class, 'destroy'])->middleware('rol:admin');

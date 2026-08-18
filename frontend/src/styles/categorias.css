@@ -70,6 +70,47 @@
   gap: 8px;
 }
 
+.orden-col {
+  width: 60px;
+}
+
+.orden-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-icon {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background-color: var(--color-white);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.btn-icon:hover:not(:disabled) {
+  background-color: var(--color-secondary);
+}
+
+.btn-icon:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.elementos-section {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.elementos-section h4 {
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
 @media (max-width: 900px) {
   .categorias-grid {
     grid-template-columns: 1fr;

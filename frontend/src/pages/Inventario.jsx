@@ -50,12 +50,14 @@ export default function Inventario() {
     const campos = categorias
       .find((c) => c.id === item.categoria_id)
       ?.campos_dinamicos?.filter((c) => c.activo)
-    if (!campos || campos.length === 0) return '-'
-    return campos
-      .slice(0, 2)
-      .map((c) => item.valores_dinamicos?.[String(c.id)] ?? '')
-      .filter(Boolean)
-      .join(' · ') || '-'
+    const detalles = campos
+      ? campos
+          .slice(0, 2)
+          .map((c) => item.valores_dinamicos?.[String(c.id)] ?? '')
+          .filter(Boolean)
+      : []
+    if (item.tipo_item?.nombre) detalles.unshift(item.tipo_item.nombre)
+    return detalles.join(' · ') || '-'
   }
 
   return (

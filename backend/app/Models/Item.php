@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Item extends Model
 {
     protected $fillable = [
-        'codigo_unico', 'categoria_id', 'responsable_id', 'area_id',
+        'codigo_unico', 'categoria_id', 'tipo_item_id', 'responsable_id', 'area_id',
         'estado_conservacion', 'cantidad', 'fecha_alta', 'valores_dinamicos', 'estado',
     ];
 
@@ -19,6 +19,11 @@ class Item extends Model
     public function categoria()
     {
         return $this->belongsTo(Categoria::class);
+    }
+
+    public function tipoItem()
+    {
+        return $this->belongsTo(TipoItem::class, 'tipo_item_id');
     }
 
     public function responsable()

@@ -17,6 +17,11 @@ class Categoria extends Model
         return $this->hasMany(CampoDinamico::class)->orderBy('orden');
     }
 
+    public function tiposItems()
+    {
+        return $this->hasMany(TipoItem::class)->orderBy('orden');
+    }
+
     public function items()
     {
         return $this->hasMany(Item::class);

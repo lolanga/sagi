@@ -15,7 +15,7 @@ class ItemController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Item::with(['categoria', 'responsable', 'area'])
+        $query = Item::with(['categoria', 'tipoItem', 'responsable', 'area'])
             ->orderByDesc('created_at');
 
         if ($request->filled('search')) {
@@ -51,6 +51,7 @@ class ItemController extends Controller
     {
         $validated = $request->validate([
             'categoria_id' => ['required', Rule::exists('categorias', 'id')->where(fn ($q) => $q->where('es_transitoria', false))],
+            'tipo_item_id' => ['nullable', 'integer', Rule::exists('tipos_items', 'id')->where(fn ($q) => $q->where('categoria_id', $request->integer('categoria_id')))],
             'estado_conservacion' => ['required', Rule::in(['Muy bueno', 'Bueno', 'Regular', 'Malo'])],
             'cantidad' => 'required|integer|min:1',
             'motivo_alta' => 'required|string',
@@ -79,6 +80,7 @@ class ItemController extends Controller
             $item = Item::create([
                 'codigo_unico' => $codigo,
                 'categoria_id' => Categoria::where('codigo', 'A7')->value('id'),
+                'tipo_item_id' => $validated['tipo_item_id'] ?? null,
                 'responsable_id' => $user->id,
                 'area_id' => $user->area_id,
                 'estado_conservacion' => $validated['estado_conservacion'],
@@ -112,14 +114,14 @@ class ItemController extends Controller
             ]);
         });
 
-        $item->load(['categoria', 'responsable', 'area']);
+        $item->load(['categoria', 'tipoItem', 'responsable', 'area']);
 
         return response()->json(['item' => $item], 201);
     }
 
     public function show(Item $item): JsonResponse
     {
-        $item->load(['categoria', 'responsable', 'area', 'movimientos.solicitante', 'movimientos.validador', 'movimientos.areaOrigen', 'movimientos.areaDestino']);
+        $item->load(['categoria', 'tipoItem', 'responsable', 'area', 'movimientos.solicitante', 'movimientos.validador', 'movimientos.areaOrigen', 'movimientos.areaDestino']);
 
         return response()->json(['item' => $item]);
     }
@@ -128,6 +130,7 @@ class ItemController extends Controller
     {
         $validated = $request->validate([
             'categoria_id' => ['sometimes', Rule::exists('categorias', 'id')->where(fn ($q) => $q->where('es_transitoria', false))],
+            'tipo_item_id' => ['nullable', 'integer', Rule::exists('tipos_items', 'id')->where(fn ($q) => $q->where('categoria_id', $request->input('categoria_id', $item->categoria_id)))],
             'estado_conservacion' => ['sometimes', Rule::in(['Muy bueno', 'Bueno', 'Regular', 'Malo'])],
             'cantidad' => 'sometimes|integer|min:1',
             'valores' => 'nullable|array',
@@ -146,7 +149,7 @@ class ItemController extends Controller
             'detalle' => ['antes' => $antes, 'despues' => $item->only(['categoria_id', 'estado_conservacion', 'cantidad', 'valores_dinamicos'])],
         ]);
 
-        $item->load(['categoria', 'responsable', 'area']);
+        $item->load(['categoria', 'tipoItem', 'responsable', 'area']);
 
         return response()->json(['item' => $item]);
     }
