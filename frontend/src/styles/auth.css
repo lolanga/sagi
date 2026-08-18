@@ -57,6 +57,8 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   font-size: 14px;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 .field input:focus {
@@ -65,7 +67,7 @@
 }
 
 .auth-error {
-  background-color: #fdecea;
+  background-color: rgba(239, 83, 80, 0.15);
   color: var(--color-danger);
   padding: 10px 12px;
   border-radius: var(--radius);

@@ -112,9 +112,9 @@ export default function Categorias() {
       <aside className="sidebar">
         <div className="sidebar-logo">SAGI</div>
         <nav className="sidebar-nav">
-          <Link to="/" className="nav-item"><span className="nav-icon">📊</span>Dashboard</Link>
-          <Link to="/inventario" className="nav-item"><span className="nav-icon">📦</span>Inventario</Link>
-          <Link to="/categorias" className="nav-item active"><span className="nav-icon">⚙️</span>Categorías</Link>
+          <Link to="/" className="nav-item">Dashboard</Link>
+          <Link to="/inventario" className="nav-item">Inventario</Link>
+          <Link to="/categorias" className="nav-item active">Categorías</Link>
         </nav>
       </aside>
 
@@ -153,7 +153,7 @@ export default function Categorias() {
                   <form onSubmit={agregarCampo} className="nuevo-campo-form">
                     <input
                       type="text"
-                      placeholder="Nombre del campo"
+                      placeholder="Ej. Marca, Material, Cantidad"
                       value={nuevoCampo.nombre}
                       onChange={(e) => setNuevoCampo({ ...nuevoCampo, nombre: e.target.value })}
                       required
@@ -169,7 +169,7 @@ export default function Categorias() {
                     {nuevoCampo.tipo === 'select' && (
                       <input
                         type="text"
-                        placeholder="Opciones separadas por coma"
+                        placeholder="Ej. Rojo, Azul, Verde"
                         value={nuevoCampo.opciones}
                         onChange={(e) => setNuevoCampo({ ...nuevoCampo, opciones: e.target.value })}
                       />
@@ -228,7 +228,7 @@ export default function Categorias() {
                     <form onSubmit={agregarTipo} className="nuevo-campo-form">
                       <input
                         type="text"
-                        placeholder="Nombre del elemento (ej. Escritorio, Silla)"
+                        placeholder="Ej. Escritorio, Silla, Teclado"
                         value={nuevoTipo}
                         onChange={(e) => setNuevoTipo(e.target.value)}
                         required

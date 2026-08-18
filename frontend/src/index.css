@@ -1,17 +1,17 @@
 :root {
-  --color-primary: #1a4d8f;
-  --color-primary-dark: #123a6b;
-  --color-secondary: #e8edf4;
-  --color-accent: #d4a017;
-  --color-success: #2e7d32;
-  --color-danger: #c62828;
-  --color-text: #212529;
-  --color-muted: #6c757d;
-  --color-border: #dde3ea;
-  --color-bg: #f4f6f9;
-  --color-white: #ffffff;
+  --color-primary: #4a8fd4;
+  --color-primary-dark: #3568a6;
+  --color-secondary: #2a3040;
+  --color-accent: #f57c00;
+  --color-success: #4caf50;
+  --color-danger: #ef5350;
+  --color-text: #e8ecf1;
+  --color-muted: #9aa4b2;
+  --color-border: #3a4150;
+  --color-bg: #1a1f2b;
+  --color-white: #232937;
   --radius: 8px;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 * {
@@ -116,10 +116,6 @@ button {
 .nav-item.active {
   background-color: rgba(255, 255, 255, 0.15);
   color: var(--color-white);
-}
-
-.nav-icon {
-  font-size: 18px;
 }
 
 .main {

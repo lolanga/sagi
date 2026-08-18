@@ -10,14 +10,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
   box-shadow: var(--shadow);
-}
-
-.stat-icon {
-  font-size: 32px;
 }
 
 .stat-card h2 {

@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom'
 import '../styles/dashboard.css'
 
 const menuItems = [
-  { to: '/', label: 'Dashboard', icon: '📊', roles: ['admin', 'jefe', 'carga', 'consulta'] },
-  { to: '/inventario', label: 'Inventario', icon: '📦', roles: ['admin', 'jefe', 'carga', 'consulta'] },
-  { to: '/movimientos', label: 'Movimientos', icon: '🔄', roles: ['admin', 'jefe', 'carga'] },
-  { to: '/reportes', label: 'Reportes', icon: '📈', roles: ['admin', 'jefe'] },
-  { to: '/alertas', label: 'Alertas', icon: '🔔', roles: ['admin', 'jefe', 'carga'] },
-  { to: '/categorias', label: 'Categorías', icon: '⚙️', roles: ['admin'] },
+  { to: '/', label: 'Dashboard', roles: ['admin', 'jefe', 'carga', 'consulta'] },
+  { to: '/inventario', label: 'Inventario', roles: ['admin', 'jefe', 'carga', 'consulta'] },
+  { to: '/movimientos', label: 'Movimientos', roles: ['admin', 'jefe', 'carga'] },
+  { to: '/reportes', label: 'Reportes', roles: ['admin', 'jefe'] },
+  { to: '/alertas', label: 'Alertas', roles: ['admin', 'jefe', 'carga'] },
+  { to: '/categorias', label: 'Categorías', roles: ['admin'] },
 ]
 
 function hasAccess(user, roles) {
@@ -27,7 +27,6 @@ export default function Dashboard() {
             .filter((item) => hasAccess(user, item.roles))
             .map((item) => (
               <Link key={item.to} to={item.to} className="nav-item">
-                <span className="nav-icon">{item.icon}</span>
                 {item.label}
               </Link>
             ))}
@@ -50,28 +49,24 @@ export default function Dashboard() {
         <section className="content">
           <div className="cards-grid">
             <div className="stat-card">
-              <span className="stat-icon">📦</span>
               <div>
                 <h2>0</h2>
                 <p>Total de ítems</p>
               </div>
             </div>
             <div className="stat-card">
-              <span className="stat-icon">🟢</span>
               <div>
                 <h2>0</h2>
                 <p>Ítems activos</p>
               </div>
             </div>
             <div className="stat-card">
-              <span className="stat-icon">🔄</span>
               <div>
                 <h2>0</h2>
                 <p>Movimientos pendientes</p>
               </div>
             </div>
             <div className="stat-card">
-              <span className="stat-icon">🔔</span>
               <div>
                 <h2>0</h2>
                 <p>Alertas activas</p>

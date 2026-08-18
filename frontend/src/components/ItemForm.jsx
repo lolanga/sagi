@@ -48,10 +48,12 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
   const renderCampo = (campo) => {
     const key = String(campo.id)
     const value = valores[key] ?? ''
+    const placeholder = campo.placeholder
     const base = {
       id: `campo-${campo.id}`,
       required: campo.requerido,
       value,
+      placeholder,
       onChange: (e) => setValores((v) => ({ ...v, [key]: e.target.value })),
     }
 
@@ -59,7 +61,7 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
       return (
         <div className="field" key={campo.id}>
           <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
-          <textarea {...base} rows={3} />
+          <textarea {...base} rows={3} placeholder={placeholder || `Ej. descripción de ${campo.nombre.toLowerCase()}`} />
         </div>
       )
     }
@@ -69,7 +71,7 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
         <div className="field" key={campo.id}>
           <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
           <select {...base}>
-            <option value="">Seleccionar...</option>
+            <option value="">{placeholder || 'Seleccionar...'}</option>
             {(campo.opciones || []).map((op) => (
               <option key={op} value={op}>{op}</option>
             ))}
@@ -82,7 +84,7 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
       return (
         <div className="field" key={campo.id}>
           <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
-          <input {...base} type="number" step="any" />
+          <input {...base} type="number" step="any" placeholder={placeholder || 'Ej. 1'} />
         </div>
       )
     }
@@ -99,7 +101,7 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
     return (
       <div className="field" key={campo.id}>
         <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
-        <input {...base} type="text" />
+        <input {...base} type="text" placeholder={placeholder || `Ej. ${campo.nombre.toLowerCase()}`} />
       </div>
     )
   }
@@ -197,6 +199,7 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
             min="1"
             value={cantidad}
             onChange={(e) => setCantidad(e.target.value)}
+            placeholder="Ej. 1"
             required
           />
         </div>

@@ -65,8 +65,8 @@ export default function Inventario() {
       <aside className="sidebar">
         <div className="sidebar-logo">SAGI</div>
         <nav className="sidebar-nav">
-          <Link to="/" className="nav-item"><span className="nav-icon">📊</span>Dashboard</Link>
-          <Link to="/inventario" className="nav-item active"><span className="nav-icon">📦</span>Inventario</Link>
+          <Link to="/" className="nav-item">Dashboard</Link>
+          <Link to="/inventario" className="nav-item active">Inventario</Link>
         </nav>
       </aside>
 
@@ -80,7 +80,7 @@ export default function Inventario() {
           </div>
           <div className="topbar-actions">
             {user?.rol?.slug === 'admin' && (
-              <Link to="/categorias" className="btn btn-secondary">⚙️ Categorías</Link>
+              <Link to="/categorias" className="btn btn-secondary">Categorías</Link>
             )}
             {puedeEditar && (
               <button className="btn btn-primary" onClick={() => setShowAlta(true)}>
@@ -95,7 +95,7 @@ export default function Inventario() {
             <input
               className="search-input"
               type="text"
-              placeholder="Buscar por código único o nombre..."
+              placeholder="Ej. SAGI-000001 o escritorio"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -141,7 +141,7 @@ export default function Inventario() {
                     <td>{item.categoria?.codigo}</td>
                     <td>{formatValores(item)}</td>
                     <td>
-                      <span className={`badge badge-${item.estado}`}>{item.estado_conservacion}</span>
+                      <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
                     </td>
                     <td>{item.cantidad}</td>
                     <td>{item.responsable?.name}</td>

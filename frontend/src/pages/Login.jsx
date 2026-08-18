@@ -40,7 +40,7 @@ export default function Login() {
               type="text"
               value={dni}
               onChange={(e) => setDni(e.target.value)}
-              placeholder="Ingrese su DNI"
+              placeholder="Ej. 10000001 o admin"
               required
             />
           </div>
@@ -52,7 +52,7 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Ingrese su contraseña"
+              placeholder="Ej. Admin1234"
               required
             />
           </div>

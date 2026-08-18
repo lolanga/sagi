@@ -24,6 +24,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background-color: var(--color-white);
+  color: var(--color-text);
   text-align: left;
   font-size: 13px;
 }
@@ -59,6 +60,8 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   font-size: 14px;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 .row-inactivo {
@@ -86,6 +89,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   background-color: var(--color-white);
+  color: var(--color-text);
   font-size: 13px;
   line-height: 1;
   cursor: pointer;

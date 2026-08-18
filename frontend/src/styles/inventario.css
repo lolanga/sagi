@@ -16,6 +16,19 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   font-size: 14px;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+.search-input {
+  padding: 9px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  flex: 1;
+  min-width: 200px;
 }
 
 .result-count {
@@ -32,24 +45,24 @@
 }
 
 .badge-activo {
-  background-color: #e3f2e7;
+  background-color: rgba(76, 175, 80, 0.18);
   color: var(--color-success);
 }
 
 .badge-pendiente {
-  background-color: #fff3cd;
-  color: #856404;
+  background-color: rgba(212, 160, 23, 0.18);
+  color: var(--color-accent);
 }
 
 .badge-baja {
-  background-color: #fdecea;
+  background-color: rgba(239, 83, 80, 0.18);
   color: var(--color-danger);
 }
 
-.badge-Muy-bueno { background-color: #e3f2e7; color: var(--color-success); }
-.badge-Bueno { background-color: #e7f0fb; color: var(--color-primary); }
-.badge-Regular { background-color: #fff3cd; color: #856404; }
-.badge-Malo { background-color: #fdecea; color: var(--color-danger); }
+.badge-estado-Muy-bueno { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
+.badge-estado-Bueno { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
+.badge-estado-Regular { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
+.badge-estado-Malo { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
 
 .btn-link {
   background: none;
