@@ -1,0 +1,198 @@
+:root {
+  --color-primary: #1a4d8f;
+  --color-primary-dark: #123a6b;
+  --color-secondary: #e8edf4;
+  --color-accent: #d4a017;
+  --color-success: #2e7d32;
+  --color-danger: #c62828;
+  --color-text: #212529;
+  --color-muted: #6c757d;
+  --color-border: #dde3ea;
+  --color-bg: #f4f6f9;
+  --color-white: #ffffff;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Botones */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.15s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.btn-secondary {
+  background-color: var(--color-white);
+  color: var(--color-primary);
+  border-color: var(--color-border);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-secondary);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 230px;
+  background-color: var(--color-primary-dark);
+  color: var(--color-white);
+  padding: 16px 0;
+  flex-shrink: 0;
+}
+
+.sidebar-logo {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-align: center;
+  padding: 12px 0 20px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-item {
+  color: rgba(255, 255, 255, 0.85);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: var(--color-white);
+}
+
+.nav-icon {
+  font-size: 18px;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background-color: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.topbar h1 {
+  font-size: 20px;
+}
+
+.topbar-user {
+  color: var(--color-muted);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.content {
+  padding: 24px;
+  flex: 1;
+}
+
+.placeholder {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.placeholder h2 {
+  margin-bottom: 10px;
+}
+
+.placeholder p {
+  color: var(--color-muted);
+  margin-bottom: 8px;
+}
+
+/* Tablas */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.table th,
+.table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 14px;
+}
+
+.table th {
+  background-color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.table tbody tr:hover {
+  background-color: var(--color-bg);
+}

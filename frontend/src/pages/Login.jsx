@@ -1,0 +1,77 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import '../styles/auth.css'
+
+export default function Login() {
+  const [dni, setDni] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { login } = useAuth()
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      await login(dni, password)
+      navigate('/')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al iniciar sesión')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-logo">SAGI</div>
+        <h1 className="auth-title">Sistema de Administración y Gestión de Inventarios</h1>
+        <p className="auth-subtitle">Instituto de Seguridad Pública</p>
+
+        <form onSubmit={handleSubmit}>
+          <div className="field">
+            <label htmlFor="dni">DNI</label>
+            <input
+              id="dni"
+              type="text"
+              value={dni}
+              onChange={(e) => setDni(e.target.value)}
+              placeholder="Ingrese su DNI"
+              required
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="password">Contraseña</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Ingrese su contraseña"
+              required
+            />
+          </div>
+
+          {error && <p className="auth-error">{error}</p>}
+
+          <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+            {loading ? 'Ingresando...' : 'Ingresar'}
+          </button>
+        </form>
+
+        <div className="auth-hint">
+          <p>Usuarios de prueba:</p>
+          <p>admin / Admin1234 (Administrador)</p>
+          <p>jefe / Jefe1234 (Jefe de área)</p>
+          <p>carga / Carga1234 (Personal de carga)</p>
+          <p>consulta / Consulta1234 (Consulta)</p>
+        </div>
+      </div>
+    </div>
+  )
+}
