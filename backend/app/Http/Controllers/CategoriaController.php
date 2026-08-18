@@ -105,10 +105,13 @@ class CategoriaController extends Controller
             return;
         }
 
-        $otro = $vecinos[$intercambio];
-        $tmpOrden = $modelo->orden;
-        $modelo->update(['orden' => $otro->orden]);
-        $otro->update(['orden' => $tmpOrden]);
+        $ids = $vecinos->pluck('id')->all();
+        [$ids[$actual], $ids[$intercambio]] = [$ids[$intercambio], $ids[$actual]];
+
+        $modelClass = get_class($modelo);
+        foreach ($ids as $i => $id) {
+            $modelClass::whereKey($id)->update(['orden' => $i]);
+        }
     }
 
     public function storeCampo(Request $request, Categoria $categoria): JsonResponse
@@ -132,7 +135,7 @@ class CategoriaController extends Controller
             'activo' => true,
             'orden' => $categoria->camposDinamicos()
                 ->where('tipo_item_id', $validated['tipo_item_id'] ?? null)
-                ->count(),
+                ->max('orden') + 1,
         ]);
 
         return response()->json(['campo' => $campo], 201);

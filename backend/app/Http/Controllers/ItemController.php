@@ -152,7 +152,13 @@ class ItemController extends Controller
         $user = $request->user();
         $antes = $item->only(['categoria_id', 'estado_conservacion', 'cantidad', 'valores_dinamicos']);
 
-        $item->update($validated);
+        $datos = $validated;
+        if (array_key_exists('valores', $datos)) {
+            $datos['valores_dinamicos'] = $datos['valores'];
+            unset($datos['valores']);
+        }
+
+        $item->update($datos);
 
         Auditoria::create([
             'user_id' => $user->id,
