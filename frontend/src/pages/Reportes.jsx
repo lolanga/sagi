@@ -44,7 +44,7 @@ export default function Reportes() {
       const res = await api.get('/reportes/items')
       const items = res.data || []
       const rows = [
-        ['Codigo', 'Categoria', 'Elemento', 'Estado', 'Conservacion', 'Cantidad', 'Area', 'Responsable', 'Fecha alta'],
+        ['Codigo', 'Categoria', 'Elemento', 'Estado', 'Conservacion', 'Cantidad', 'Sede', 'Unidad', 'Responsable', 'Fecha alta'],
         ...items.map((i) => [
           i.codigo_unico,
           i.categoria?.codigo ?? '',
@@ -52,7 +52,8 @@ export default function Reportes() {
           i.estado,
           i.estado_conservacion,
           i.cantidad,
-          i.area?.nombre ?? '',
+          i.unidad?.sede?.nombre ?? '',
+          i.unidad?.nombre ?? '',
           i.responsable?.name ?? '',
           i.fecha_alta ?? '',
         ]),
@@ -97,9 +98,14 @@ export default function Reportes() {
               filas={data.por_estado_conservacion.map((e) => [e.estado_conservacion, e.total])}
             />
             <Tabla
-              titulo="Ítems activos por área"
-              encabezados={['Área', 'Ítems']}
-              filas={data.por_area.map((a) => [a.nombre, a.total])}
+              titulo="Ítems activos por sede"
+              encabezados={['Sede', 'Ítems']}
+              filas={data.por_sede.map((s) => [s.nombre, s.total])}
+            />
+            <Tabla
+              titulo="Ítems activos por unidad de destino"
+              encabezados={['Unidad', 'Sede', 'Ítems']}
+              filas={data.por_unidad.map((u) => [u.nombre, u.sede_nombre ?? '', u.total])}
             />
             <Tabla
               titulo="Ítems activos por elemento"

@@ -4,11 +4,12 @@ import '../styles/form.css'
 
 const estadosConservacion = ['Muy bueno', 'Bueno', 'Regular', 'Malo']
 
-export default function ItemForm({ categorias, item, onSaved, onCancel }) {
+export default function ItemForm({ categorias, unidades, item, onSaved, onCancel }) {
   const [categoriaId, setCategoriaId] = useState(item?.categoria_id ?? '')
   const [tipoItemId, setTipoItemId] = useState(item?.tipo_item_id ?? '')
   const [estadoConservacion, setEstadoConservacion] = useState(item?.estado_conservacion ?? 'Muy bueno')
   const [cantidad, setCantidad] = useState(item?.cantidad ?? 1)
+  const [unidadId, setUnidadId] = useState(item?.unidad_id ?? '')
   const [motivoAlta, setMotivoAlta] = useState('')
   const [valores, setValores] = useState({})
   const [campos, setCampos] = useState([])
@@ -126,7 +127,10 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
         cantidad: Number(cantidad),
         valores,
       }
-      if (!esEdicion) payload.motivo_alta = motivoAlta
+      if (!esEdicion) {
+        payload.motivo_alta = motivoAlta
+        payload.unidad_id = Number(unidadId)
+      }
 
       if (esEdicion) {
         await api.put(`/items/${item.id}`, payload)
@@ -216,6 +220,25 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
             required
           />
         </div>
+
+        {!esEdicion && (
+          <div className="field">
+            <label htmlFor="unidad">Unidad de destino *</label>
+            <select
+              id="unidad"
+              value={unidadId}
+              onChange={(e) => setUnidadId(e.target.value)}
+              required
+            >
+              <option value="">Seleccionar unidad...</option>
+              {(unidades || []).map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.nombre} ({u.sede?.nombre ?? ''})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {!esEdicion && (
           <div className="field field-full">

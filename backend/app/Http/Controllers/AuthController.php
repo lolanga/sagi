@@ -21,7 +21,7 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $user = User::with(['rol', 'area'])
+        $user = User::with(['rol', 'sede'])
             ->where('dni', $validated['dni'])
             ->orWhere('username', $validated['dni'])
             ->first();
@@ -49,14 +49,14 @@ class AuthController extends Controller
                 'username' => $user->username,
                 'email' => $user->email,
                 'rol' => $user->rol,
-                'area' => $user->area,
+                'sede' => $user->sede,
             ],
         ]);
     }
 
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user()->load(['rol', 'area']);
+        $user = $request->user()->load(['rol', 'sede']);
 
         return response()->json([
             'user' => [
@@ -66,7 +66,7 @@ class AuthController extends Controller
                 'username' => $user->username,
                 'email' => $user->email,
                 'rol' => $user->rol,
-                'area' => $user->area,
+                'sede' => $user->sede,
             ],
         ]);
     }

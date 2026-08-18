@@ -9,6 +9,7 @@ const menuItems = [
   { to: '/reportes', label: 'Reportes', roles: ['admin', 'jefe'] },
   { to: '/alertas', label: 'Alertas', roles: ['admin', 'jefe', 'carga'] },
   { to: '/categorias', label: 'Categorías', roles: ['admin'] },
+  { to: '/unidades', label: 'Sedes y Unidades', roles: ['admin'] },
   { to: '/auditoria', label: 'Auditoría', roles: ['admin', 'jefe'] },
 ]
 
@@ -42,7 +43,7 @@ export default function Layout({ title, actions, children, back }) {
             )}
             <h1>{title}</h1>
             <p className="topbar-user">
-              {user?.name} · {user?.rol?.nombre} · {user?.area?.nombre}
+              {user?.name} · {user?.rol?.nombre} · {user?.sede?.nombre}
             </p>
           </div>
           <div className="topbar-actions">

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('dni')->unique();
             $table->string('username')->unique();
             $table->foreignId('rol_id')->constrained('roles');
-            $table->foreignId('area_id')->constrained('areas');
+            $table->foreignId('sede_id')->constrained('sedes');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

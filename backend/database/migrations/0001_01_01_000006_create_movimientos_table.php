@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('item_id')->constrained('items')->cascadeOnDelete();
             $table->string('tipo'); // alta, traslado, baja
-            $table->foreignId('area_origen_id')->constrained('areas');
-            $table->foreignId('area_destino_id')->nullable()->constrained('areas');
+            $table->foreignId('unidad_origen_id')->constrained('unidades');
+            $table->foreignId('unidad_destino_id')->nullable()->constrained('unidades');
             $table->text('motivo');
             $table->string('estado')->default('pendiente'); // pendiente, aprobado, rechazado
             $table->foreignId('solicitante_id')->constrained('users');

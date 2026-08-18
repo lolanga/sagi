@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Item extends Model
 {
     protected $fillable = [
-        'codigo_unico', 'categoria_id', 'tipo_item_id', 'responsable_id', 'area_id',
+        'codigo_unico', 'categoria_id', 'tipo_item_id', 'responsable_id', 'unidad_id',
         'estado_conservacion', 'cantidad', 'fecha_alta', 'valores_dinamicos', 'estado',
     ];
 
@@ -31,9 +31,9 @@ class Item extends Model
         return $this->belongsTo(User::class, 'responsable_id');
     }
 
-    public function area()
+    public function unidad()
     {
-        return $this->belongsTo(Area::class);
+        return $this->belongsTo(Unidad::class);
     }
 
     public function movimientos()

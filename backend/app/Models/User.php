@@ -25,7 +25,7 @@ class User extends Authenticatable
         'dni',
         'username',
         'rol_id',
-        'area_id',
+        'sede_id',
         'password',
     ];
 
@@ -57,9 +57,9 @@ class User extends Authenticatable
         return $this->belongsTo(Rol::class);
     }
 
-    public function area()
+    public function sede()
     {
-        return $this->belongsTo(Area::class);
+        return $this->belongsTo(Sede::class);
     }
 
     public function esAdmin(): bool

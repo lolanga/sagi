@@ -14,7 +14,7 @@ const prioridades = [
 export default function Alertas() {
   const { user } = useAuth()
   const [alertas, setAlertas] = useState([])
-  const [areas, setAreas] = useState([])
+  const [unidades, setUnidades] = useState([])
   const [items, setItems] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -22,7 +22,7 @@ export default function Alertas() {
   const [showNueva, setShowNueva] = useState(false)
   const [mensaje, setMensaje] = useState('')
   const [prioridad, setPrioridad] = useState('importante')
-  const [areaId, setAreaId] = useState('')
+  const [unidadId, setUnidadId] = useState('')
   const [itemId, setItemId] = useState('')
   const [error, setError] = useState('')
 
@@ -48,7 +48,7 @@ export default function Alertas() {
   useEffect(cargar, [filtroEstado])
 
   useEffect(() => {
-    api.get('/areas').then((res) => setAreas(res.data.areas || [])).catch(() => {})
+    api.get('/unidades').then((res) => setUnidades(res.data.unidades || [])).catch(() => {})
     api.get('/items').then((res) => setItems(res.data.data || [])).catch(() => {})
   }, [])
 
@@ -56,13 +56,13 @@ export default function Alertas() {
     e.preventDefault()
     setError('')
     try {
-      const payload = { mensaje, prioridad, area_id: Number(areaId) }
+      const payload = { mensaje, prioridad, unidad_id: Number(unidadId) }
       if (itemId) payload.item_id = Number(itemId)
       await api.post('/alertas', payload)
       setShowNueva(false)
       setMensaje('')
       setPrioridad('importante')
-      setAreaId('')
+      setUnidadId('')
       setItemId('')
       cargar()
     } catch (err) {
@@ -171,11 +171,11 @@ export default function Alertas() {
               </select>
             </div>
             <div className="field">
-              <label htmlFor="a-area">Área *</label>
-              <select id="a-area" value={areaId} onChange={(e) => setAreaId(e.target.value)} required>
-                <option value="">Seleccionar área...</option>
-                {areas.map((a) => (
-                  <option key={a.id} value={a.id}>{a.nombre}</option>
+              <label htmlFor="a-unidad">Unidad *</label>
+              <select id="a-unidad" value={unidadId} onChange={(e) => setUnidadId(e.target.value)} required>
+                <option value="">Seleccionar unidad...</option>
+                {unidades.map((u) => (
+                  <option key={u.id} value={u.id}>{u.nombre} ({u.sede?.nombre ?? ''})</option>
                 ))}
               </select>
             </div>

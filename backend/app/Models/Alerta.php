@@ -8,7 +8,7 @@ class Alerta extends Model
 {
     protected $fillable = [
         'tipo', 'prioridad', 'estado', 'item_id', 'movimiento_id',
-        'area_id', 'mensaje', 'fecha_cierre',
+        'unidad_id', 'mensaje', 'fecha_cierre',
     ];
 
     protected $casts = [
@@ -25,8 +25,8 @@ class Alerta extends Model
         return $this->belongsTo(Movimiento::class);
     }
 
-    public function area()
+    public function unidad()
     {
-        return $this->belongsTo(Area::class);
+        return $this->belongsTo(Unidad::class);
     }
 }

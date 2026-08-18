@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Movimiento extends Model
 {
     protected $fillable = [
-        'item_id', 'tipo', 'area_origen_id', 'area_destino_id', 'motivo',
+        'item_id', 'tipo', 'unidad_origen_id', 'unidad_destino_id', 'motivo',
         'estado', 'solicitante_id', 'validador_id', 'fecha_validacion', 'motivo_rechazo',
     ];
 
@@ -20,14 +20,14 @@ class Movimiento extends Model
         return $this->belongsTo(Item::class);
     }
 
-    public function areaOrigen()
+    public function unidadOrigen()
     {
-        return $this->belongsTo(Area::class, 'area_origen_id');
+        return $this->belongsTo(Unidad::class, 'unidad_origen_id');
     }
 
-    public function areaDestino()
+    public function unidadDestino()
     {
-        return $this->belongsTo(Area::class, 'area_destino_id');
+        return $this->belongsTo(Unidad::class, 'unidad_destino_id');
     }
 
     public function solicitante()

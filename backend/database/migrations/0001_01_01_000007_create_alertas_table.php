@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('estado')->default('abierta'); // abierta, cerrada
             $table->foreignId('item_id')->nullable()->constrained('items');
             $table->foreignId('movimiento_id')->nullable()->constrained('movimientos');
-            $table->foreignId('area_id')->constrained('areas');
+            $table->foreignId('unidad_id')->constrained('unidades');
             $table->text('mensaje');
             $table->dateTime('fecha_cierre')->nullable();
             $table->timestamps();

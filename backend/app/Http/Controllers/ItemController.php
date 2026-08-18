@@ -15,7 +15,7 @@ class ItemController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Item::with(['categoria', 'tipoItem', 'responsable', 'area'])
+        $query = Item::with(['categoria', 'tipoItem', 'responsable', 'unidad.sede'])
             ->orderByDesc('created_at');
 
         if ($request->filled('search')) {
@@ -38,8 +38,8 @@ class ItemController extends Controller
             $query->where('estado', $request->string('estado'));
         }
 
-        if ($request->filled('area_id')) {
-            $query->where('area_id', $request->integer('area_id'));
+        if ($request->filled('unidad_id')) {
+            $query->where('unidad_id', $request->integer('unidad_id'));
         }
 
         $items = $query->paginate(25)->withQueryString();
@@ -67,6 +67,7 @@ class ItemController extends Controller
             'tipo_item_id' => ['nullable', 'integer', Rule::exists('tipos_items', 'id')->where(fn ($q) => $q->where('categoria_id', $request->integer('categoria_id')))],
             'estado_conservacion' => ['required', Rule::in(['Muy bueno', 'Bueno', 'Regular', 'Malo'])],
             'cantidad' => 'required|integer|min:1',
+            'unidad_id' => ['required', 'integer', Rule::exists('unidades', 'id')],
             'motivo_alta' => 'required|string',
             'valores' => 'nullable|array',
         ]);
@@ -95,7 +96,7 @@ class ItemController extends Controller
                 'categoria_id' => Categoria::where('codigo', 'A7')->value('id'),
                 'tipo_item_id' => $validated['tipo_item_id'] ?? null,
                 'responsable_id' => $user->id,
-                'area_id' => $user->area_id,
+                'unidad_id' => $validated['unidad_id'],
                 'estado_conservacion' => $validated['estado_conservacion'],
                 'cantidad' => $validated['cantidad'],
                 'fecha_alta' => now()->toDateString(),
@@ -106,8 +107,8 @@ class ItemController extends Controller
             $alta = Movimiento::create([
                 'item_id' => $item->id,
                 'tipo' => 'alta',
-                'area_origen_id' => $user->area_id,
-                'area_destino_id' => null,
+                'unidad_origen_id' => $validated['unidad_id'],
+                'unidad_destino_id' => null,
                 'motivo' => $validated['motivo_alta'],
                 'estado' => 'aprobado',
                 'solicitante_id' => $user->id,
@@ -127,14 +128,14 @@ class ItemController extends Controller
             ]);
         });
 
-        $item->load(['categoria', 'tipoItem', 'responsable', 'area']);
+        $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);
 
         return response()->json(['item' => $item], 201);
     }
 
     public function show(Item $item): JsonResponse
     {
-        $item->load(['categoria', 'tipoItem', 'responsable', 'area', 'movimientos.solicitante', 'movimientos.validador', 'movimientos.areaOrigen', 'movimientos.areaDestino']);
+        $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede', 'movimientos.solicitante', 'movimientos.validador', 'movimientos.unidadOrigen', 'movimientos.unidadDestino']);
 
         return response()->json(['item' => $item]);
     }
@@ -168,7 +169,7 @@ class ItemController extends Controller
             'detalle' => ['antes' => $antes, 'despues' => $item->only(['categoria_id', 'estado_conservacion', 'cantidad', 'valores_dinamicos'])],
         ]);
 
-        $item->load(['categoria', 'tipoItem', 'responsable', 'area']);
+        $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);
 
         return response()->json(['item' => $item]);
     }

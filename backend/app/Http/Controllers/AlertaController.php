@@ -12,7 +12,7 @@ class AlertaController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Alerta::with(['item.categoria', 'item.tipoItem', 'movimiento', 'area'])
+        $query = Alerta::with(['item.categoria', 'item.tipoItem', 'movimiento', 'unidad'])
             ->orderByDesc('created_at');
 
         if ($request->filled('estado')) {
@@ -23,8 +23,8 @@ class AlertaController extends Controller
             $query->where('tipo', $request->string('tipo'));
         }
 
-        if ($request->filled('area_id')) {
-            $query->where('area_id', $request->integer('area_id'));
+        if ($request->filled('unidad_id')) {
+            $query->where('unidad_id', $request->integer('unidad_id'));
         }
 
         return response()->json($query->paginate(50)->withQueryString());
@@ -49,7 +49,7 @@ class AlertaController extends Controller
             'detalle' => ['mensaje' => $alerta->mensaje],
         ]);
 
-        $alerta->load(['item.categoria', 'item.tipoItem', 'movimiento', 'area']);
+        $alerta->load(['item.categoria', 'item.tipoItem', 'movimiento', 'unidad']);
 
         return response()->json(['alerta' => $alerta]);
     }
@@ -59,7 +59,7 @@ class AlertaController extends Controller
         $validated = $request->validate([
             'mensaje' => 'required|string',
             'prioridad' => ['required', Rule::in(['critica', 'importante', 'informativa'])],
-            'area_id' => ['required', 'integer', Rule::exists('areas', 'id')],
+            'unidad_id' => ['required', 'integer', Rule::exists('unidades', 'id')],
             'tipo' => ['nullable', Rule::in(['pendiente_aprobacion', 'pendiente_movimiento', 'manual'])],
             'item_id' => ['nullable', 'integer', Rule::exists('items', 'id')],
         ]);
@@ -67,7 +67,7 @@ class AlertaController extends Controller
         $alerta = Alerta::create([
             'mensaje' => $validated['mensaje'],
             'prioridad' => $validated['prioridad'],
-            'area_id' => $validated['area_id'],
+            'unidad_id' => $validated['unidad_id'],
             'tipo' => $validated['tipo'] ?? 'manual',
             'item_id' => $validated['item_id'] ?? null,
             'estado' => 'abierta',

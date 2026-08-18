@@ -22,7 +22,7 @@ class MovimientoController extends Controller
             'estado' => 'abierta',
             'item_id' => $item->id,
             'movimiento_id' => $m->id,
-            'area_id' => $item->area_id,
+            'unidad_id' => $item->unidad_id,
             'mensaje' => sprintf(
                 '%s pendiente de aprobación para el ítem %s (%s)',
                 $m->tipo === 'traslado' ? 'Traslado' : 'Baja',
@@ -43,8 +43,8 @@ class MovimientoController extends Controller
         $query = Movimiento::with([
             'item.categoria',
             'item.tipoItem',
-            'areaOrigen',
-            'areaDestino',
+            'unidadOrigen',
+            'unidadDestino',
             'solicitante',
             'validador',
         ])->orderByDesc('created_at');
@@ -68,14 +68,14 @@ class MovimientoController extends Controller
     {
         $validated = $request->validate([
             'item_id' => ['required', Rule::exists('items', 'id')->where(fn ($q) => $q->where('estado', 'activo'))],
-            'area_destino_id' => ['required', 'integer', Rule::exists('areas', 'id')],
+            'unidad_destino_id' => ['required', 'integer', Rule::exists('unidades', 'id')],
             'motivo' => 'required|string',
         ]);
 
         $item = Item::findOrFail($validated['item_id']);
         $user = $request->user();
 
-        if ((int) $validated['area_destino_id'] === (int) $item->area_id) {
+        if ((int) $validated['unidad_destino_id'] === (int) $item->unidad_id) {
             return response()->json(['message' => 'El área de destino es la misma que el área actual del ítem'], 422);
         }
 
@@ -83,8 +83,8 @@ class MovimientoController extends Controller
             $m = Movimiento::create([
                 'item_id' => $item->id,
                 'tipo' => 'traslado',
-                'area_origen_id' => $item->area_id,
-                'area_destino_id' => $validated['area_destino_id'],
+                'unidad_origen_id' => $item->unidad_id,
+                'unidad_destino_id' => $validated['unidad_destino_id'],
                 'motivo' => $validated['motivo'],
                 'estado' => 'pendiente',
                 'solicitante_id' => $user->id,
@@ -98,8 +98,8 @@ class MovimientoController extends Controller
                 'detalle' => [
                     'tipo' => 'traslado',
                     'item' => $item->codigo_unico,
-                    'area_origen' => $item->area_id,
-                    'area_destino' => $validated['area_destino_id'],
+                    'unidad_origen' => $item->unidad_id,
+                    'unidad_destino' => $validated['unidad_destino_id'],
                     'motivo' => $validated['motivo'],
                 ],
             ]);
@@ -109,7 +109,7 @@ class MovimientoController extends Controller
             return $m;
         });
 
-        $movimiento->load(['item.categoria', 'item.tipoItem', 'areaOrigen', 'areaDestino', 'solicitante', 'validador']);
+        $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
 
         return response()->json(['movimiento' => $movimiento], 201);
     }
@@ -128,8 +128,8 @@ class MovimientoController extends Controller
             $m = Movimiento::create([
                 'item_id' => $item->id,
                 'tipo' => 'baja',
-                'area_origen_id' => $item->area_id,
-                'area_destino_id' => null,
+                'unidad_origen_id' => $item->unidad_id,
+                'unidad_destino_id' => null,
                 'motivo' => $validated['motivo'],
                 'estado' => 'pendiente',
                 'solicitante_id' => $user->id,
@@ -143,7 +143,7 @@ class MovimientoController extends Controller
                 'detalle' => [
                     'tipo' => 'baja',
                     'item' => $item->codigo_unico,
-                    'area_origen' => $item->area_id,
+                    'unidad_origen' => $item->unidad_id,
                     'motivo' => $validated['motivo'],
                 ],
             ]);
@@ -153,7 +153,7 @@ class MovimientoController extends Controller
             return $m;
         });
 
-        $movimiento->load(['item.categoria', 'item.tipoItem', 'areaOrigen', 'areaDestino', 'solicitante', 'validador']);
+        $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
 
         return response()->json(['movimiento' => $movimiento], 201);
     }
@@ -169,7 +169,7 @@ class MovimientoController extends Controller
 
         DB::transaction(function () use ($movimiento, $item, $user) {
             if ($movimiento->tipo === 'traslado') {
-                $item->update(['area_id' => $movimiento->area_destino_id]);
+                $item->update(['unidad_id' => $movimiento->unidad_destino_id]);
             }
 
             if ($movimiento->tipo === 'baja') {
@@ -200,7 +200,7 @@ class MovimientoController extends Controller
             ]);
         });
 
-        $movimiento->load(['item.categoria', 'item.tipoItem', 'areaOrigen', 'areaDestino', 'solicitante', 'validador']);
+        $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
 
         return response()->json(['movimiento' => $movimiento]);
     }
@@ -238,7 +238,7 @@ class MovimientoController extends Controller
             ],
         ]);
 
-        $movimiento->load(['item.categoria', 'item.tipoItem', 'areaOrigen', 'areaDestino', 'solicitante', 'validador']);
+        $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
 
         return response()->json(['movimiento' => $movimiento]);
     }

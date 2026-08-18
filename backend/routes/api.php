@@ -2,13 +2,14 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AlertaController;
-use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\MovimientoController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\SedeController;
+use App\Http\Controllers\UnidadController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -23,8 +24,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auditoría
     Route::get('/auditoria', [AuditoriaController::class, 'index'])->middleware('rol:admin,jefe');
 
-    // Áreas
-    Route::get('/areas', [AreaController::class, 'index']);
+    // Sedes y Unidades de destino
+    Route::get('/sedes', [SedeController::class, 'index']);
+    Route::get('/unidades', [UnidadController::class, 'index']);
+    Route::post('/unidades', [UnidadController::class, 'store'])->middleware('rol:admin');
+    Route::put('/unidades/{unidad}', [UnidadController::class, 'update'])->middleware('rol:admin');
+    Route::delete('/unidades/{unidad}', [UnidadController::class, 'destroy'])->middleware('rol:admin');
 
     // Alertas
     Route::get('/alertas', [AlertaController::class, 'index']);

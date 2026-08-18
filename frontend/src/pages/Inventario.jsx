@@ -11,6 +11,7 @@ export default function Inventario() {
   const { user } = useAuth()
   const [items, setItems] = useState([])
   const [categorias, setCategorias] = useState([])
+  const [unidades, setUnidades] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -42,6 +43,7 @@ export default function Inventario() {
 
   useEffect(() => {
     api.get('/categorias').then((res) => setCategorias(res.data.categorias || []))
+    api.get('/unidades').then((res) => setUnidades(res.data.unidades || [])).catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -130,6 +132,7 @@ export default function Inventario() {
               <th>Detalle</th>
               <th>Estado</th>
               <th>Cant.</th>
+              <th>Unidad</th>
               <th>Responsable</th>
               <th></th>
             </tr>
@@ -144,6 +147,7 @@ export default function Inventario() {
                   <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
                 </td>
                 <td>{item.cantidad}</td>
+                <td>{item.unidad?.nombre ?? '-'}</td>
                 <td>{item.responsable?.name}</td>
                 <td>
                   {puedeEditar && (
@@ -162,6 +166,7 @@ export default function Inventario() {
       <Modal open={showAlta} title="Registrar alta de ítem" onClose={() => setShowAlta(false)} wide>
         <ItemForm
           categorias={categorias}
+          unidades={unidades}
           onSaved={() => {
             setShowAlta(false)
             cargarItems()
@@ -175,6 +180,7 @@ export default function Inventario() {
           <ItemForm
             key={editando.id}
             categorias={categorias}
+            unidades={unidades}
             item={editando}
             onSaved={() => {
               setEditando(null)

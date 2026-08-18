@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('codigo_unico', 20)->unique();
             $table->foreignId('categoria_id')->constrained('categorias');
             $table->foreignId('responsable_id')->constrained('users');
-            $table->foreignId('area_id')->constrained('areas');
+            $table->foreignId('unidad_id')->constrained('unidades');
             $table->string('estado_conservacion')->default('Muy bueno'); // Muy bueno, Bueno, Regular, Malo
             $table->integer('cantidad')->default(1);
             $table->date('fecha_alta');

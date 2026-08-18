@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Area extends Model
+class Sede extends Model
 {
     protected $fillable = ['nombre'];
 
-    public function users()
+    public function unidades()
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(Unidad::class);
     }
 }

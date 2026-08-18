@@ -29,11 +29,20 @@ class ReporteController extends Controller
             ->orderBy('estado_conservacion')
             ->get();
 
-        $porArea = Item::select('area_id', 'areas.nombre', DB::raw('COUNT(*) as total'))
-            ->join('areas', 'areas.id', '=', 'items.area_id')
+        $porSede = Item::select('unidades.sede_id', 'sedes.nombre', DB::raw('COUNT(*) as total'))
+            ->join('unidades', 'unidades.id', '=', 'items.unidad_id')
+            ->join('sedes', 'sedes.id', '=', 'unidades.sede_id')
             ->where('items.estado', 'activo')
-            ->groupBy('items.area_id', 'areas.nombre')
-            ->orderBy('areas.nombre')
+            ->groupBy('unidades.sede_id', 'sedes.nombre')
+            ->orderBy('sedes.nombre')
+            ->get();
+
+        $porUnidad = Item::select('items.unidad_id', 'unidades.nombre', 'sedes.nombre as sede_nombre', DB::raw('COUNT(*) as total'))
+            ->join('unidades', 'unidades.id', '=', 'items.unidad_id')
+            ->join('sedes', 'sedes.id', '=', 'unidades.sede_id')
+            ->where('items.estado', 'activo')
+            ->groupBy('items.unidad_id', 'unidades.nombre', 'sedes.nombre')
+            ->orderBy('unidades.nombre')
             ->get();
 
         $porElemento = Item::select('tipo_item_id', 'tipos_items.nombre', DB::raw('COUNT(*) as total'))
@@ -57,7 +66,8 @@ class ReporteController extends Controller
         return response()->json([
             'por_categoria' => $porCategoria,
             'por_estado_conservacion' => $porEstadoConservacion,
-            'por_area' => $porArea,
+            'por_sede' => $porSede,
+            'por_unidad' => $porUnidad,
             'por_elemento' => $porElemento,
             'movimientos_mes' => $movimientosMes,
         ]);
@@ -65,7 +75,7 @@ class ReporteController extends Controller
 
     public function items(Request $request): JsonResponse
     {
-        $query = Item::with(['categoria', 'tipoItem', 'responsable', 'area'])->orderBy('codigo_unico');
+        $query = Item::with(['categoria', 'tipoItem', 'responsable', 'unidad'])->orderBy('codigo_unico');
 
         if ($request->filled('estado')) {
             $query->where('estado', $request->string('estado'));
@@ -75,8 +85,8 @@ class ReporteController extends Controller
             $query->where('categoria_id', $request->integer('categoria_id'));
         }
 
-        if ($request->filled('area_id')) {
-            $query->where('area_id', $request->integer('area_id'));
+        if ($request->filled('unidad_id')) {
+            $query->where('unidad_id', $request->integer('unidad_id'));
         }
 
         return response()->json($query->get());

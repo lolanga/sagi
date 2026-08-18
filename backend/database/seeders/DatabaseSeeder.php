@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Area;
 use App\Models\Categoria;
 use App\Models\Rol;
+use App\Models\Sede;
+use App\Models\Unidad;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -13,7 +14,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->seedRoles();
-        $this->seedAreas();
+        $this->seedSedes();
+        $this->seedUnidades();
         $this->seedCategorias();
         $this->call(EstructuraCategoriasSeeder::class);
         $this->seedUsuarios();
@@ -33,12 +35,92 @@ class DatabaseSeeder extends Seeder
         }
     }
 
-    private function seedAreas(): void
+    private function seedSedes(): void
     {
-        $areas = ['Área Norte', 'Área Sur'];
+        $sedes = ['Rosario', 'Recreo', 'Reconquista', 'Rafaela', 'Murphy/Melincue', 'Provincial'];
 
-        foreach ($areas as $nombre) {
-            Area::firstOrCreate(['nombre' => $nombre]);
+        foreach ($sedes as $nombre) {
+            Sede::firstOrCreate(['nombre' => $nombre]);
+        }
+    }
+
+    private function seedUnidades(): void
+    {
+        $porSede = [
+            'Rosario' => [
+                'Escuela de Especialidades',
+                'Escuela de Policía',
+                'Escuela de Investigaciones',
+                'Escuela Superior',
+                'Área Inscripción Alumnado',
+                'Cuerpo Escuela de Especialidades',
+                'Cuerpo Escuela de Investigaciones',
+                'Cuerpo Escuela de Policía',
+                'Cuerpo Escuela Superior',
+                'Dirección Escuela de Especialidades',
+                'Dirección Escuela de Investigaciones',
+                'Dirección Escuela de Policía',
+                'Dirección Escuela Superior',
+                'Dirección Programa de Formación Permanente',
+                'Departamento Tecnología, Desarrollo e Innovación',
+                'Educación a Distancia',
+                'Estudio Escuela de Especialidades',
+                'Estudio Escuela de Investigaciones',
+                'Estudio Escuela de Policía',
+                'Estudio Escuela Superior',
+                'Secretaría Escuela de Especialidades',
+                'Secretaría Escuela de Investigaciones',
+                'Secretaría Escuela de Policía',
+                'Secretaría Escuela Superior',
+                'Sede Escuela Superior',
+                'Sede Escuela Especialidades',
+                'Subdirección General Escuela de Policía',
+                'Primer Compañía Rosario',
+                'Segunda Compañía Rosario',
+                'Tercer Compañía Rosario',
+                'Cuarta Compañía Rosario',
+            ],
+            'Recreo' => [
+                'Secretaría Sede Recreo',
+                'Primer Compañía Recreo',
+                'Segunda Compañía Recreo',
+                'Tercer Compañía Recreo',
+                'Cuarta Compañía Recreo',
+            ],
+            'Reconquista' => [
+                'Secretaría Sede Reconquista',
+            ],
+            'Rafaela' => [
+                'Secretaría Sede Rafaela',
+            ],
+            'Murphy/Melincue' => [
+                'Secretaría Sede Murphy',
+            ],
+            'Provincial' => [
+                'Administración y Finanzas',
+                'Asesoría Letrada General',
+                'Departamento Psicopedagógico, Asistencia y Psicológico',
+                'Dirección General',
+                'División Archivo General',
+                'Extensión Comunitaria',
+                'Guardia de Prevención',
+                'Logística',
+                'Relaciones Policiales',
+                'Sanidad',
+                'Sección SARH',
+                'Secretaría Académica',
+                'Secretaría General',
+                'Títulos y Certificaciones',
+                'zDestino',
+            ],
+        ];
+
+        foreach ($porSede as $sedeNombre => $unidades) {
+            $sede = Sede::where('nombre', $sedeNombre)->firstOrFail();
+
+            foreach ($unidades as $unidad) {
+                Unidad::firstOrCreate(['nombre' => $unidad], ['sede_id' => $sede->id]);
+            }
         }
     }
 
@@ -70,34 +152,34 @@ class DatabaseSeeder extends Seeder
                 'username' => 'admin',
                 'password' => 'Admin1234',
                 'rol' => 'admin',
-                'area' => 'Área Norte',
+                'sede' => 'Rosario',
             ],
             [
-                'name' => 'Jefe Área Norte',
+                'name' => 'Jefe Sede Rosario',
                 'email' => 'jefe@sagi.local',
                 'dni' => '10000002',
                 'username' => 'jefe',
                 'password' => 'Jefe1234',
                 'rol' => 'jefe',
-                'area' => 'Área Norte',
+                'sede' => 'Rosario',
             ],
             [
-                'name' => 'Carga Área Norte',
+                'name' => 'Carga Sede Rosario',
                 'email' => 'carga@sagi.local',
                 'dni' => '10000003',
                 'username' => 'carga',
                 'password' => 'Carga1234',
                 'rol' => 'carga',
-                'area' => 'Área Norte',
+                'sede' => 'Rosario',
             ],
             [
-                'name' => 'Consulta Área Norte',
+                'name' => 'Consulta Sede Rosario',
                 'email' => 'consulta@sagi.local',
                 'dni' => '10000004',
                 'username' => 'consulta',
                 'password' => 'Consulta1234',
                 'rol' => 'consulta',
-                'area' => 'Área Norte',
+                'sede' => 'Rosario',
             ],
             [
                 'name' => 'Prueba Flexible',
@@ -106,13 +188,13 @@ class DatabaseSeeder extends Seeder
                 'username' => 'prueba',
                 'password' => 'Prueba1234',
                 'rol' => 'carga',
-                'area' => 'Área Sur',
+                'sede' => 'Murphy/Melincue',
             ],
         ];
 
         foreach ($usuarios as $usuario) {
             $rol = Rol::where('slug', $usuario['rol'])->firstOrFail();
-            $area = Area::where('nombre', $usuario['area'])->firstOrFail();
+            $sede = Sede::where('nombre', $usuario['sede'])->firstOrFail();
 
             User::firstOrCreate(
                 ['username' => $usuario['username']],
@@ -122,7 +204,7 @@ class DatabaseSeeder extends Seeder
                     'dni' => $usuario['dni'],
                     'password' => $usuario['password'],
                     'rol_id' => $rol->id,
-                    'area_id' => $area->id,
+                    'sede_id' => $sede->id,
                 ]
             );
         }

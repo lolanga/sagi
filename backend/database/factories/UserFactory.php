@@ -30,7 +30,7 @@ class UserFactory extends Factory
             'dni' => (string) fake()->unique()->numberBetween(10000000, 99999999),
             'username' => fake()->unique()->userName(),
             'rol_id' => 1,
-            'area_id' => 1,
+            'sede_id' => 1,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),

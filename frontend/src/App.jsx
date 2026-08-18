@@ -8,6 +8,7 @@ import Movimientos from './pages/Movimientos'
 import Reportes from './pages/Reportes'
 import Alertas from './pages/Alertas'
 import Auditoria from './pages/Auditoria'
+import Unidades from './pages/Unidades'
 import './index.css'
 
 function ProtectedRoute({ children }) {
@@ -43,6 +44,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Categorias />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/unidades"
+            element={
+              <ProtectedRoute>
+                <Unidades />
               </ProtectedRoute>
             }
           />

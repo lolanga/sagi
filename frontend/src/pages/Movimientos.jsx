@@ -14,7 +14,7 @@ export default function Movimientos() {
   const { user } = useAuth()
   const [movimientos, setMovimientos] = useState([])
   const [items, setItems] = useState([])
-  const [areas, setAreas] = useState([])
+  const [unidades, setUnidades] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [filtroTipo, setFiltroTipo] = useState('')
@@ -22,7 +22,7 @@ export default function Movimientos() {
   const [showNuevo, setShowNuevo] = useState(false)
   const [tipo, setTipo] = useState('traslado')
   const [itemId, setItemId] = useState('')
-  const [areaDestino, setAreaDestino] = useState('')
+  const [unidadDestino, setUnidadDestino] = useState('')
   const [motivo, setMotivo] = useState('')
   const [rechazando, setRechazando] = useState(null)
   const [motivoRechazo, setMotivoRechazo] = useState('')
@@ -53,7 +53,7 @@ export default function Movimientos() {
 
   useEffect(() => {
     api.get('/items').then((res) => setItems((res.data.data || []).filter((i) => i.estado === 'activo')))
-    api.get('/areas').then((res) => setAreas(res.data.areas || [])).catch(() => {})
+    api.get('/unidades').then((res) => setUnidades(res.data.unidades || [])).catch(() => {})
   }, [])
 
   const guardar = async (e) => {
@@ -61,13 +61,13 @@ export default function Movimientos() {
     setError('')
     try {
       const payload = { item_id: Number(itemId), motivo }
-      if (tipo === 'traslado') payload.area_destino_id = Number(areaDestino)
+      if (tipo === 'traslado') payload.unidad_destino_id = Number(unidadDestino)
       const url = tipo === 'traslado' ? '/movimientos/traslados' : '/movimientos/bajas'
       await api.post(url, payload)
       setShowNuevo(false)
       setTipo('traslado')
       setItemId('')
-      setAreaDestino('')
+      setUnidadDestino('')
       setMotivo('')
       cargar()
     } catch (err) {
@@ -155,7 +155,7 @@ export default function Movimientos() {
                 <td>{m.tipo === 'traslado' ? 'Traslado' : 'Baja'}</td>
                 <td><strong>{m.item?.codigo_unico}</strong> · {m.item?.tipo_item?.nombre ?? '-'}</td>
                 <td>
-                  {m.area_origen?.nombre ?? '-'} → {m.area_destino?.nombre ?? '-'}
+                  {m.unidad_origen?.nombre ?? '-'} → {m.unidad_destino?.nombre ?? '-'}
                   {m.motivo && <div className="muted small">{m.motivo}</div>}
                   {m.motivo_rechazo && <div className="muted small">Rechazo: {m.motivo_rechazo}</div>}
                 </td>
@@ -199,11 +199,11 @@ export default function Movimientos() {
             </div>
             {tipo === 'traslado' && (
               <div className="field">
-                <label htmlFor="m-area">Área de destino *</label>
-                <select id="m-area" value={areaDestino} onChange={(e) => setAreaDestino(e.target.value)} required>
-                  <option value="">Seleccionar área...</option>
-                  {areas.map((a) => (
-                    <option key={a.id} value={a.id}>{a.nombre}</option>
+                <label htmlFor="m-unidad">Unidad de destino *</label>
+                <select id="m-unidad" value={unidadDestino} onChange={(e) => setUnidadDestino(e.target.value)} required>
+                  <option value="">Seleccionar unidad...</option>
+                  {unidades.map((u) => (
+                    <option key={u.id} value={u.id}>{u.nombre} ({u.sede?.nombre ?? ''})</option>
                   ))}
                 </select>
               </div>
