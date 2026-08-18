@@ -9,6 +9,7 @@ const menuItems = [
   { to: '/reportes', label: 'Reportes', roles: ['admin', 'jefe'] },
   { to: '/alertas', label: 'Alertas', roles: ['admin', 'jefe', 'carga'] },
   { to: '/categorias', label: 'Categorías', roles: ['admin'] },
+  { to: '/auditoria', label: 'Auditoría', roles: ['admin', 'jefe'] },
 ]
 
 function hasAccess(user, roles) {

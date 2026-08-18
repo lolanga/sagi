@@ -7,6 +7,7 @@ import Categorias from './pages/Categorias'
 import Movimientos from './pages/Movimientos'
 import Reportes from './pages/Reportes'
 import Alertas from './pages/Alertas'
+import Auditoria from './pages/Auditoria'
 import './index.css'
 
 function ProtectedRoute({ children }) {
@@ -66,6 +67,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Alertas />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/auditoria"
+            element={
+              <ProtectedRoute>
+                <Auditoria />
               </ProtectedRoute>
             }
           />

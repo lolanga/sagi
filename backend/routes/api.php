@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AreaController;
+use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\MovimientoController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -14,6 +17,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+
+    // Auditoría
+    Route::get('/auditoria', [AuditoriaController::class, 'index'])->middleware('rol:admin,jefe');
+
+    // Áreas
+    Route::get('/areas', [AreaController::class, 'index']);
+
+    // Movimientos (Fase 3: traslados y bajas)
+    Route::get('/movimientos', [MovimientoController::class, 'index']);
+    Route::post('/movimientos/traslados', [MovimientoController::class, 'storeTraslado'])->middleware('rol:admin,jefe,carga');
+    Route::post('/movimientos/bajas', [MovimientoController::class, 'storeBaja'])->middleware('rol:admin,jefe,carga');
+    Route::post('/movimientos/{movimiento}/aprobar', [MovimientoController::class, 'aprobar'])->middleware('rol:admin,jefe');
+    Route::post('/movimientos/{movimiento}/rechazar', [MovimientoController::class, 'rechazar'])->middleware('rol:admin,jefe');
 
     // Inventario
     Route::get('/items', [ItemController::class, 'index']);

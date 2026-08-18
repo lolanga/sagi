@@ -64,6 +64,25 @@
 .badge-estado-Regular { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
 .badge-estado-Malo { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
 
+.badge-accion {
+  background-color: var(--color-secondary);
+  color: var(--color-text);
+}
+.badge-login { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
+.badge-crear { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
+.badge-editar { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
+.badge-eliminar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
+.badge-mover { background-color: var(--color-secondary); color: var(--color-text); }
+.badge-solicitar { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
+.badge-aprobar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
+.badge-rechazar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
+
+.audit-detalle {
+  color: var(--color-muted);
+  font-size: 13px;
+  max-width: 480px;
+}
+
 .btn-link {
   background: none;
   border: none;
