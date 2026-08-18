@@ -14,6 +14,30 @@ use Illuminate\Validation\Rule;
 
 class MovimientoController extends Controller
 {
+    private function crearAlerta(Movimiento $m, Item $item): void
+    {
+        Alerta::create([
+            'tipo' => 'pendiente_aprobacion',
+            'prioridad' => $m->tipo === 'baja' ? 'critica' : 'importante',
+            'estado' => 'abierta',
+            'item_id' => $item->id,
+            'movimiento_id' => $m->id,
+            'area_id' => $item->area_id,
+            'mensaje' => sprintf(
+                '%s pendiente de aprobación para el ítem %s (%s)',
+                $m->tipo === 'traslado' ? 'Traslado' : 'Baja',
+                $item->codigo_unico,
+                $item->tipoItem?->nombre ?? 'sin elemento'
+            ),
+        ]);
+    }
+
+    private function cerrarAlertas(Movimiento $m): void
+    {
+        Alerta::where('movimiento_id', $m->id)
+            ->where('estado', 'abierta')
+            ->update(['estado' => 'cerrada', 'fecha_cierre' => now()]);
+    }
     public function index(Request $request): JsonResponse
     {
         $query = Movimiento::with([
@@ -80,6 +104,8 @@ class MovimientoController extends Controller
                 ],
             ]);
 
+            $this->crearAlerta($m, $item);
+
             return $m;
         });
 
@@ -122,6 +148,8 @@ class MovimientoController extends Controller
                 ],
             ]);
 
+            $this->crearAlerta($m, $item);
+
             return $m;
         });
 
@@ -156,6 +184,8 @@ class MovimientoController extends Controller
                 'validador_id' => $user->id,
                 'fecha_validacion' => now(),
             ]);
+
+            $this->cerrarAlertas($movimiento);
 
             Auditoria::create([
                 'user_id' => $user->id,
@@ -193,6 +223,8 @@ class MovimientoController extends Controller
             'fecha_validacion' => now(),
             'motivo_rechazo' => $validated['motivo_rechazo'],
         ]);
+
+        $this->cerrarAlertas($movimiento);
 
         Auditoria::create([
             'user_id' => $user->id,

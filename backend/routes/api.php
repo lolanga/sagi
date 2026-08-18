@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AlertaController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\MovimientoController;
+use App\Http\Controllers\ReporteController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -24,12 +26,21 @@ Route::middleware('auth:sanctum')->group(function () {
     // Áreas
     Route::get('/areas', [AreaController::class, 'index']);
 
+    // Alertas
+    Route::get('/alertas', [AlertaController::class, 'index']);
+    Route::post('/alertas', [AlertaController::class, 'store'])->middleware('rol:admin,jefe');
+    Route::post('/alertas/{alerta}/cerrar', [AlertaController::class, 'cerrar'])->middleware('rol:admin,jefe');
+
     // Movimientos (Fase 3: traslados y bajas)
     Route::get('/movimientos', [MovimientoController::class, 'index']);
     Route::post('/movimientos/traslados', [MovimientoController::class, 'storeTraslado'])->middleware('rol:admin,jefe,carga');
     Route::post('/movimientos/bajas', [MovimientoController::class, 'storeBaja'])->middleware('rol:admin,jefe,carga');
     Route::post('/movimientos/{movimiento}/aprobar', [MovimientoController::class, 'aprobar'])->middleware('rol:admin,jefe');
     Route::post('/movimientos/{movimiento}/rechazar', [MovimientoController::class, 'rechazar'])->middleware('rol:admin,jefe');
+
+    // Reportes
+    Route::get('/reportes/resumen', [ReporteController::class, 'resumen'])->middleware('rol:admin,jefe');
+    Route::get('/reportes/items', [ReporteController::class, 'items'])->middleware('rol:admin,jefe');
 
     // Inventario
     Route::get('/items', [ItemController::class, 'index']);

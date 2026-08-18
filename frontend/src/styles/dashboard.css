@@ -41,3 +41,24 @@
   border: none;
   box-shadow: none;
 }
+
+.reportes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.reporte-card {
+  padding: 20px;
+}
+
+.reporte-card h3 {
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.reporte-card .table th,
+.reporte-card .table td {
+  padding: 8px 12px;
+  font-size: 13px;
+}

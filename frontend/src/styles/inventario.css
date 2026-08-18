@@ -77,6 +77,10 @@
 .badge-aprobar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
 .badge-rechazar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
 
+.badge-prioridad-critica { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
+.badge-prioridad-importante { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
+.badge-prioridad-informativa { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
+
 .audit-detalle {
   color: var(--color-muted);
   font-size: 13px;
