@@ -43,7 +43,7 @@ export default function Inventario() {
 
   useEffect(() => {
     api.get('/categorias').then((res) => setCategorias(res.data.categorias || []))
-    api.get('/unidades').then((res) => setUnidades(res.data.unidades || [])).catch(() => {})
+    api.get('/unidades').then((res) => setUnidades((res.data.unidades || []).filter((u) => u.activa))).catch(() => {})
   }, [])
 
   useEffect(() => {

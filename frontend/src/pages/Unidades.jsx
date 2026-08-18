@@ -10,6 +10,7 @@ export default function Unidades() {
   const [unidades, setUnidades] = useState([])
   const [loading, setLoading] = useState(true)
   const [busqueda, setBusqueda] = useState('')
+  const [verInactivas, setVerInactivas] = useState(false)
   const [error, setError] = useState('')
 
   const puedeGestionar = user?.rol?.slug === 'admin'
@@ -75,6 +76,28 @@ export default function Unidades() {
     }
   }
 
+  const toggleSede = async (sede) => {
+    setError('')
+    const objetivo = !sede.activa
+    try {
+      const r = await api.put(`/sedes/${sede.id}`, { activa: objetivo })
+      setSedes((s) => s.map((x) => (x.id === sede.id ? { ...x, activa: r.data.sede.activa } : x)))
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al cambiar el estado de la sede')
+    }
+  }
+
+  const toggleUnidad = async (unidad) => {
+    setError('')
+    const objetivo = !unidad.activa
+    try {
+      const r = await api.put(`/unidades/${unidad.id}`, { activa: objetivo })
+      setUnidades((u) => u.map((x) => (x.id === unidad.id ? { ...x, activa: r.data.unidad.activa } : x)))
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al cambiar el estado de la unidad')
+    }
+  }
+
   const guardarUnidad = async (unidad, cambios) => {
     setError('')
     try {
@@ -113,9 +136,12 @@ export default function Unidades() {
   }
 
   const termino = busqueda.trim().toLowerCase()
-  const unidadesFiltradas = unidades
+  const unidadesBase = unidades.filter((u) => verInactivas || u.activa)
+  const unidadesFiltradas = unidadesBase
     .filter((u) => !termino || u.nombre.toLowerCase().includes(termino) || sedeDe(u.sede_id).toLowerCase().includes(termino))
     .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
+
+  const sedesVisibles = sedes.filter((s) => verInactivas || s.activa)
 
   return (
     <Layout title="Sedes y Unidades de destino" back="/">
@@ -128,8 +154,8 @@ export default function Unidades() {
             <div className="panel-admin">
               <div className="panel-admin-section">
                 <h3>Sedes</h3>
-                {sedes.map((sede) => (
-                  <div key={sede.id} className="editable-row">
+                {sedesVisibles.map((sede) => (
+                  <div key={sede.id} className={`editable-row ${sede.activa ? '' : 'inactiva'}`}>
                     <input
                       className="editable-input"
                       type="text"
@@ -143,6 +169,11 @@ export default function Unidades() {
                       }}
                     />
                     <span className="result-count">{sede.unidades?.length ?? 0} unidades</span>
+                    {puedeGestionar && (
+                      <button className="btn-link" onClick={() => toggleSede(sede)}>
+                        {sede.activa ? 'Desactivar' : 'Activar'}
+                      </button>
+                    )}
                     {puedeGestionar && (
                       <button className="btn-link btn-link-danger" onClick={() => eliminarSede(sede)}>Eliminar</button>
                     )}
@@ -160,7 +191,7 @@ export default function Unidades() {
                   <input name="nueva_unidad" type="text" placeholder="Ej. Secretaría Académica" required />
                   <select name="sede_id" required defaultValue="">
                     <option value="" disabled>Seleccionar sede...</option>
-                    {sedes.map((s) => (
+                    {sedes.filter((s) => s.activa).map((s) => (
                       <option key={s.id} value={s.id}>{s.nombre}</option>
                     ))}
                   </select>
@@ -178,6 +209,14 @@ export default function Unidades() {
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
             />
+            <label className="checkbox-inline">
+              <input
+                type="checkbox"
+                checked={verInactivas}
+                onChange={(e) => setVerInactivas(e.target.checked)}
+              />
+              Ver desactivadas
+            </label>
             <span className="result-count">{unidadesFiltradas.length} unidades</span>
           </div>
 
@@ -197,7 +236,7 @@ export default function Unidades() {
               </thead>
               <tbody>
                 {unidadesFiltradas.map((u) => (
-                  <tr key={u.id}>
+                  <tr key={u.id} className={u.activa ? '' : 'inactiva'}>
                     <td>
                       <input
                         className="editable-input"
@@ -219,13 +258,18 @@ export default function Unidades() {
                         onChange={(e) => guardarUnidad(u, { sede_id: Number(e.target.value) })}
                       >
                         {sedes.map((s) => (
-                          <option key={s.id} value={s.id}>{s.nombre}</option>
+                          <option key={s.id} value={s.id}>{s.nombre}{s.activa ? '' : ' (inactiva)'}</option>
                         ))}
                       </select>
                     </td>
                     <td>
                       {puedeGestionar && (
-                        <button className="btn-link btn-link-danger" onClick={() => eliminarUnidad(u)}>Eliminar</button>
+                        <div className="row-actions">
+                          <button className="btn-link" onClick={() => toggleUnidad(u)}>
+                            {u.activa ? 'Desactivar' : 'Activar'}
+                          </button>
+                          <button className="btn-link btn-link-danger" onClick={() => eliminarUnidad(u)}>Eliminar</button>
+                        </div>
                       )}
                     </td>
                   </tr>

@@ -76,6 +76,8 @@
 .badge-solicitar { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
 .badge-aprobar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
 .badge-rechazar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
+.badge-desactivar { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
+.badge-activar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
 
 .badge-prioridad-critica { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
 .badge-prioridad-importante { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
@@ -195,4 +197,18 @@
   font-size: 13px;
   margin: 0 0 12px;
   font-weight: 600;
+}
+
+.inactiva {
+  opacity: 0.55;
+}
+
+.checkbox-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-muted);
+  cursor: pointer;
+  white-space: nowrap;
 }

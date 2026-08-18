@@ -37,16 +37,24 @@ class SedeController extends Controller
     {
         $validated = $request->validate([
             'nombre' => 'sometimes|string|max:255',
+            'activa' => 'sometimes|boolean',
         ]);
 
+        $antes = $sede->activa;
         $sede->update($validated);
+
+        if (array_key_exists('activa', $validated)) {
+            $accion = $sede->activa ? 'activar' : 'desactivar';
+        } else {
+            $accion = 'editar';
+        }
 
         Auditoria::create([
             'user_id' => $request->user()->id,
-            'accion' => 'editar',
+            'accion' => $accion,
             'entidad' => 'sede',
             'entidad_id' => $sede->id,
-            'detalle' => ['nombre' => $sede->nombre],
+            'detalle' => ['nombre' => $sede->nombre, 'activa_anterior' => $antes, 'activa_nueva' => $sede->activa],
         ]);
 
         return response()->json(['sede' => $sede]);

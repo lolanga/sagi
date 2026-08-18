@@ -48,7 +48,7 @@ export default function Alertas() {
   useEffect(cargar, [filtroEstado])
 
   useEffect(() => {
-    api.get('/unidades').then((res) => setUnidades(res.data.unidades || [])).catch(() => {})
+    api.get('/unidades').then((res) => setUnidades((res.data.unidades || []).filter((u) => u.activa))).catch(() => {})
     api.get('/items').then((res) => setItems(res.data.data || [])).catch(() => {})
   }, [])
 

@@ -53,7 +53,7 @@ export default function Movimientos() {
 
   useEffect(() => {
     api.get('/items').then((res) => setItems((res.data.data || []).filter((i) => i.estado === 'activo')))
-    api.get('/unidades').then((res) => setUnidades(res.data.unidades || [])).catch(() => {})
+    api.get('/unidades').then((res) => setUnidades((res.data.unidades || []).filter((u) => u.activa))).catch(() => {})
   }, [])
 
   const guardar = async (e) => {

@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sede extends Model
 {
-    protected $fillable = ['nombre'];
+    protected $fillable = ['nombre', 'activa'];
+
+    protected $casts = [
+        'activa' => 'boolean',
+    ];
 
     public function unidades()
     {

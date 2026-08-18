@@ -40,16 +40,24 @@ class UnidadController extends Controller
         $validated = $request->validate([
             'nombre' => 'sometimes|string|max:255',
             'sede_id' => ['sometimes', 'integer', Rule::exists('sedes', 'id')],
+            'activa' => 'sometimes|boolean',
         ]);
 
+        $antes = $unidad->activa;
         $unidad->update($validated);
+
+        if (array_key_exists('activa', $validated)) {
+            $accion = $unidad->activa ? 'activar' : 'desactivar';
+        } else {
+            $accion = 'editar';
+        }
 
         Auditoria::create([
             'user_id' => $request->user()->id,
-            'accion' => 'editar',
+            'accion' => $accion,
             'entidad' => 'unidad',
             'entidad_id' => $unidad->id,
-            'detalle' => ['nombre' => $unidad->nombre, 'sede_id' => $unidad->sede_id],
+            'detalle' => ['nombre' => $unidad->nombre, 'activa_anterior' => $antes, 'activa_nueva' => $unidad->activa],
         ]);
 
         return response()->json(['unidad' => $unidad->load('sede')]);
