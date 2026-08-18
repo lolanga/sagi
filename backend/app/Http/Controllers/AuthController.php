@@ -23,6 +23,7 @@ class AuthController extends Controller
 
         $user = User::with(['rol', 'area'])
             ->where('dni', $validated['dni'])
+            ->orWhere('username', $validated['dni'])
             ->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {

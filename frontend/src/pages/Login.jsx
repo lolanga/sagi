@@ -65,11 +65,11 @@ export default function Login() {
         </form>
 
         <div className="auth-hint">
-          <p>Usuarios de prueba:</p>
-          <p>admin / Admin1234 (Administrador)</p>
-          <p>jefe / Jefe1234 (Jefe de área)</p>
-          <p>carga / Carga1234 (Personal de carga)</p>
-          <p>consulta / Consulta1234 (Consulta)</p>
+          <p>Usuarios de prueba (DNI o usuario / clave):</p>
+          <p>10000001 (admin) / Admin1234 — Administrador</p>
+          <p>10000002 (jefe) / Jefe1234 — Jefe de área</p>
+          <p>10000003 (carga) / Carga1234 — Personal de carga</p>
+          <p>10000004 (consulta) / Consulta1234 — Consulta</p>
         </div>
       </div>
     </div>
