@@ -47,6 +47,30 @@
   font-size: 16px;
 }
 
+.scope-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.scope-form label {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.scope-form select {
+  padding: 9px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  flex: 1;
+  max-width: 360px;
+}
+
 .nuevo-campo-form {
   display: grid;
   grid-template-columns: 1fr 140px auto;
@@ -71,6 +95,12 @@
 .row-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.table td {
+  vertical-align: middle;
 }
 
 .orden-col {
@@ -113,6 +143,12 @@
 .elementos-section h4 {
   margin-bottom: 12px;
   font-size: 14px;
+}
+
+.scope-label {
+  font-size: 13px;
+  font-weight: 600;
+  align-self: center;
 }
 
 @media (max-width: 900px) {

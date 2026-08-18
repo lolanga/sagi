@@ -50,6 +50,7 @@ export default function Inventario() {
     const campos = categorias
       .find((c) => c.id === item.categoria_id)
       ?.campos_dinamicos?.filter((c) => c.activo)
+      .filter((c) => (item.tipo_item_id ? c.tipo_item_id === item.tipo_item_id : !c.tipo_item_id))
     const detalles = campos
       ? campos
           .slice(0, 2)

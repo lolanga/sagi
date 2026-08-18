@@ -3,10 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Area;
-use App\Models\CampoDinamico;
 use App\Models\Categoria;
 use App\Models\Rol;
-use App\Models\TipoItem;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -17,7 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->seedRoles();
         $this->seedAreas();
         $this->seedCategorias();
-        $this->seedTiposItems();
+        $this->call(EstructuraCategoriasSeeder::class);
         $this->seedUsuarios();
     }
 
@@ -59,123 +57,6 @@ class DatabaseSeeder extends Seeder
 
         foreach ($categorias as $categoria) {
             Categoria::firstOrCreate(['codigo' => $categoria['codigo']], $categoria);
-        }
-
-        $this->seedCamposDinamicos();
-    }
-
-    private function seedCamposDinamicos(): void
-    {
-        $campos = [
-            'A1' => [
-                ['nombre' => 'Material', 'tipo' => 'texto'],
-                ['nombre' => 'Color', 'tipo' => 'texto'],
-                ['nombre' => 'Medidas', 'tipo' => 'texto'],
-                ['nombre' => 'Detalles', 'tipo' => 'textarea'],
-                ['nombre' => 'Procedencia', 'tipo' => 'texto'],
-                ['nombre' => 'Cantidad', 'tipo' => 'numero'],
-            ],
-            'A2' => [
-                ['nombre' => 'Marca', 'tipo' => 'texto'],
-                ['nombre' => 'Modelo', 'tipo' => 'texto'],
-                ['nombre' => 'N° de serie', 'tipo' => 'texto'],
-                ['nombre' => 'Potencia o capacidad', 'tipo' => 'texto'],
-                ['nombre' => 'Detalle', 'tipo' => 'textarea'],
-                ['nombre' => 'Procedencia', 'tipo' => 'texto'],
-                ['nombre' => 'Cantidad', 'tipo' => 'numero'],
-            ],
-            'A3' => [
-                ['nombre' => 'Tipo de equipo', 'tipo' => 'texto'],
-                ['nombre' => 'Modo de conexión', 'tipo' => 'select', 'opciones' => ['Cableado', 'Wifi', 'Red', 'Otro']],
-                ['nombre' => 'Sistema operativo', 'tipo' => 'texto'],
-                ['nombre' => 'Dirección IP/MAC', 'tipo' => 'texto'],
-                ['nombre' => 'Marca', 'tipo' => 'texto'],
-                ['nombre' => 'Modelo', 'tipo' => 'texto'],
-                ['nombre' => 'N° de serie', 'tipo' => 'texto'],
-                ['nombre' => 'Procedencia', 'tipo' => 'texto'],
-                ['nombre' => 'Cantidad', 'tipo' => 'numero'],
-            ],
-            'A4' => [
-                ['nombre' => 'Tipo', 'tipo' => 'select', 'opciones' => ['Arma', 'Munición', 'Equipo de protección']],
-                ['nombre' => 'Calibre', 'tipo' => 'texto'],
-                ['nombre' => 'N° de registro', 'tipo' => 'texto'],
-                ['nombre' => 'Talla', 'tipo' => 'texto'],
-                ['nombre' => 'Estado', 'tipo' => 'texto'],
-                ['nombre' => 'Detalle', 'tipo' => 'textarea'],
-                ['nombre' => 'Procedencia', 'tipo' => 'texto'],
-                ['nombre' => 'Fecha de fabricación', 'tipo' => 'fecha'],
-                ['nombre' => 'Cantidad', 'tipo' => 'numero'],
-            ],
-            'A5' => [
-                ['nombre' => 'Marca', 'tipo' => 'texto'],
-                ['nombre' => 'Modelo', 'tipo' => 'texto'],
-                ['nombre' => 'N° de serie', 'tipo' => 'texto'],
-                ['nombre' => 'Potencia', 'tipo' => 'texto'],
-                ['nombre' => 'Detalle', 'tipo' => 'textarea'],
-                ['nombre' => 'Procedencia', 'tipo' => 'texto'],
-                ['nombre' => 'Cantidad', 'tipo' => 'numero'],
-            ],
-            'A6' => [
-                ['nombre' => 'Tipo de vehículo', 'tipo' => 'select', 'opciones' => ['Auto', 'Camioneta', 'Moto', 'Camión', 'Otro']],
-                ['nombre' => 'Marca', 'tipo' => 'texto'],
-                ['nombre' => 'Modelo', 'tipo' => 'texto'],
-                ['nombre' => 'Patente', 'tipo' => 'texto'],
-                ['nombre' => 'Año', 'tipo' => 'numero'],
-                ['nombre' => 'Color', 'tipo' => 'texto'],
-                ['nombre' => 'N° de chasis/motor', 'tipo' => 'texto'],
-                ['nombre' => 'Combustible', 'tipo' => 'texto'],
-                ['nombre' => 'N° identificatorio', 'tipo' => 'texto'],
-                ['nombre' => 'Economía de consumo', 'tipo' => 'texto'],
-                ['nombre' => 'Procedencia', 'tipo' => 'texto'],
-                ['nombre' => 'N° de expediente', 'tipo' => 'texto'],
-                ['nombre' => 'Cantidad', 'tipo' => 'numero'],
-            ],
-        ];
-
-        foreach ($campos as $codigo => $camposList) {
-            $categoria = Categoria::where('codigo', $codigo)->first();
-            if (!$categoria) {
-                continue;
-            }
-
-            foreach ($camposList as $orden => $campo) {
-                CampoDinamico::firstOrCreate(
-                    ['categoria_id' => $categoria->id, 'nombre' => $campo['nombre']],
-                    [
-                        'tipo' => $campo['tipo'],
-                        'opciones' => $campo['opciones'] ?? null,
-                        'requerido' => false,
-                        'activo' => true,
-                        'orden' => $orden,
-                    ]
-                );
-            }
-        }
-    }
-
-    private function seedTiposItems(): void
-    {
-        $tipos = [
-            'A1' => ['Mesa', 'Silla', 'Sillón', 'Estantería', 'Escritorio', 'Archivador', 'Útil'],
-            'A2' => ['Ventilador', 'Aire acondicionado', 'Heladera', 'Microondas', 'Plancha', 'Termo eléctrico'],
-            'A3' => ['Radio', 'Handy', 'Teléfono', 'PC de escritorio', 'Notebook', 'Monitor', 'Impresora', 'Cámara', 'Router', 'Switch'],
-            'A4' => ['Pistola', 'Revólver', 'Escopeta', 'Munición 9mm', 'Munición .38', 'Chaleco antibalas', 'Casco', 'Escudo', 'Máscara antigás'],
-            'A5' => ['Taladro', 'Amoladora', 'Soldadora', 'Compresora', 'Generador', 'Juego de herramientas'],
-            'A6' => ['Auto', 'Camioneta', 'Moto', 'Camión', 'Bicicleta'],
-        ];
-
-        foreach ($tipos as $codigo => $nombres) {
-            $categoria = Categoria::where('codigo', $codigo)->first();
-            if (!$categoria) {
-                continue;
-            }
-
-            foreach ($nombres as $orden => $nombre) {
-                TipoItem::firstOrCreate(
-                    ['categoria_id' => $categoria->id, 'nombre' => $nombre],
-                    ['orden' => $orden]
-                );
-            }
         }
     }
 

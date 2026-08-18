@@ -47,6 +47,19 @@ class ItemController extends Controller
         return response()->json($items);
     }
 
+    private function camposActivos(Categoria $categoria, ?int $tipoItemId)
+    {
+        $query = $categoria->camposDinamicos()->where('activo', true);
+
+        if ($tipoItemId) {
+            $query->where('tipo_item_id', $tipoItemId);
+        } else {
+            $query->whereNull('tipo_item_id');
+        }
+
+        return $query->orderBy('orden')->get();
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -61,8 +74,8 @@ class ItemController extends Controller
         $categoria = Categoria::findOrFail($validated['categoria_id']);
         $user = $request->user();
 
-        // Validar campos dinámicos requeridos
-        $campos = $categoria->camposDinamicos()->where('activo', true)->get();
+        // Validar campos dinámicos requeridos del elemento (o de la categoría)
+        $campos = $this->camposActivos($categoria, $validated['tipo_item_id'] ?? null);
         $valores = $validated['valores'] ?? [];
         foreach ($campos->where('requerido', true) as $campo) {
             if (empty($valores[$campo->id])) {

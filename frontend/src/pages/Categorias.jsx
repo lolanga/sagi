@@ -15,6 +15,7 @@ export default function Categorias() {
   const [nuevoTipo, setNuevoTipo] = useState('')
   const [editandoTipo, setEditandoTipo] = useState(null)
   const [nombreEdit, setNombreEdit] = useState('')
+  const [scopeTipo, setScopeTipo] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
 
@@ -39,6 +40,7 @@ export default function Categorias() {
       nombre: nuevoCampo.nombre,
       tipo: nuevoCampo.tipo,
     }
+    if (scopeTipo) payload.tipo_item_id = Number(scopeTipo)
     if (nuevoCampo.tipo === 'select' && nuevoCampo.opciones) {
       payload.opciones = nuevoCampo.opciones.split(',').map((o) => o.trim()).filter(Boolean)
     }
@@ -122,6 +124,10 @@ export default function Categorias() {
 
   const ordenar = (lista) => [...(lista || [])].sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
 
+  const camposDelScope = (selected?.campos_dinamicos || []).filter((c) =>
+    scopeTipo ? c.tipo_item_id === Number(scopeTipo) : !c.tipo_item_id
+  )
+
   return (
     <div className="layout">
       <aside className="sidebar">
@@ -152,7 +158,7 @@ export default function Categorias() {
                   <button
                     key={c.id}
                     className={`categoria-item ${selected?.id === c.id ? 'active' : ''}`}
-                    onClick={() => setSelected(c)}
+                    onClick={() => { setSelected(c); setScopeTipo('') }}
                   >
                     <strong>{c.codigo}</strong>
                     <span>{c.nombre}</span>
@@ -164,6 +170,19 @@ export default function Categorias() {
               {selected && (
                 <div className="campos-panel">
                   <h3>Campos dinámicos — {selected.codigo} {selected.nombre}</h3>
+
+                  <div className="scope-form">
+                    <label>Campos del elemento:</label>
+                    <select
+                      value={scopeTipo}
+                      onChange={(e) => setScopeTipo(e.target.value)}
+                    >
+                      <option value="">Campos generales de la categoría</option>
+                      {ordenar(selected.tipos_items).map((t) => (
+                        <option key={t.id} value={t.id}>{t.nombre}</option>
+                      ))}
+                    </select>
+                  </div>
 
                   <form onSubmit={agregarCampo} className="nuevo-campo-form">
                     <input
@@ -194,7 +213,7 @@ export default function Categorias() {
 
                   {error && <p className="form-error">{error}</p>}
 
-                  {ordenar(selected.campos_dinamicos).length === 0 ? (
+                  {ordenar(camposDelScope).length === 0 ? (
                     <p className="muted">Sin campos definidos.</p>
                   ) : (
                     <table className="table">
@@ -209,8 +228,8 @@ export default function Categorias() {
                         </tr>
                       </thead>
                       <tbody>
-                        {ordenar(selected.campos_dinamicos).map((campo, i) => {
-                          const total = selected.campos_dinamicos.length
+                        {ordenar(camposDelScope).map((campo, i) => {
+                          const total = camposDelScope.length
                           return (
                             <tr key={campo.id} className={campo.activo ? '' : 'row-inactivo'}>
                               <td className="orden-col">

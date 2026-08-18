@@ -8,6 +8,7 @@ use App\Models\TipoItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class CategoriaController extends Controller
 {
@@ -18,9 +19,15 @@ class CategoriaController extends Controller
         return response()->json(['categorias' => $categorias]);
     }
 
-    public function campos(Categoria $categoria): JsonResponse
+    public function campos(Request $request, Categoria $categoria): JsonResponse
     {
-        return response()->json(['campos' => $categoria->camposDinamicos]);
+        $query = $categoria->camposDinamicos();
+
+        if ($request->filled('tipo_item_id')) {
+            $query->where('tipo_item_id', $request->integer('tipo_item_id'));
+        }
+
+        return response()->json(['campos' => $query->orderBy('orden')->get()]);
     }
 
     public function tipos(Categoria $categoria): JsonResponse
@@ -75,7 +82,8 @@ class CategoriaController extends Controller
     public function moverCampo(Request $request, CampoDinamico $campo): JsonResponse
     {
         $direccion = $request->validate(['direccion' => 'required|in:up,down'])['direccion'];
-        $this->moverEnLista(CampoDinamico::where('categoria_id', $campo->categoria_id), $campo, $direccion);
+        $this->moverEnLista(CampoDinamico::where('categoria_id', $campo->categoria_id)
+            ->where('tipo_item_id', $campo->tipo_item_id), $campo, $direccion);
 
         return response()->json(['message' => 'Orden actualizado']);
     }
@@ -107,16 +115,22 @@ class CategoriaController extends Controller
             'nombre' => 'required|string|max:255',
             'tipo' => 'required|in:texto,numero,fecha,select,textarea',
             'opciones' => 'nullable|array',
+            'placeholder' => 'nullable|string|max:255',
             'requerido' => 'nullable|boolean',
+            'tipo_item_id' => ['nullable', 'integer', Rule::exists('tipos_items', 'id')->where(fn ($q) => $q->where('categoria_id', $categoria->id))],
         ]);
 
         $campo = $categoria->camposDinamicos()->create([
+            'tipo_item_id' => $validated['tipo_item_id'] ?? null,
             'nombre' => $validated['nombre'],
             'tipo' => $validated['tipo'],
             'opciones' => $validated['opciones'] ?? null,
+            'placeholder' => $validated['placeholder'] ?? null,
             'requerido' => $validated['requerido'] ?? false,
             'activo' => true,
-            'orden' => $categoria->camposDinamicos()->count(),
+            'orden' => $categoria->camposDinamicos()
+                ->where('tipo_item_id', $validated['tipo_item_id'] ?? null)
+                ->count(),
         ]);
 
         return response()->json(['campo' => $campo], 201);
@@ -128,6 +142,7 @@ class CategoriaController extends Controller
             'nombre' => 'sometimes|string|max:255',
             'tipo' => 'sometimes|in:texto,numero,fecha,select,textarea',
             'opciones' => 'nullable|array',
+            'placeholder' => 'nullable|string|max:255',
             'requerido' => 'nullable|boolean',
             'activo' => 'nullable|boolean',
             'orden' => 'nullable|integer',

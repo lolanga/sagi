@@ -27,11 +27,13 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
   useEffect(() => {
     if (!categoriaId) {
       setCampos([])
+      setTipos([])
+      setTipoItemId('')
       return
     }
     setLoading(true)
     api
-      .get(`/categorias/${categoriaId}/campos`)
+      .get(`/categorias/${categoriaId}/campos`, { params: tipoItemId ? { tipo_item_id: tipoItemId } : {} })
       .then((res) => {
         const activos = (res.data.campos || []).filter((c) => c.activo)
         setCampos(activos)
@@ -43,7 +45,7 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
       .get(`/categorias/${categoriaId}/tipos`)
       .then((res) => setTipos(res.data.tipos || []))
       .catch(() => setTipos([]))
-  }, [categoriaId])
+  }, [categoriaId, tipoItemId])
 
   const renderCampo = (campo) => {
     const key = String(campo.id)
@@ -148,7 +150,10 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
           <select
             id="categoria"
             value={categoriaId}
-            onChange={(e) => setCategoriaId(e.target.value)}
+            onChange={(e) => {
+              setCategoriaId(e.target.value)
+              if (!esEdicion) setTipoItemId('')
+            }}
             required
             disabled={esEdicion}
           >
@@ -175,21 +180,20 @@ export default function ItemForm({ categorias, item, onSaved, onCancel }) {
           </select>
         </div>
 
-        {tipos.length > 0 && (
-          <div className="field">
-            <label htmlFor="tipo-item">Elemento</label>
-            <select
-              id="tipo-item"
-              value={tipoItemId}
-              onChange={(e) => setTipoItemId(e.target.value)}
-            >
-              <option value="">Seleccionar elemento...</option>
-              {tipos.map((t) => (
-                <option key={t.id} value={t.id}>{t.nombre}</option>
-              ))}
-            </select>
-          </div>
-        )}
+        <div className="field">
+          <label htmlFor="tipo-item">Elemento</label>
+          <select
+            id="tipo-item"
+            value={tipoItemId}
+            onChange={(e) => setTipoItemId(e.target.value)}
+            required={tipos.length > 0}
+          >
+            <option value="">{tipos.length > 0 ? 'Seleccionar elemento...' : 'Sin elementos definidos'}</option>
+            {tipos.map((t) => (
+              <option key={t.id} value={t.id}>{t.nombre}</option>
+            ))}
+          </select>
+        </div>
 
         <div className="field">
           <label htmlFor="cantidad">Cantidad *</label>

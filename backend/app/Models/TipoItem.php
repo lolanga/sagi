@@ -14,4 +14,9 @@ class TipoItem extends Model
     {
         return $this->belongsTo(Categoria::class);
     }
+
+    public function campos()
+    {
+        return $this->hasMany(CampoDinamico::class)->orderBy('orden');
+    }
 }
