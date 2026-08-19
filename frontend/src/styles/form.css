@@ -71,3 +71,21 @@
 .muted {
   color: var(--color-muted);
 }
+
+.small {
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions .btn {
+    width: 100%;
+  }
+}

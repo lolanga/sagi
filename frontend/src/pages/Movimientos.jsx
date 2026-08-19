@@ -136,6 +136,7 @@ export default function Movimientos() {
           <p>No hay movimientos registrados. Crea una solicitud de traslado o baja.</p>
         </div>
       ) : (
+        <div className="table-wrap">
         <table className="table">
           <thead>
             <tr>
@@ -151,19 +152,19 @@ export default function Movimientos() {
           <tbody>
             {movimientos.map((m) => (
               <tr key={m.id}>
-                <td>{new Date(m.created_at).toLocaleString()}</td>
-                <td>{m.tipo === 'traslado' ? 'Traslado' : 'Baja'}</td>
-                <td><strong>{m.item?.codigo_unico}</strong> · {m.item?.tipo_item?.nombre ?? '-'}</td>
-                <td>
+                <td data-label="Fecha">{new Date(m.created_at).toLocaleString()}</td>
+                <td data-label="Tipo">{m.tipo === 'traslado' ? 'Traslado' : 'Baja'}</td>
+                <td data-label="Ítem"><strong>{m.item?.codigo_unico}</strong> · {m.item?.tipo_item?.nombre ?? '-'}</td>
+                <td data-label="Origen → Destino">
                   {m.unidad_origen?.nombre ?? '-'} → {m.unidad_destino?.nombre ?? '-'}
                   {m.motivo && <div className="muted small">{m.motivo}</div>}
                   {m.motivo_rechazo && <div className="muted small">Rechazo: {m.motivo_rechazo}</div>}
                 </td>
-                <td>
+                <td data-label="Estado">
                   <span className={`badge badge-${m.estado}`}>{m.estado}</span>
                 </td>
-                <td>{m.solicitante?.name}{m.validador ? ` · validado por ${m.validador.name}` : ''}</td>
-                <td>
+                <td data-label="Solicitante">{m.solicitante?.name}{m.validador ? ` · validado por ${m.validador.name}` : ''}</td>
+                <td data-label="Acciones">
                   {puedeValidar && m.estado === 'pendiente' && (
                     <div className="row-actions">
                       <button className="btn-link" onClick={() => aprobar(m)}>Aprobar</button>
@@ -175,6 +176,7 @@ export default function Movimientos() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Modal open={showNuevo} title="Nueva solicitud de movimiento" onClose={() => setShowNuevo(false)} wide>

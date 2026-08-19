@@ -49,3 +49,19 @@
 .modal-body {
   padding: 20px;
 }
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 16px 10px;
+    align-items: center;
+  }
+
+  .modal {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-wide {
+    max-width: 100%;
+  }
+}

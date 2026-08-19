@@ -226,6 +226,7 @@ export default function Unidades() {
               <p>No hay unidades que coincidan con la búsqueda.</p>
             </div>
           ) : (
+            <div className="table-wrap">
             <table className="table">
               <thead>
                 <tr>
@@ -237,7 +238,7 @@ export default function Unidades() {
               <tbody>
                 {unidadesFiltradas.map((u) => (
                   <tr key={u.id} className={u.activa ? '' : 'inactiva'}>
-                    <td>
+                    <td data-label="Nombre">
                       <input
                         className="editable-input"
                         type="text"
@@ -251,7 +252,7 @@ export default function Unidades() {
                         }}
                       />
                     </td>
-                    <td>
+                    <td data-label="Sede">
                       <select
                         className="editable-select"
                         value={u.sede_id}
@@ -262,7 +263,7 @@ export default function Unidades() {
                         ))}
                       </select>
                     </td>
-                    <td>
+                    <td data-label="Acciones">
                       {puedeGestionar && (
                         <div className="row-actions">
                           <button className="btn-link" onClick={() => toggleUnidad(u)}>
@@ -276,6 +277,7 @@ export default function Unidades() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </>
       )}

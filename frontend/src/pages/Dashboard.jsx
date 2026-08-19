@@ -59,6 +59,7 @@ export default function Dashboard() {
             {porCategoria.length === 0 ? (
               <p className="muted">Sin ítems cargados.</p>
             ) : (
+              <div className="table-wrap">
               <table className="table">
                 <thead>
                   <tr>
@@ -70,13 +71,14 @@ export default function Dashboard() {
                 <tbody>
                   {porCategoria.map((c) => (
                     <tr key={c.codigo}>
-                      <td><strong>{c.codigo}</strong></td>
-                      <td>{c.nombre}</td>
-                      <td>{c.total}</td>
+                      <td data-label="Código"><strong>{c.codigo}</strong></td>
+                      <td data-label="Categoría">{c.nombre}</td>
+                      <td data-label="Ítems">{c.total}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </>

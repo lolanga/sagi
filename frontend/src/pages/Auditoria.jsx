@@ -67,6 +67,7 @@ export default function Auditoria() {
           <p>No hay movimientos de auditoría que coincidan con los filtros.</p>
         </div>
       ) : (
+        <div className="table-wrap">
         <table className="table">
           <thead>
             <tr>
@@ -80,15 +81,16 @@ export default function Auditoria() {
           <tbody>
             {logs.map((log) => (
               <tr key={log.id}>
-                <td>{new Date(log.created_at).toLocaleString()}</td>
-                <td>{log.user?.name}</td>
-                <td><span className={`badge badge-accion badge-${log.accion}`}>{log.accion}</span></td>
-                <td>{log.entidad}</td>
-                <td className="audit-detalle">{formatearDetalle(log.detalle)}</td>
+                <td data-label="Fecha">{new Date(log.created_at).toLocaleString()}</td>
+                <td data-label="Usuario">{log.user?.name}</td>
+                <td data-label="Acción"><span className={`badge badge-accion badge-${log.accion}`}>{log.accion}</span></td>
+                <td data-label="Entidad">{log.entidad}</td>
+                <td data-label="Detalle" className="audit-detalle">{formatearDetalle(log.detalle)}</td>
               </tr>
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </Layout>
   )

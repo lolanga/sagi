@@ -217,3 +217,65 @@
   cursor: pointer;
   white-space: nowrap;
 }
+
+@media (max-width: 768px) {
+  .filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters-bar .search-input,
+  .filters-bar .filter-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .filters-bar .result-count {
+    align-self: flex-end;
+  }
+
+  .editable-row {
+    flex-wrap: wrap;
+  }
+
+  .editable-row .editable-input {
+    flex-basis: 100%;
+  }
+
+  .inline-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inline-form .btn {
+    width: 100%;
+  }
+
+  .inline-form select {
+    width: 100%;
+  }
+
+  .panel-admin-section {
+    padding: 14px;
+  }
+
+  .editable-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .table td[data-label='Acciones'] .row-actions,
+  .table td:has(.row-actions) {
+    justify-content: flex-end;
+  }
+
+  .scope-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .scope-form select {
+    max-width: none;
+    width: 100%;
+  }
+}

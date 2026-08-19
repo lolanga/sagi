@@ -126,6 +126,7 @@ export default function Inventario() {
           <p>No hay ítems que coincidan con la búsqueda. Registra un alta para comenzar.</p>
         </div>
       ) : (
+        <div className="table-wrap">
         <table className="table">
           <thead>
             <tr>
@@ -142,16 +143,16 @@ export default function Inventario() {
           <tbody>
             {items.map((item) => (
               <tr key={item.id}>
-                <td><strong>{item.codigo_unico}</strong></td>
-                <td>{item.categoria?.codigo}</td>
-                <td>{formatValores(item)}</td>
-                <td>
+                <td data-label="Código"><strong>{item.codigo_unico}</strong></td>
+                <td data-label="Categoría">{item.categoria?.codigo}</td>
+                <td data-label="Detalle">{formatValores(item)}</td>
+                <td data-label="Estado">
                   <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
                 </td>
-                <td>{item.cantidad}</td>
-                <td>{item.unidad?.nombre ?? '-'}</td>
-                <td>{item.responsable?.name}</td>
-                <td>
+                <td data-label="Cant.">{item.cantidad}</td>
+                <td data-label="Unidad">{item.unidad?.nombre ?? '-'}</td>
+                <td data-label="Responsable">{item.responsable?.name}</td>
+                <td data-label="Acciones">
                   <div className="row-actions">
                     <button className="btn-link" onClick={() => setViendo(item)}>Ver</button>
                     {puedeEditar && (
@@ -166,6 +167,7 @@ export default function Inventario() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Modal open={showAlta} title="Registrar alta de ítem" onClose={() => setShowAlta(false)} wide>

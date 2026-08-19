@@ -87,6 +87,7 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
       <div className="detalle-card">
         <h4>Historial de movimientos</h4>
         {item.movimientos && item.movimientos.length > 0 ? (
+          <div className="table-wrap">
           <table className="table">
             <thead>
               <tr>
@@ -103,18 +104,19 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
             <tbody>
               {item.movimientos.map((m) => (
                 <tr key={m.id}>
-                  <td>{formatearFecha(m.created_at)}</td>
-                  <td><span className={`badge ${badgeTipo[m.tipo] || ''}`}>{m.tipo}</span></td>
-                  <td>{m.unidad_origen?.nombre ?? '-'}</td>
-                  <td>{m.unidad_destino?.nombre ?? '-'}</td>
-                  <td>{m.motivo}</td>
-                  <td>{m.solicitante?.name ?? '-'}</td>
-                  <td>{m.validador?.name ?? '-'}</td>
-                  <td><span className={`badge ${badgeEstado[m.estado] || ''}`}>{m.estado}</span></td>
+                  <td data-label="Fecha">{formatearFecha(m.created_at)}</td>
+                  <td data-label="Tipo"><span className={`badge ${badgeTipo[m.tipo] || ''}`}>{m.tipo}</span></td>
+                  <td data-label="Origen">{m.unidad_origen?.nombre ?? '-'}</td>
+                  <td data-label="Destino">{m.unidad_destino?.nombre ?? '-'}</td>
+                  <td data-label="Motivo">{m.motivo}</td>
+                  <td data-label="Solicitante">{m.solicitante?.name ?? '-'}</td>
+                  <td data-label="Validador">{m.validador?.name ?? '-'}</td>
+                  <td data-label="Estado"><span className={`badge ${badgeEstado[m.estado] || ''}`}>{m.estado}</span></td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         ) : (
           <p className="muted">Sin movimientos registrados.</p>
         )}

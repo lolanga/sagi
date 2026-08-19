@@ -111,6 +111,7 @@ export default function Alertas() {
           <p>No hay alertas que coincidan con el filtro.</p>
         </div>
       ) : (
+        <div className="table-wrap">
         <table className="table">
           <thead>
             <tr>
@@ -125,19 +126,19 @@ export default function Alertas() {
           <tbody>
             {alertas.map((a) => (
               <tr key={a.id}>
-                <td>{new Date(a.created_at).toLocaleString()}</td>
-                <td>
+                <td data-label="Fecha">{new Date(a.created_at).toLocaleString()}</td>
+                <td data-label="Prioridad">
                   <span className={`badge badge-prioridad-${a.prioridad}`}>{a.prioridad}</span>
                 </td>
-                <td>
+                <td data-label="Mensaje">
                   {a.mensaje}
                   {a.fecha_cierre && <div className="muted small">Cerrada: {new Date(a.fecha_cierre).toLocaleString()}</div>}
                 </td>
-                <td>{a.item?.codigo_unico ?? '-'}</td>
-                <td>
+                <td data-label="Ítem">{a.item?.codigo_unico ?? '-'}</td>
+                <td data-label="Estado">
                   <span className={`badge badge-${a.estado}`}>{a.estado}</span>
                 </td>
-                <td>
+                <td data-label="Acciones">
                   {puedeGestionar && a.estado === 'abierta' && (
                     <button className="btn-link" onClick={() => cerrar(a)}>Cerrar</button>
                   )}
@@ -146,6 +147,7 @@ export default function Alertas() {
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Modal open={showNueva} title="Nueva alerta" onClose={() => setShowNueva(false)} wide>

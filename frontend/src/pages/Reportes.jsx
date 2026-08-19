@@ -7,6 +7,7 @@ function Tabla({ titulo, encabezados, filas }) {
   return (
     <div className="stat-card reporte-card">
       <h3>{titulo}</h3>
+      <div className="table-wrap">
       <table className="table">
         <thead>
           <tr>
@@ -16,11 +17,12 @@ function Tabla({ titulo, encabezados, filas }) {
         <tbody>
           {filas.map((f, i) => (
             <tr key={i}>
-              {f.map((c, j) => <td key={j}>{c}</td>)}
+              {f.map((c, j) => <td key={j} data-label={encabezados[j]}>{c}</td>)}
             </tr>
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }

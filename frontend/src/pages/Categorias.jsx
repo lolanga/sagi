@@ -196,6 +196,7 @@ export default function Categorias() {
                   {ordenar(camposDelScope).length === 0 ? (
                     <p className="muted">Sin campos definidos.</p>
                   ) : (
+                    <div className="table-wrap">
                     <table className="table">
                       <thead>
                         <tr>
@@ -212,17 +213,17 @@ export default function Categorias() {
                           const total = camposDelScope.length
                           return (
                             <tr key={campo.id} className={campo.activo ? '' : 'row-inactivo'}>
-                              <td className="orden-col">
+                              <td data-label="#" className="orden-col">
                                 <div className="orden-buttons">
                                   <button className="btn-icon" disabled={i === 0} onClick={() => moverCampo(campo, 'up')} title="Subir">↑</button>
                                   <button className="btn-icon" disabled={i === total - 1} onClick={() => moverCampo(campo, 'down')} title="Bajar">↓</button>
                                 </div>
                               </td>
-                              <td>{campo.nombre}</td>
-                              <td>{campo.tipo}{campo.opciones?.length ? ` (${campo.opciones.join(', ')})` : ''}</td>
-                              <td>{campo.requerido ? 'Sí' : 'No'}</td>
-                              <td>{campo.activo ? 'Sí' : 'No'}</td>
-                              <td className="row-actions">
+                              <td data-label="Campo">{campo.nombre}</td>
+                              <td data-label="Tipo">{campo.tipo}{campo.opciones?.length ? ` (${campo.opciones.join(', ')})` : ''}</td>
+                              <td data-label="Requerido">{campo.requerido ? 'Sí' : 'No'}</td>
+                              <td data-label="Activo">{campo.activo ? 'Sí' : 'No'}</td>
+                              <td data-label="Acciones" className="row-actions">
                                 <button className="btn-link" onClick={() => toggleCampo(campo)}>
                                   {campo.activo ? 'Desactivar' : 'Activar'}
                                 </button>
@@ -235,6 +236,7 @@ export default function Categorias() {
                         })}
                       </tbody>
                     </table>
+                    </div>
                   )}
 
                   <div className="elementos-section">
@@ -253,6 +255,7 @@ export default function Categorias() {
                     {ordenar(selected.tipos_items).length === 0 ? (
                       <p className="muted">Sin elementos definidos.</p>
                     ) : (
+                      <div className="table-wrap">
                       <table className="table">
                         <thead>
                           <tr>
@@ -266,14 +269,14 @@ export default function Categorias() {
                             const total = selected.tipos_items.length
                             return (
                               <tr key={tipo.id}>
-                                <td className="orden-col">
+                                <td data-label="#" className="orden-col">
                                   <div className="orden-buttons">
                                     <button className="btn-icon" disabled={i === 0} onClick={() => moverTipo(tipo, 'up')} title="Subir">↑</button>
                                     <button className="btn-icon" disabled={i === total - 1} onClick={() => moverTipo(tipo, 'down')} title="Bajar">↓</button>
                                   </div>
                                 </td>
-                                <td>{tipo.nombre}</td>
-                                <td className="row-actions">
+                                <td data-label="Elemento">{tipo.nombre}</td>
+                                <td data-label="Acciones" className="row-actions">
                                   <button className="btn-link" onClick={() => abrirEdicionTipo(tipo)}>
                                     Renombrar
                                   </button>
@@ -286,6 +289,7 @@ export default function Categorias() {
                           })}
                         </tbody>
                       </table>
+                      </div>
                     )}
                   </div>
                 </div>
