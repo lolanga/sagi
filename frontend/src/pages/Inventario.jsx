@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import Modal from '../components/Modal'
 import ItemForm from '../components/ItemForm'
+import ItemDetalle from '../components/ItemDetalle'
 import Layout from '../components/Layout'
 import '../styles/inventario.css'
 
@@ -18,6 +19,7 @@ export default function Inventario() {
   const [categoriaId, setCategoriaId] = useState('')
   const [showAlta, setShowAlta] = useState(false)
   const [editando, setEditando] = useState(null)
+  const [viendo, setViendo] = useState(null)
   const [eliminando, setEliminando] = useState(null)
   const [error, setError] = useState('')
 
@@ -150,12 +152,15 @@ export default function Inventario() {
                 <td>{item.unidad?.nombre ?? '-'}</td>
                 <td>{item.responsable?.name}</td>
                 <td>
-                  {puedeEditar && (
-                    <div className="row-actions">
-                      <button className="btn-link" onClick={() => setEditando(item)}>Editar</button>
-                      <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)}>Eliminar</button>
-                    </div>
-                  )}
+                  <div className="row-actions">
+                    <button className="btn-link" onClick={() => setViendo(item)}>Ver</button>
+                    {puedeEditar && (
+                      <>
+                        <button className="btn-link" onClick={() => setEditando(item)}>Editar</button>
+                        <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)}>Eliminar</button>
+                      </>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -187,6 +192,16 @@ export default function Inventario() {
               cargarItems()
             }}
             onCancel={() => setEditando(null)}
+          />
+        )}
+      </Modal>
+
+      <Modal open={Boolean(viendo)} title={`Detalle ${viendo?.codigo_unico ?? ''}`} onClose={() => setViendo(null)} wide>
+        {viendo && (
+          <ItemDetalle
+            itemId={viendo.id}
+            categorias={categorias}
+            onClose={() => setViendo(null)}
           />
         )}
       </Modal>

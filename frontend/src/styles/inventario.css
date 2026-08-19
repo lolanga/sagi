@@ -78,6 +78,11 @@
 .badge-rechazar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
 .badge-desactivar { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
 .badge-activar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
+.badge-alta { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
+.badge-traslado { background-color: rgba(33, 150, 243, 0.18); color: var(--color-info); }
+.badge-baja { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
+.badge-aprobado { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
+.badge-pendiente { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
 
 .badge-prioridad-critica { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
 .badge-prioridad-importante { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }

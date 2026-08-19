@@ -55,3 +55,7 @@ Abrir `http://localhost:5173`.
 - `SAGI-Especificaciones-Funcionales.md`
 - `SAGI-Especificaciones-Tecnicas.md`
 - `SAGI-Plan-de-Implementacion.md`
+
+## Estado
+
+- Fases 1 a 5 implementadas en `main` (inventario, movimientos, reportes, alertas, sedes/unidades con activar/desactivar, auditoría y detalle de ítem con historial).
