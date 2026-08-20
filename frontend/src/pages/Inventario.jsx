@@ -154,10 +154,10 @@ export default function Inventario() {
                 <td data-label="Responsable">{item.responsable?.name}</td>
                 <td data-label="Acciones">
                   <div className="row-actions">
-                    <button className="btn-link" onClick={() => setViendo(item)}>Ver</button>
+                    <button className="btn-link btn-link-ver" onClick={() => setViendo(item)}>Ver</button>
                     {puedeEditar && (
                       <>
-                        <button className="btn-link" onClick={() => setEditando(item)}>Editar</button>
+                        <button className="btn-link btn-link-editar" onClick={() => setEditando(item)}>Editar</button>
                         <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)}>Eliminar</button>
                       </>
                     )}

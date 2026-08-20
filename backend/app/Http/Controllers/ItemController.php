@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alerta;
 use App\Models\Auditoria;
 use App\Models\Categoria;
 use App\Models\Item;
@@ -186,6 +187,12 @@ class ItemController extends Controller
                 'entidad_id' => $item->id,
                 'detalle' => ['codigo' => $item->codigo_unico],
             ]);
+
+            $movimientoIds = $item->movimientos()->pluck('id');
+
+            Alerta::where('item_id', $item->id)
+                ->orWhereIn('movimiento_id', $movimientoIds)
+                ->update(['item_id' => null, 'movimiento_id' => null]);
 
             $item->movimientos()->delete();
             $item->delete();
