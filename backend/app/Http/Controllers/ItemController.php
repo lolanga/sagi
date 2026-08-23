@@ -20,7 +20,7 @@ class ItemController extends Controller
         $query = Item::with(['categoria', 'tipoItem', 'responsable', 'unidad.sede'])
             ->orderByDesc('created_at');
 
-        if ($request->filled('search')) {
+if ($request->filled('search')) {
             $termino = $request->string('search');
             $query->where(function ($q) use ($termino) {
                 $q->where('codigo_unico', 'like', "%{$termino}%")

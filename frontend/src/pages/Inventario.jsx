@@ -176,6 +176,26 @@ export default function Inventario() {
         </div>
       )}
 
+      {lastPage > 1 && (
+        <div className="pagination">
+          <button
+            className={page === 1 ? 'btn btn-secondary disabled' : 'btn btn-secondary'}
+            onClick={() => setPage((page) => page - 1)}
+            disabled={page === 1}
+            aria-label="Página anterior">
+            Anterior
+          </button>
+          <span>Página {page} de {lastPage}</span>
+          <button
+            className={page === lastPage ? 'btn btn-secondary disabled' : 'btn btn-secondary'}
+            onClick={() => setPage((page) => page + 1)}
+            disabled={page === lastPage}
+            aria-label="Página siguiente">
+            Siguiente
+          </button>
+        </div>
+      )}
+
       <Modal open={showAlta} title="Registrar alta de ítem" onClose={() => setShowAlta(false)} wide>
         <ItemForm
           categorias={categorias}
