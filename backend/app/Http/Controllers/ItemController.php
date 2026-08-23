@@ -7,6 +7,7 @@ use App\Models\Auditoria;
 use App\Models\Categoria;
 use App\Models\Item;
 use App\Models\Movimiento;
+use App\Models\Unidad;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -90,7 +91,7 @@ class ItemController extends Controller
         }
 
         DB::transaction(function () use (&$item, $request, $categoria, $user, $valores, $validated) {
-            $codigo = $this->generarCodigoUnico();
+            $codigo = $this->generarCodigoUnico($categoria->codigo, (int) $validated['unidad_id']);
 
             // El ítem ingresa en A7 (Altas) y se traslada a su categoría real en el alta
             $item = Item::create([
@@ -202,15 +203,18 @@ class ItemController extends Controller
         return response()->json(['message' => 'Ítem eliminado']);
     }
 
-    private function generarCodigoUnico(): string
+    private function generarCodigoUnico(string $codigoCategoria, int $unidadId): string
     {
-        $ultimo = Item::orderByDesc('codigo_unico')->value('codigo_unico');
-        $nro = 1;
+        // Formato: {Categoria}-{IdSede 2}-{IdUnidad 2}-{orden 6} -> A1-03-47-000001
+        $unidad = Unidad::findOrFail($unidadId);
+        $prefijo = sprintf('%s-%02d-%02d-', $codigoCategoria, $unidad->sede_id, $unidadId);
 
-        if ($ultimo && preg_match('/(\d+)$/', $ultimo, $m)) {
-            $nro = (int) $m[1] + 1;
-        }
+        $ultimo = Item::where('codigo_unico', 'like', $prefijo.'%')
+            ->orderByDesc('codigo_unico')
+            ->value('codigo_unico');
 
-        return 'SAGI-' . str_pad((string) $nro, 6, '0', STR_PAD_LEFT);
+        $nro = $ultimo ? ((int) substr($ultimo, -6)) + 1 : 1;
+
+        return $prefijo.str_pad((string) $nro, 6, '0', STR_PAD_LEFT);
     }
 }

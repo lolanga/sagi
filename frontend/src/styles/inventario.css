@@ -194,6 +194,10 @@
   flex-wrap: wrap;
 }
 
+.sede-id {
+  color: var(--color-accent);
+}
+
 @media (min-width: 640px) {
   .sedes-grid {
     grid-template-columns: repeat(2, 1fr);

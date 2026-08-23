@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  background: linear-gradient(135deg, #131722 0%, var(--color-primary-dark) 55%, var(--color-primary) 100%);
   padding: 20px;
 }
 
@@ -14,15 +14,30 @@
   padding: 36px 32px;
   width: 100%;
   max-width: 380px;
+  border-top: 4px solid var(--color-accent);
 }
 
 .auth-logo {
-  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 30px;
   font-weight: 800;
   letter-spacing: 3px;
-  color: var(--color-primary);
-  text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.auth-logo svg {
+  width: 40px;
+  height: 40px;
+}
+
+.auth-logo .logo-text {
+  background: linear-gradient(90deg, var(--color-primary-dark), var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .auth-title {

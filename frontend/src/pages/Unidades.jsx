@@ -197,7 +197,9 @@ export default function Unidades() {
                         }}
                       />
                       <div className="sede-card-meta">
-                        <span className="result-count">{sede.unidades?.length ?? 0} unidades</span>
+                        <span className="result-count">
+                          <strong className="sede-id">IdSede {String(sede.id).padStart(2, '0')}</strong> · {sede.unidades?.length ?? 0} unidades
+                        </span>
                         {puedeGestionar && (
                           <div className="row-actions">
                             <button className="btn-link" onClick={() => toggleSede(sede)}>
@@ -261,6 +263,7 @@ export default function Unidades() {
             <table className="table">
               <thead>
                 <tr>
+                  <th>IdUnidad</th>
                   <th>Nombre</th>
                   <th>Sede</th>
                   <th></th>
@@ -269,6 +272,7 @@ export default function Unidades() {
               <tbody>
                 {unidadesFiltradas.map((u) => (
                   <tr key={u.id} className={u.activa ? '' : 'inactiva'}>
+                    <td data-label="IdUnidad"><strong>{String(u.id).padStart(2, '0')}</strong></td>
                     <td data-label="Nombre">
                       <input
                         className="editable-input"

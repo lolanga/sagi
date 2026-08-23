@@ -154,7 +154,7 @@ export default function Movimientos() {
             {movimientos.map((m) => (
               <tr key={m.id}>
                 <td data-label="Fecha">{new Date(m.created_at).toLocaleString()}</td>
-                <td data-label="Tipo">{m.tipo === 'traslado' ? 'Traslado' : 'Baja'}</td>
+                <td data-label="Tipo">{m.tipo === 'traslado' ? 'Traslado' : m.tipo === 'baja' ? 'Baja' : 'Alta'}</td>
                 <td data-label="Ítem"><strong>{m.item?.codigo_unico}</strong> · {m.item?.tipo_item?.nombre ?? '-'}</td>
                 <td data-label="Origen → Destino">
                   {m.unidad_origen?.nombre ?? '-'} → {m.unidad_destino?.nombre ?? '-'}

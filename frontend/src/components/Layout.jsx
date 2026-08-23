@@ -52,6 +52,7 @@ export default function Layout({ title, actions, children, back }) {
               </Link>
             ))}
         </nav>
+        <div className="sidebar-footer">Departamento Tecnología, Desarrollo e Innovación</div>
       </aside>
 
       <main className="main">

@@ -28,7 +28,20 @@ export default function Login() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <div className="auth-logo">SAGI</div>
+        <div className="auth-logo">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="login-grad" x1="0" y1="0" x2="24" y2="24">
+                <stop offset="0%" stopColor="#3568a6" />
+                <stop offset="100%" stopColor="#f57c00" />
+              </linearGradient>
+            </defs>
+            <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z" stroke="url(#login-grad)" strokeWidth="1.8" strokeLinejoin="round" />
+            <path d="M3 7.5 12 12l9-4.5M12 12v9" stroke="url(#login-grad)" strokeWidth="1.8" strokeLinejoin="round" />
+            <path d="M7.5 5.25 16.5 9.75" stroke="#f57c00" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+          <span className="logo-text">SAGI</span>
+        </div>
         <h1 className="auth-title">Sistema de Administración y Gestión de Inventarios</h1>
         <p className="auth-subtitle">Instituto de Seguridad Pública</p>
 
