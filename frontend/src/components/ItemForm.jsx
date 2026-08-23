@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../services/api'
+import Aviso from '../components/Aviso'
 import '../styles/form.css'
 
 const estadosConservacion = ['Muy bueno', 'Bueno', 'Regular', 'Malo']
@@ -296,7 +297,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
         </fieldset>
       )}
 
-      {error && <p className="form-error">{error}</p>}
+      <Aviso mensaje={error} onCerrar={() => setError('')} />
 
       <div className="form-actions">
         <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading}>

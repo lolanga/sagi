@@ -38,6 +38,19 @@
   outline-offset: -1px;
 }
 
+/* Checkbox dentro de un campo: alineado con el borde del input */
+.field > .checkbox-inline {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding-left: 1px;
+}
+
+.field > .checkbox-inline input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+}
+
 .campos-dinamicos {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);

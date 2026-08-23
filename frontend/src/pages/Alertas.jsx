@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import Aviso from '../components/Aviso'
 import Modal from '../components/Modal'
 import Layout from '../components/Layout'
 import '../styles/inventario.css'
@@ -191,7 +192,7 @@ export default function Alertas() {
               </select>
             </div>
           </div>
-          {error && <p className="form-error">{error}</p>}
+          <Aviso mensaje={error} onCerrar={() => setError('')} />
           <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={() => setShowNueva(false)}>Cancelar</button>
             <button type="submit" className="btn btn-primary">Crear alerta</button>

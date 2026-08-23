@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import Aviso from '../components/Aviso'
 import Layout from '../components/Layout'
 import '../styles/inventario.css'
 
@@ -169,7 +170,7 @@ export default function Unidades() {
 
   return (
     <Layout title="Sedes y Unidades de destino" back="/">
-      {error && <p className="form-error">{error}</p>}
+      <Aviso mensaje={error} onCerrar={() => setError('')} />
       {loading ? (
         <p className="muted">Cargando...</p>
       ) : (
@@ -178,33 +179,37 @@ export default function Unidades() {
             <div className="panel-admin">
               <div className="panel-admin-section">
                 <h3>Sedes</h3>
-                {sedesVisibles.map((sede) => (
-                  <div key={sede.id} className={`editable-row ${sede.activa ? '' : 'inactiva'}`}>
-                    <input
-                      className="editable-input"
-                      type="text"
-                      defaultValue={sede.nombre}
-                      onBlur={async (e) => {
-                        const valor = e.target.value.trim()
-                        if (valor && valor !== sede.nombre) {
-                          const ok = await guardarSede(sede, valor)
-                          if (!ok) e.target.value = sede.nombre
-                        } else {
-                          e.target.value = sede.nombre
-                        }
-                      }}
-                    />
-                    <span className="result-count">{sede.unidades?.length ?? 0} unidades</span>
-                    {puedeGestionar && (
-                      <button className="btn-link" onClick={() => toggleSede(sede)}>
-                        {sede.activa ? 'Desactivar' : 'Activar'}
-                      </button>
-                    )}
-                    {puedeGestionar && (
-                      <button className="btn-link btn-link-danger" onClick={() => eliminarSede(sede)}>Eliminar</button>
-                    )}
-                  </div>
-                ))}
+                <div className="sedes-grid">
+                  {sedesVisibles.map((sede) => (
+                    <div key={sede.id} className={`sede-card ${sede.activa ? '' : 'inactiva'}`}>
+                      <input
+                        className="editable-input"
+                        type="text"
+                        defaultValue={sede.nombre}
+                        onBlur={async (e) => {
+                          const valor = e.target.value.trim()
+                          if (valor && valor !== sede.nombre) {
+                            const ok = await guardarSede(sede, valor)
+                            if (!ok) e.target.value = sede.nombre
+                          } else {
+                            e.target.value = sede.nombre
+                          }
+                        }}
+                      />
+                      <div className="sede-card-meta">
+                        <span className="result-count">{sede.unidades?.length ?? 0} unidades</span>
+                        {puedeGestionar && (
+                          <div className="row-actions">
+                            <button className="btn-link" onClick={() => toggleSede(sede)}>
+                              {sede.activa ? 'Desactivar' : 'Activar'}
+                            </button>
+                            <button className="btn-link btn-link-danger" onClick={() => eliminarSede(sede)}>Eliminar</button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
                 <form className="inline-form" onSubmit={crearSede}>
                   <input name="nueva_sede" type="text" placeholder="Nombre de la nueva sede" required />
                   <button className="btn btn-primary" type="submit">+ Agregar sede</button>

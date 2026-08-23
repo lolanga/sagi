@@ -97,11 +97,29 @@ button {
 }
 
 .sidebar-logo {
-  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: 2px;
-  text-align: center;
-  padding: 12px 0 20px;
+  padding: 16px 0 18px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-logo svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.sidebar-logo .logo-text {
+  background: linear-gradient(90deg, #6fb2e8, #ffa94d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .sidebar-nav {
@@ -173,14 +191,23 @@ button {
 }
 
 .btn-back {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 13px;
-  color: var(--color-muted);
-  margin-bottom: 6px;
+  font-weight: 700;
+  color: #ffd54f;
+  background-color: rgba(245, 124, 0, 0.16);
+  border: 1px solid rgba(245, 124, 0, 0.5);
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  transition: background-color 0.15s ease;
 }
 
 .btn-back:hover {
-  color: var(--color-primary);
+  background-color: rgba(245, 124, 0, 0.32);
+  color: #ffe082;
 }
 
 .topbar-actions {

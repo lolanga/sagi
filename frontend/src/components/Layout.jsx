@@ -29,7 +29,20 @@ export default function Layout({ title, actions, children, back }) {
       <div className={`sidebar-overlay ${menuOpen ? 'visible' : ''}`} onClick={closeMenu} />
 
       <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
-        <div className="sidebar-logo">SAGI</div>
+        <div className="sidebar-logo">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="logo-grad" x1="0" y1="0" x2="24" y2="24">
+                <stop offset="0%" stopColor="#6fb2e8" />
+                <stop offset="100%" stopColor="#ffa94d" />
+              </linearGradient>
+            </defs>
+            <path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z" stroke="url(#logo-grad)" strokeWidth="1.8" strokeLinejoin="round" />
+            <path d="M3 7.5 12 12l9-4.5M12 12v9" stroke="url(#logo-grad)" strokeWidth="1.8" strokeLinejoin="round" />
+            <path d="M7.5 5.25 16.5 9.75" stroke="#ffa94d" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+          <span className="logo-text">SAGI</span>
+        </div>
         <nav className="sidebar-nav">
           {menuItems
             .filter((item) => hasAccess(user, item.roles))

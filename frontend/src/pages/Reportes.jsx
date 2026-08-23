@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as XLSX from 'xlsx'
 import api from '../services/api'
+import Aviso from '../components/Aviso'
 import Layout from '../components/Layout'
 import '../styles/dashboard.css'
 
@@ -166,7 +167,7 @@ export default function Reportes() {
         </div>
       ) : data ? (
         <>
-          {error && <p className="form-error">{error}</p>}
+          <Aviso mensaje={error} onCerrar={() => setError('')} />
           <div className="reportes-grid">
             <Tabla
               titulo="Ítems activos por categoría"

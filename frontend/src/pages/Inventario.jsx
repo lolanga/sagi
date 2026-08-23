@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import Aviso from '../components/Aviso'
 import Modal from '../components/Modal'
 import ItemForm from '../components/ItemForm'
 import ItemDetalle from '../components/ItemDetalle'
@@ -213,7 +214,7 @@ export default function Inventario() {
           ¿Seguro que deseas eliminar el ítem <strong>{eliminando?.codigo_unico}</strong>?
           Esta acción no se puede deshacer y eliminará sus movimientos asociados.
         </p>
-        {error && <p className="form-error">{error}</p>}
+        <Aviso mensaje={error} onCerrar={() => setError('')} />
         <div className="form-actions">
           <button type="button" className="btn btn-secondary" onClick={() => setEliminando(null)}>
             Cancelar

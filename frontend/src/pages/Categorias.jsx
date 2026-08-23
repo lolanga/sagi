@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../services/api'
+import Aviso from '../components/Aviso'
 import Modal from '../components/Modal'
 import Layout from '../components/Layout'
 import '../styles/categorias.css'
@@ -251,7 +252,7 @@ export default function Categorias() {
                     <button type="submit" className="btn btn-primary">+ Agregar</button>
                   </form>
 
-                  {error && <p className="form-error">{error}</p>}
+                  <Aviso mensaje={error} onCerrar={() => setError('')} />
 
                   {ordenar(camposDelScope).length === 0 ? (
                     <p className="muted">Sin campos definidos.</p>
@@ -374,7 +375,7 @@ export default function Categorias() {
               required
             />
           </div>
-          {error && <p className="form-error">{error}</p>}
+          <Aviso mensaje={error} onCerrar={() => setError('')} />
           <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={() => setEditandoTipo(null)}>
               Cancelar
@@ -430,7 +431,7 @@ export default function Categorias() {
             />
             Campo requerido al dar de alta un ítem
           </label>
-          {error && <p className="form-error">{error}</p>}
+          <Aviso mensaje={error} onCerrar={() => setError('')} />
           <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={() => setEditandoCampo(null)}>
               Cancelar
