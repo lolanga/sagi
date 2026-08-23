@@ -79,12 +79,16 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
     }
 
     if (campo.tipo === 'select') {
+      const opcionesPlano = (campo.opciones || [])
+        .flatMap((op) => String(op).split(','))
+        .map((op) => op.trim())
+        .filter(Boolean)
       return (
         <div className="field" key={campo.id}>
           <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
           <select {...base}>
-            <option value="">{placeholder || 'Seleccionar...'}</option>
-            {(campo.opciones || []).map((op) => (
+            <option value="">Seleccionar...</option>
+            {opcionesPlano.map((op) => (
               <option key={op} value={op}>{op}</option>
             ))}
           </select>
