@@ -33,15 +33,23 @@ export default function Unidades() {
 
   const sedeDe = (id) => sedes.find((s) => s.id === id)?.nombre ?? '-'
 
+  const norm = (s) => String(s ?? '').trim().toLowerCase()
+
   const guardarSede = async (sede, nombre) => {
     setError('')
+    if (sedes.some((x) => x.id !== sede.id && norm(x.nombre) === norm(nombre))) {
+      setError('Ya existe una sede con ese nombre.')
+      return false
+    }
     const antes = sede.nombre
     try {
       const r = await api.put(`/sedes/${sede.id}`, { nombre })
       setSedes((s) => s.map((x) => (x.id === sede.id ? { ...x, nombre: r.data.sede.nombre } : x)))
+      return true
     } catch (err) {
       setSedes((s) => s.map((x) => (x.id === sede.id ? { ...x, nombre: antes } : x)))
       setError(err.response?.data?.message || 'Error al renombrar la sede')
+      return false
     }
   }
 
@@ -51,6 +59,10 @@ export default function Unidades() {
     const form = e.target
     const nombre = new FormData(form).get('nueva_sede').trim()
     if (!nombre) return
+    if (sedes.some((x) => norm(x.nombre) === norm(nombre))) {
+      setError('Ya existe una sede con ese nombre.')
+      return
+    }
     try {
       const r = await api.post('/sedes', { nombre })
       setSedes((s) => [...s, r.data.sede])
@@ -100,11 +112,19 @@ export default function Unidades() {
 
   const guardarUnidad = async (unidad, cambios) => {
     setError('')
+    const sedeFinal = cambios.sede_id ?? unidad.sede_id
+    const nombreFinal = cambios.nombre ?? unidad.nombre
+    if (unidades.some((x) => x.id !== unidad.id && x.sede_id === sedeFinal && norm(x.nombre) === norm(nombreFinal))) {
+      setError('Ya existe una unidad con ese nombre en la sede seleccionada.')
+      return false
+    }
     try {
       const r = await api.put(`/unidades/${unidad.id}`, cambios)
       setUnidades((u) => u.map((x) => (x.id === unidad.id ? r.data.unidad : x)))
+      return true
     } catch (err) {
       setError(err.response?.data?.message || 'Error al guardar la unidad')
+      return false
     }
   }
 
@@ -115,6 +135,10 @@ export default function Unidades() {
     const nombre = new FormData(form).get('nueva_unidad').trim()
     const sedeId = form.sede_id.value
     if (!nombre || !sedeId) return
+    if (unidades.some((x) => x.sede_id === Number(sedeId) && norm(x.nombre) === norm(nombre))) {
+      setError('Ya existe una unidad con ese nombre en la sede seleccionada.')
+      return
+    }
     try {
       const r = await api.post('/unidades', { nombre, sede_id: Number(sedeId) })
       setUnidades((u) => [...u, r.data.unidad])
@@ -160,9 +184,11 @@ export default function Unidades() {
                       className="editable-input"
                       type="text"
                       defaultValue={sede.nombre}
-                      onBlur={(e) => {
-                        if (e.target.value.trim() && e.target.value.trim() !== sede.nombre) {
-                          guardarSede(sede, e.target.value.trim())
+                      onBlur={async (e) => {
+                        const valor = e.target.value.trim()
+                        if (valor && valor !== sede.nombre) {
+                          const ok = await guardarSede(sede, valor)
+                          if (!ok) e.target.value = sede.nombre
                         } else {
                           e.target.value = sede.nombre
                         }
@@ -243,9 +269,11 @@ export default function Unidades() {
                         className="editable-input"
                         type="text"
                         defaultValue={u.nombre}
-                        onBlur={(e) => {
-                          if (e.target.value.trim() && e.target.value.trim() !== u.nombre) {
-                            guardarUnidad(u, { nombre: e.target.value.trim() })
+                        onBlur={async (e) => {
+                          const valor = e.target.value.trim()
+                          if (valor && valor !== u.nombre) {
+                            const ok = await guardarUnidad(u, { nombre: valor })
+                            if (!ok) e.target.value = u.nombre
                           } else {
                             e.target.value = u.nombre
                           }
@@ -256,7 +284,10 @@ export default function Unidades() {
                       <select
                         className="editable-select"
                         value={u.sede_id}
-                        onChange={(e) => guardarUnidad(u, { sede_id: Number(e.target.value) })}
+                        onChange={async (e) => {
+                          const ok = await guardarUnidad(u, { sede_id: Number(e.target.value) })
+                          if (!ok) e.target.value = u.sede_id
+                        }}
                       >
                         {sedes.map((s) => (
                           <option key={s.id} value={s.id}>{s.nombre}{s.activa ? '' : ' (inactiva)'}</option>

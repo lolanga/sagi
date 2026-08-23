@@ -52,12 +52,21 @@ class CategoriaController extends Controller
 
     public function storeTipo(Request $request, Categoria $categoria): JsonResponse
     {
+        $nombre = trim((string) $request->input('nombre'));
+
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre' => [
+                'required', 'string', 'max:255',
+                Rule::unique('tipos_items', 'nombre')->where(fn ($q) => $q
+                    ->where('categoria_id', $categoria->id)
+                    ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
+        ], [
+            'nombre.unique' => 'Ya existe un elemento con ese nombre en esta categoría.',
         ]);
 
         $tipo = $categoria->tiposItems()->create([
-            'nombre' => $validated['nombre'],
+            'nombre' => $nombre,
             'orden' => $categoria->tiposItems()->count(),
         ]);
 
@@ -71,10 +80,20 @@ class CategoriaController extends Controller
 
     public function updateTipo(Request $request, TipoItem $tipo): JsonResponse
     {
+        $nombre = trim((string) $request->input('nombre'));
+
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre' => [
+                'required', 'string', 'max:255',
+                Rule::unique('tipos_items', 'nombre')->ignore($tipo->id)->where(fn ($q) => $q
+                    ->where('categoria_id', $tipo->categoria_id)
+                    ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
+        ], [
+            'nombre.unique' => 'Ya existe un elemento con ese nombre en esta categoría.',
         ]);
 
+        $validated['nombre'] = $nombre;
         $antes = $tipo->nombre;
         $tipo->update($validated);
 
@@ -155,13 +174,26 @@ class CategoriaController extends Controller
 
     public function storeCampo(Request $request, Categoria $categoria): JsonResponse
     {
+        $nombre = trim((string) $request->input('nombre'));
+        $tipoItemId = $request->filled('tipo_item_id') ? $request->integer('tipo_item_id') : null;
+
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre' => [
+                'required', 'string', 'max:255',
+                Rule::unique('campos_dinamicos', 'nombre')->where(fn ($q) => $q
+                    ->where('categoria_id', $categoria->id)
+                    ->when(is_null($tipoItemId),
+                        fn ($qq) => $qq->whereNull('tipo_item_id'),
+                        fn ($qq) => $qq->where('tipo_item_id', $tipoItemId))
+                    ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
             'tipo' => 'required|in:texto,numero,fecha,select,textarea',
             'opciones' => 'nullable|array',
             'placeholder' => 'nullable|string|max:255',
             'requerido' => 'nullable|boolean',
             'tipo_item_id' => ['nullable', 'integer', Rule::exists('tipos_items', 'id')->where(fn ($q) => $q->where('categoria_id', $categoria->id))],
+        ], [
+            'nombre.unique' => 'Ya existe un campo con ese nombre en este ámbito.',
         ]);
 
         $campo = $categoria->camposDinamicos()->create([
@@ -189,15 +221,31 @@ class CategoriaController extends Controller
 
     public function updateCampo(Request $request, CampoDinamico $campo): JsonResponse
     {
+        $nombre = trim((string) $request->input('nombre', ''));
+
         $validated = $request->validate([
-            'nombre' => 'sometimes|string|max:255',
+            'nombre' => [
+                'sometimes', 'string', 'max:255',
+                Rule::unique('campos_dinamicos', 'nombre')->ignore($campo->id)->where(fn ($q) => $q
+                    ->where('categoria_id', $campo->categoria_id)
+                    ->when(is_null($campo->tipo_item_id),
+                        fn ($qq) => $qq->whereNull('tipo_item_id'),
+                        fn ($qq) => $qq->where('tipo_item_id', $campo->tipo_item_id))
+                    ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
             'tipo' => 'sometimes|in:texto,numero,fecha,select,textarea',
             'opciones' => 'nullable|array',
             'placeholder' => 'nullable|string|max:255',
             'requerido' => 'nullable|boolean',
             'activo' => 'nullable|boolean',
             'orden' => 'nullable|integer',
+        ], [
+            'nombre.unique' => 'Ya existe un campo con ese nombre en este ámbito.',
         ]);
+
+        if (array_key_exists('nombre', $validated)) {
+            $validated['nombre'] = $nombre;
+        }
 
         $antes = $campo->only(['nombre', 'tipo', 'opciones', 'placeholder', 'requerido', 'activo']);
         $campo->update($validated);

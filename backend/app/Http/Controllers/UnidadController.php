@@ -17,12 +17,25 @@ class UnidadController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $sedeId = $request->integer('sede_id');
+        $nombre = trim((string) $request->input('nombre'));
+
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre' => [
+                'required', 'string', 'max:255',
+                Rule::unique('unidades', 'nombre')->where(fn ($q) => $q
+                    ->where('sede_id', $sedeId)
+                    ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
             'sede_id' => ['required', 'integer', Rule::exists('sedes', 'id')],
+        ], [
+            'nombre.unique' => 'Ya existe una unidad con ese nombre en la sede seleccionada.',
         ]);
 
-        $unidad = Unidad::create($validated);
+        $unidad = Unidad::create([
+            'nombre' => $nombre,
+            'sede_id' => $validated['sede_id'],
+        ]);
 
         Auditoria::create([
             'user_id' => $request->user()->id,
@@ -37,11 +50,33 @@ class UnidadController extends Controller
 
     public function update(Request $request, Unidad $unidad): JsonResponse
     {
-        $validated = $request->validate([
-            'nombre' => 'sometimes|string|max:255',
+        $cambiaNombre = $request->has('nombre');
+        $cambiaSede = $request->has('sede_id');
+
+        $rules = [
             'sede_id' => ['sometimes', 'integer', Rule::exists('sedes', 'id')],
             'activa' => 'sometimes|boolean',
+        ];
+
+        if ($cambiaNombre || $cambiaSede) {
+            $nombreFinal = $cambiaNombre ? trim((string) $request->input('nombre')) : $unidad->nombre;
+            $sedeFinal = $cambiaSede ? $request->integer('sede_id') : $unidad->sede_id;
+
+            $rules['nombre'] = [
+                'sometimes', 'string', 'max:255',
+                Rule::unique('unidades', 'nombre')->ignore($unidad->id)->where(fn ($q) => $q
+                    ->where('sede_id', $sedeFinal)
+                    ->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombreFinal)])),
+            ];
+        }
+
+        $validated = $request->validate($rules, [
+            'nombre.unique' => 'Ya existe una unidad con ese nombre en la sede seleccionada.',
         ]);
+
+        if (array_key_exists('nombre', $validated)) {
+            $validated['nombre'] = trim((string) $request->input('nombre'));
+        }
 
         $antes = $unidad->activa;
         $unidad->update($validated);

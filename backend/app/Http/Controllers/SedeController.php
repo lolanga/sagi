@@ -6,6 +6,7 @@ use App\Models\Auditoria;
 use App\Models\Sede;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class SedeController extends Controller
 {
@@ -16,8 +17,15 @@ class SedeController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        $nombre = trim((string) $request->input('nombre'));
+
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre' => [
+                'required', 'string', 'max:255',
+                Rule::unique('sedes', 'nombre')->where(fn ($q) => $q->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
+        ], [
+            'nombre.unique' => 'Ya existe una sede con ese nombre.',
         ]);
 
         $sede = Sede::create($validated);
@@ -35,10 +43,21 @@ class SedeController extends Controller
 
     public function update(Request $request, Sede $sede): JsonResponse
     {
+        $nombre = trim((string) $request->input('nombre', ''));
+
         $validated = $request->validate([
-            'nombre' => 'sometimes|string|max:255',
+            'nombre' => [
+                'sometimes', 'string', 'max:255',
+                Rule::unique('sedes', 'nombre')->ignore($sede->id)->where(fn ($q) => $q->whereRaw('LOWER(nombre) = ?', [mb_strtolower($nombre)])),
+            ],
             'activa' => 'sometimes|boolean',
+        ], [
+            'nombre.unique' => 'Ya existe una sede con ese nombre.',
         ]);
+
+        if (array_key_exists('nombre', $validated)) {
+            $validated['nombre'] = $nombre;
+        }
 
         $antes = $sede->activa;
         $sede->update($validated);

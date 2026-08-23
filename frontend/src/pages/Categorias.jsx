@@ -13,9 +13,13 @@ export default function Categorias() {
   const [nuevoTipo, setNuevoTipo] = useState('')
   const [editandoTipo, setEditandoTipo] = useState(null)
   const [nombreEdit, setNombreEdit] = useState('')
+  const [editandoCampo, setEditandoCampo] = useState(null)
+  const [formCampo, setFormCampo] = useState({ nombre: '', tipo: 'texto', opciones: '', requerido: false })
   const [scopeTipo, setScopeTipo] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
+
+  const norm = (s) => String(s ?? '').trim().toLowerCase()
 
   const cargar = () => {
     api.get('/categorias').then((res) => {
@@ -34,8 +38,13 @@ export default function Categorias() {
     setError('')
     if (!selected) return
 
+    if (camposDelScope.some((c) => norm(c.nombre) === norm(nuevoCampo.nombre))) {
+      setError('Ya existe un campo con ese nombre en este ámbito.')
+      return
+    }
+
     const payload = {
-      nombre: nuevoCampo.nombre,
+      nombre: nuevoCampo.nombre.trim(),
       tipo: nuevoCampo.tipo,
     }
     if (scopeTipo) payload.tipo_item_id = Number(scopeTipo)
@@ -55,6 +64,45 @@ export default function Categorias() {
   const toggleCampo = async (campo) => {
     await api.put(`/campos-dinamicos/${campo.id}`, { activo: !campo.activo })
     cargar()
+  }
+
+  const abrirEdicionCampo = (campo) => {
+    setError('')
+    setFormCampo({
+      nombre: campo.nombre,
+      tipo: campo.tipo,
+      opciones: (campo.opciones || []).join(', '),
+      requerido: Boolean(campo.requerido),
+    })
+    setEditandoCampo(campo)
+  }
+
+  const guardarCampo = async (e) => {
+    e.preventDefault()
+    setError('')
+    if (!editandoCampo) return
+
+    if (camposDelScope.some((c) => c.id !== editandoCampo.id && norm(c.nombre) === norm(formCampo.nombre))) {
+      setError('Ya existe un campo con ese nombre en este ámbito.')
+      return
+    }
+
+    const payload = {
+      nombre: formCampo.nombre.trim(),
+      tipo: formCampo.tipo,
+      requerido: formCampo.requerido,
+      opciones: formCampo.tipo === 'select'
+        ? formCampo.opciones.split(',').map((o) => o.trim()).filter(Boolean)
+        : null,
+    }
+
+    try {
+      await api.put(`/campos-dinamicos/${editandoCampo.id}`, payload)
+      setEditandoCampo(null)
+      cargar()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al guardar el campo')
+    }
   }
 
   const eliminarCampo = async (campo) => {
@@ -77,6 +125,11 @@ export default function Categorias() {
     setError('')
     if (!selected || !nuevoTipo.trim()) return
 
+    if (ordenar(selected.tipos_items).some((t) => norm(t.nombre) === norm(nuevoTipo))) {
+      setError('Ya existe un elemento con ese nombre en esta categoría.')
+      return
+    }
+
     try {
       await api.post(`/categorias/${selected.id}/tipos`, { nombre: nuevoTipo.trim() })
       setNuevoTipo('')
@@ -90,6 +143,12 @@ export default function Categorias() {
     e.preventDefault()
     setError('')
     if (!editandoTipo || !nombreEdit.trim()) return
+
+    if (ordenar(selected.tipos_items).some((t) => t.id !== editandoTipo.id && norm(t.nombre) === norm(nombreEdit))) {
+      setError('Ya existe un elemento con ese nombre en esta categoría.')
+      return
+    }
+
     try {
       await api.put(`/tipos-item/${editandoTipo.id}`, { nombre: nombreEdit.trim() })
       setEditandoTipo(null)
@@ -101,6 +160,7 @@ export default function Categorias() {
   }
 
   const abrirEdicionTipo = (tipo) => {
+    setError('')
     setNombreEdit(tipo.nombre)
     setEditandoTipo(tipo)
   }
@@ -224,6 +284,9 @@ export default function Categorias() {
                               <td data-label="Requerido">{campo.requerido ? 'Sí' : 'No'}</td>
                               <td data-label="Activo">{campo.activo ? 'Sí' : 'No'}</td>
                               <td data-label="Acciones" className="row-actions">
+                                <button className="btn-link btn-link-editar" onClick={() => abrirEdicionCampo(campo)}>
+                                  Editar
+                                </button>
                                 <button className="btn-link" onClick={() => toggleCampo(campo)}>
                                   {campo.activo ? 'Desactivar' : 'Activar'}
                                 </button>
@@ -277,8 +340,8 @@ export default function Categorias() {
                                 </td>
                                 <td data-label="Elemento">{tipo.nombre}</td>
                                 <td data-label="Acciones" className="row-actions">
-                                  <button className="btn-link" onClick={() => abrirEdicionTipo(tipo)}>
-                                    Renombrar
+                                  <button className="btn-link btn-link-editar" onClick={() => abrirEdicionTipo(tipo)}>
+                                    Editar
                                   </button>
                                   <button className="btn-link btn-link-danger" onClick={() => eliminarTipo(tipo)}>
                                     Eliminar
@@ -297,7 +360,7 @@ export default function Categorias() {
             </div>
           )}
 
-      <Modal open={Boolean(editandoTipo)} title={`Renombrar elemento — ${editandoTipo?.nombre ?? ''}`} onClose={() => setEditandoTipo(null)}>
+      <Modal open={Boolean(editandoTipo)} title={`Editar elemento — ${editandoTipo?.nombre ?? ''}`} onClose={() => setEditandoTipo(null)}>
         <form onSubmit={renombrarTipo} className="item-form">
           <div className="field">
             <label htmlFor="nombre-elemento">Nuevo nombre *</label>
@@ -314,6 +377,62 @@ export default function Categorias() {
           {error && <p className="form-error">{error}</p>}
           <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={() => setEditandoTipo(null)}>
+              Cancelar
+            </button>
+            <button type="submit" className="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal open={Boolean(editandoCampo)} title={`Editar campo — ${editandoCampo?.nombre ?? ''}`} onClose={() => setEditandoCampo(null)}>
+        <form onSubmit={guardarCampo} className="item-form">
+          <div className="field">
+            <label htmlFor="campo-nombre">Nombre del campo *</label>
+            <input
+              id="campo-nombre"
+              type="text"
+              value={formCampo.nombre}
+              onChange={(e) => setFormCampo({ ...formCampo, nombre: e.target.value })}
+              placeholder="Ej. Marca, Material, Cantidad"
+              autoFocus
+              required
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="campo-tipo">Tipo de dato *</label>
+            <select
+              id="campo-tipo"
+              value={formCampo.tipo}
+              onChange={(e) => setFormCampo({ ...formCampo, tipo: e.target.value })}
+            >
+              {tiposCampo.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+          </div>
+          {formCampo.tipo === 'select' && (
+            <div className="field">
+              <label htmlFor="campo-opciones">Opciones (separadas por coma) *</label>
+              <input
+                id="campo-opciones"
+                type="text"
+                value={formCampo.opciones}
+                onChange={(e) => setFormCampo({ ...formCampo, opciones: e.target.value })}
+                placeholder="Ej. Rojo, Azul, Verde"
+              />
+            </div>
+          )}
+          <label className="checkbox-inline">
+            <input
+              type="checkbox"
+              checked={formCampo.requerido}
+              onChange={(e) => setFormCampo({ ...formCampo, requerido: e.target.checked })}
+            />
+            Campo requerido al dar de alta un ítem
+          </label>
+          {error && <p className="form-error">{error}</p>}
+          <div className="form-actions">
+            <button type="button" className="btn btn-secondary" onClick={() => setEditandoCampo(null)}>
               Cancelar
             </button>
             <button type="submit" className="btn btn-primary">Guardar</button>
