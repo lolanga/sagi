@@ -1,0 +1,2136 @@
+<h1 id="sagi---manual-de-especificaciones-técnicas">SAGI - Manual de
+Especificaciones Técnicas</h1>
+<p><strong>Sistema de Administración y Gestión de Inventarios</strong>
+Instituto de Seguridad Pública (ISeP)</p>
+<p>Versión: 1.0 Fecha: 23 de agosto de 2026 Estado: Producción</p>
+<hr />
+<h2 id="índice">Índice</h2>
+<ol type="1">
+<li><a href="#1-descripción-general">Descripción General</a></li>
+<li><a href="#2-arquitectura-del-sistema">Arquitectura del
+Sistema</a></li>
+<li><a href="#3-stack-tecnológico">Stack Tecnológico</a></li>
+<li><a href="#4-modelo-de-datos">Modelo de Datos</a></li>
+<li><a href="#5-estructura-de-base-de-datos">Estructura de Base de
+Datos</a></li>
+<li><a href="#6-api-rest---endpoints">API REST - Endpoints</a></li>
+<li><a href="#7-autenticación-y-autorización">Autenticación y
+Autorización</a></li>
+<li><a href="#8-lógica-de-negocio">Lógica de Negocio</a></li>
+<li><a href="#9-frontend---componentes-y-rutas">Frontend - Componentes y
+Rutas</a></li>
+<li><a href="#10-sistema-de-auditoría">Sistema de Auditoría</a></li>
+<li><a href="#11-exportación-de-datos">Exportación de Datos</a></li>
+<li><a href="#12-seguridad">Seguridad</a></li>
+<li><a href="#13-requisitos-de-instalación">Requisitos de
+Instalación</a></li>
+</ol>
+<hr />
+<h2 id="descripción-general">1. Descripción General</h2>
+<p>SAGI es un sistema web full-stack diseñado para la administración,
+registro y control de inventarios de bienes muebles del Instituto de
+Seguridad Pública (ISeP). El sistema permite:</p>
+<ul>
+<li>Registro de ítems con campos dinámicos por categoría</li>
+<li>Control de movimientos (altas, traslados, bajas) con flujo de
+aprobación</li>
+<li>Gestión de sedes y unidades organizacionales</li>
+<li>Sistema de alertas para pendientes</li>
+<li>Registro de auditoría completo</li>
+<li>Reportes y exportación de datos (Excel, CSV, JSON)</li>
+</ul>
+<h3 id="alcance">1.1 Alcance</h3>
+<p>El sistema cubre: - Inventario de bienes muebles (equipamiento,
+mobiliario, elementos de oficina, etc.) - Control de movimientos con
+aprobación jerárquica - Trazabilidad completa de cada ítem - Gestión de
+categorías con campos personalizables - Reportes para toma de
+decisiones</p>
+<h3 id="público-objetivo">1.2 Público Objetivo</h3>
+<ul>
+<li><strong>Administradores</strong>: Gestión completa del sistema</li>
+<li><strong>Jefes de Área</strong>: Aprobación de movimientos,
+reportes</li>
+<li><strong>Personal de Carga</strong>: Registro de ítems, solicitudes
+de movimiento</li>
+<li><strong>Personal de Consulta</strong>: Solo visualización</li>
+</ul>
+<hr />
+<h2 id="arquitectura-del-sistema">2. Arquitectura del Sistema</h2>
+<h3 id="arquitectura-general">2.1 Arquitectura General</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                      CLIENTE (Browser)                      │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │              React + Vite SPA                       │    │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐            │    │
+│  │  │ Dashboard│ │Inventario│ │Movimientos│ ...         │    │
+│  │  └──────────┘ └──────────┘ └──────────┘            │    │
+│  │                    │                                 │    │
+│  │              Axios (HTTP)                            │    │
+│  └────────────────────┼────────────────────────────────┘    │
+│                       │ Puerto 5173 (Dev)                    │
+│                       ▼                                      │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │              Vite Dev Server (Proxy)                │    │
+│  │              /api → localhost:8000                   │    │
+│  └────────────────────┼────────────────────────────────┘    │
+└───────────────────────┼─────────────────────────────────────┘
+                        │
+                        ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    SERVIDOR (Backend)                        │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │              Laravel 12 + Sanctum                    │    │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐            │    │
+│  │  │AuthController│ │ItemController│ │MovimientoController││
+│  │  └──────────┘ └──────────┘ └──────────┘            │    │
+│  │                    │                                 │    │
+│  │              Eloquent ORM                            │    │
+│  └────────────────────┼────────────────────────────────┘    │
+│                       │ Puerto 8000                          │
+│                       ▼                                      │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │                   MySQL 8.x                         │    │
+│  │                   Base: sagi                        │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="flujo-de-datos">2.2 Flujo de Datos</h3>
+<ol type="1">
+<li><strong>Autenticación</strong>: El usuario envía DNI + contraseña →
+Sanctum genera token → token se almacena en localStorage</li>
+<li><strong>Peticiones</strong>: Cada petición HTTP incluye header
+<code>Authorization: Bearer {token}</code></li>
+<li><strong>Autorización</strong>: Middleware <code>rol</code> verifica
+el slug del usuario contra los roles permitidos</li>
+<li><strong>Respuesta</strong>: JSON estandarizado con datos y/o
+errores</li>
+</ol>
+<hr />
+<h2 id="stack-tecnológico">3. Stack Tecnológico</h2>
+<h3 id="backend">3.1 Backend</h3>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Versión</th>
+<th>Propósito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PHP</td>
+<td>8.2+</td>
+<td>Lenguaje del servidor</td>
+</tr>
+<tr>
+<td>Laravel</td>
+<td>12.x</td>
+<td>Framework PHP</td>
+</tr>
+<tr>
+<td>Sanctum</td>
+<td>4.x</td>
+<td>Autenticación por tokens</td>
+</tr>
+<tr>
+<td>MySQL</td>
+<td>8.x</td>
+<td>Base de datos relacional</td>
+</tr>
+<tr>
+<td>Eloquent ORM</td>
+<td>-</td>
+<td>Mapeo objeto-relacional</td>
+</tr>
+</tbody>
+</table>
+<h3 id="frontend">3.2 Frontend</h3>
+<table>
+<thead>
+<tr>
+<th>Componente</th>
+<th>Versión</th>
+<th>Propósito</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>React</td>
+<td>19.x</td>
+<td>Biblioteca de UI</td>
+</tr>
+<tr>
+<td>Vite</td>
+<td>6.x</td>
+<td>Bundler y dev server</td>
+</tr>
+<tr>
+<td>React Router</td>
+<td>7.x</td>
+<td>Enrutamiento SPA</td>
+</tr>
+<tr>
+<td>Axios</td>
+<td>1.x</td>
+<td>Cliente HTTP</td>
+</tr>
+<tr>
+<td>SheetJS (xlsx)</td>
+<td>-</td>
+<td>Exportación Excel</td>
+</tr>
+</tbody>
+</table>
+<h3 id="herramientas-de-desarrollo">3.3 Herramientas de Desarrollo</h3>
+<ul>
+<li><strong>Git</strong>: Control de versiones (GitHub:
+<code>https://github.com/lolanga/sagi.git</code>)</li>
+<li><strong>Node.js</strong>: Runtime de JavaScript</li>
+<li><strong>Composer</strong>: Gestor de dependencias PHP</li>
+</ul>
+<hr />
+<h2 id="modelo-de-datos">4. Modelo de Datos</h2>
+<h3 id="diagrama-de-relaciones">4.1 Diagrama de Relaciones</h3>
+<pre><code>┌──────────┐     ┌──────────┐     ┌──────────┐
+│  roles   │────&lt;│  users   │&gt;────│  sedes   │
+└──────────┘     └────┬─────┘     └────┬─────┘
+                      │                │
+                      │                └────────┐
+                      │                         │
+                      │                ┌────────▼─────┐
+                      │                │   unidades   │
+                      │                └────────┬─────┘
+                      │                         │
+                      │                ┌────────▼─────┐
+                      │                │    items     │
+                      │                └──┬───┬───┬───┘
+                      │                   │   │   │
+                      │    ┌──────────────┘   │   └──────────────┐
+                      │    │                  │                  │
+                      │    ▼                  ▼                  ▼
+                      │ ┌──────────┐  ┌──────────────┐  ┌──────────────┐
+                      │ │categorias│  │ tipos_items  │  │ movimientos  │
+                      │ └────┬─────┘  └──────┬───────┘  └──────────────┘
+                      │      │               │
+                      │      └───────┬───────┘
+                      │              │
+                      │      ┌───────▼────────┐
+                      │      │campos_dinamicos│
+                      │      └────────────────┘
+                      │
+                ┌─────▼──────┐
+                │ auditoria  │
+                └────────────┘
+
+                ┌────────────┐
+                │   alertas  │
+                └────────────┘</code></pre>
+<h3 id="entidades-principales">4.2 Entidades Principales</h3>
+<h4 id="roles">Roles</h4>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>nombre</td>
+<td>VARCHAR(50)</td>
+<td>Nombre descriptivo</td>
+</tr>
+<tr>
+<td>slug</td>
+<td>VARCHAR(50) (UNIQUE)</td>
+<td>Identificador técnico</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Valores posibles</strong>: admin, jefe, carga, consulta</p>
+<h4 id="users-usuarios">Users (Usuarios)</h4>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>name</td>
+<td>VARCHAR(255)</td>
+<td>Nombre completo</td>
+</tr>
+<tr>
+<td>email</td>
+<td>VARCHAR(255) (UNIQUE)</td>
+<td>Correo electrónico</td>
+</tr>
+<tr>
+<td>dni</td>
+<td>VARCHAR(8) (UNIQUE)</td>
+<td>Documento Nacional de Identidad</td>
+</tr>
+<tr>
+<td>username</td>
+<td>VARCHAR(50) (UNIQUE)</td>
+<td>Nombre de usuario</td>
+</tr>
+<tr>
+<td>rol_id</td>
+<td>INT (FK → roles)</td>
+<td>Rol asignado</td>
+</tr>
+<tr>
+<td>sede_id</td>
+<td>INT (FK → sedes)</td>
+<td>Sede de trabajo</td>
+</tr>
+<tr>
+<td>password</td>
+<td>VARCHAR(255)</td>
+<td>Contraseña hasheada (bcrypt)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="sedes">Sedes</h4>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>nombre</td>
+<td>VARCHAR(255)</td>
+<td>Nombre de la sede</td>
+</tr>
+<tr>
+<td>activa</td>
+<td>BOOLEAN</td>
+<td>Estado (true=activa, false=inactiva)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="unidades">Unidades</h4>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>sede_id</td>
+<td>INT (FK → sedes)</td>
+<td>Sede a la que pertenece</td>
+</tr>
+<tr>
+<td>nombre</td>
+<td>VARCHAR(255)</td>
+<td>Nombre de la unidad</td>
+</tr>
+<tr>
+<td>activa</td>
+<td>BOOLEAN</td>
+<td>Estado (true=activa, false=inactiva)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="categorías">Categorías</h4>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 23%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>codigo</td>
+<td>VARCHAR(4) (UNIQUE)</td>
+<td>Código abreviado (ej: A1, A2)</td>
+</tr>
+<tr>
+<td>nombre</td>
+<td>VARCHAR(255)</td>
+<td>Nombre descriptivo</td>
+</tr>
+<tr>
+<td>es_transitoria</td>
+<td>BOOLEAN</td>
+<td>Si es categoría temporal (A7=alta, A8=baja)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Categorías predefinidas:</strong> - A1: Equipamiento
+Tecnológico - A2: Mobiliario de Oficina - A3: Elementos de Seguridad -
+A4: Vehículos - A5: Herramientas - A6: Material Bibliográfico - A7:
+Categoría Temporal de Alta (transitoria) - A8: Categoría de Baja
+(transitoria)</p>
+<h4 id="tipos-de-item-tipositems">Tipos de Item (TiposItems)</h4>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>categoria_id</td>
+<td>INT (FK → categorias)</td>
+<td>Categoría padre</td>
+</tr>
+<tr>
+<td>nombre</td>
+<td>VARCHAR(255)</td>
+<td>Nombre del tipo</td>
+</tr>
+<tr>
+<td>orden</td>
+<td>INT</td>
+<td>Posición en la lista</td>
+</tr>
+</tbody>
+</table>
+<h4 id="campos-dinámicos">Campos Dinámicos</h4>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 23%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>categoria_id</td>
+<td>INT (FK → categorias)</td>
+<td>Categoría padre</td>
+</tr>
+<tr>
+<td>tipo_item_id</td>
+<td>INT (FK → tipos_items, nullable)</td>
+<td>Tipo específico (null=general)</td>
+</tr>
+<tr>
+<td>nombre</td>
+<td>VARCHAR(255)</td>
+<td>Nombre del campo</td>
+</tr>
+<tr>
+<td>tipo</td>
+<td>ENUM</td>
+<td>tipo, numero, fecha, select, textarea</td>
+</tr>
+<tr>
+<td>opciones</td>
+<td>JSON</td>
+<td>Opciones para tipo “select”</td>
+</tr>
+<tr>
+<td>placeholder</td>
+<td>VARCHAR(255)</td>
+<td>Texto de ayuda</td>
+</tr>
+<tr>
+<td>requerido</td>
+<td>BOOLEAN</td>
+<td>Si es obligatorio</td>
+</tr>
+<tr>
+<td>activo</td>
+<td>BOOLEAN</td>
+<td>Si está habilitado</td>
+</tr>
+<tr>
+<td>orden</td>
+<td>INT</td>
+<td>Posición en la lista</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Tipos de campo disponibles:</strong> - <code>texto</code>:
+Campo de texto corto (input) - <code>numero</code>: Campo numérico
+(input number) - <code>fecha</code>: Campo de fecha (input date) -
+<code>select</code>: Lista desplegable (opciones en JSON) -
+<code>textarea</code>: Campo de texto largo</p>
+<h4 id="items-inventario">Items (Inventario)</h4>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 23%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>codigo_unico</td>
+<td>VARCHAR(20) (UNIQUE)</td>
+<td>Código del ítem (ej: A1-03-47-000001)</td>
+</tr>
+<tr>
+<td>categoria_id</td>
+<td>INT (FK → categorias)</td>
+<td>Categoría</td>
+</tr>
+<tr>
+<td>tipo_item_id</td>
+<td>INT (FK → tipos_items, nullable)</td>
+<td>Tipo específico</td>
+</tr>
+<tr>
+<td>responsable_id</td>
+<td>INT (FK → users)</td>
+<td>Persona responsable</td>
+</tr>
+<tr>
+<td>unidad_id</td>
+<td>INT (FK → unidades)</td>
+<td>Unidad de destino</td>
+</tr>
+<tr>
+<td>estado_conservacion</td>
+<td>VARCHAR(50)</td>
+<td>Estado físico</td>
+</tr>
+<tr>
+<td>cantidad</td>
+<td>INT</td>
+<td>Cantidad (default: 1)</td>
+</tr>
+<tr>
+<td>fecha_alta</td>
+<td>DATE (nullable)</td>
+<td>Fecha de incorporación</td>
+</tr>
+<tr>
+<td>valores_dinamicos</td>
+<td>JSON</td>
+<td>Valores de campos dinámicos</td>
+</tr>
+<tr>
+<td>estado</td>
+<td>ENUM</td>
+<td>activo, pendiente, baja</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Formato del código único:</strong>
+<code>{Categoría}-{IdSede 2dígitos}-{IdUnidad 2dígitos}-{Secuencial 6dígitos}</code>
+Ejemplo: <code>A1-03-47-000001</code></p>
+<p><strong>Estados de conservación:</strong> Muy bueno, Bueno, Regular,
+Malo</p>
+<h4 id="movimientos">Movimientos</h4>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 23%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>item_id</td>
+<td>INT (FK → items)</td>
+<td>Ítem afectado</td>
+</tr>
+<tr>
+<td>tipo</td>
+<td>ENUM</td>
+<td>alta, traslado, baja</td>
+</tr>
+<tr>
+<td>unidad_origen_id</td>
+<td>INT (FK → unidades)</td>
+<td>Unidad de origen</td>
+</tr>
+<tr>
+<td>unidad_destino_id</td>
+<td>INT (FK → unidades, nullable)</td>
+<td>Unidad de destino</td>
+</tr>
+<tr>
+<td>motivo</td>
+<td>TEXT</td>
+<td>Razón del movimiento</td>
+</tr>
+<tr>
+<td>estado</td>
+<td>ENUM</td>
+<td>pendiente, aprobado, rechazado</td>
+</tr>
+<tr>
+<td>solicitante_id</td>
+<td>INT (FK → users)</td>
+<td>Quien solicita</td>
+</tr>
+<tr>
+<td>validador_id</td>
+<td>INT (FK → users, nullable)</td>
+<td>Quien aprueba/rechaza</td>
+</tr>
+<tr>
+<td>fecha_validacion</td>
+<td>DATETIME</td>
+<td>Fecha de validación</td>
+</tr>
+<tr>
+<td>motivo_rechazo</td>
+<td>TEXT</td>
+<td>Razón del rechazo</td>
+</tr>
+</tbody>
+</table>
+<h4 id="alertas">Alertas</h4>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 23%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>tipo</td>
+<td>ENUM</td>
+<td>pendiente_aprobacion, pendiente_movimiento, manual</td>
+</tr>
+<tr>
+<td>prioridad</td>
+<td>ENUM</td>
+<td>critica, importante, informativa</td>
+</tr>
+<tr>
+<td>estado</td>
+<td>ENUM</td>
+<td>abierta, cerrada</td>
+</tr>
+<tr>
+<td>item_id</td>
+<td>INT (FK → items, nullable)</td>
+<td>Ítem relacionado</td>
+</tr>
+<tr>
+<td>movimiento_id</td>
+<td>INT (FK → movimientos, nullable)</td>
+<td>Movimiento relacionado</td>
+</tr>
+<tr>
+<td>unidad_id</td>
+<td>INT (FK → unidades)</td>
+<td>Unidad afectada</td>
+</tr>
+<tr>
+<td>mensaje</td>
+<td>TEXT</td>
+<td>Descripción de la alerta</td>
+</tr>
+<tr>
+<td>fecha_cierre</td>
+<td>DATETIME</td>
+<td>Fecha de cierre</td>
+</tr>
+</tbody>
+</table>
+<h4 id="auditoría">Auditoría</h4>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>INT (PK)</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>INT (FK → users)</td>
+<td>Usuario que realizó la acción</td>
+</tr>
+<tr>
+<td>accion</td>
+<td>VARCHAR(50)</td>
+<td>Tipo de acción</td>
+</tr>
+<tr>
+<td>entidad</td>
+<td>VARCHAR(50)</td>
+<td>Entidad afectada</td>
+</tr>
+<tr>
+<td>entidad_id</td>
+<td>INT (nullable)</td>
+<td>ID de la entidad</td>
+</tr>
+<tr>
+<td>detalle</td>
+<td>JSON</td>
+<td>Detalle adicional</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Acciones registradas:</strong> crear, editar, eliminar,
+aprobar, rechazar, login, solicitar, mover, cerrar, activar,
+desactivar</p>
+<hr />
+<h2 id="estructura-de-base-de-datos">5. Estructura de Base de Datos</h2>
+<h3 id="nombre-de-la-base-de-datos">5.1 Nombre de la Base de Datos</h3>
+<pre><code>sagi</code></pre>
+<h3 id="conexión">5.2 Conexión</h3>
+<pre class="env"><code>DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sagi
+DB_USERNAME=root
+DB_PASSWORD=</code></pre>
+<h3 id="migraciones">5.3 Migraciones</h3>
+<p>El sistema utiliza 19 migraciones para crear y modificar las
+tablas:</p>
+<table>
+<thead>
+<tr>
+<th>Migración</th>
+<th>Tabla</th>
+<th>Acción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>000000</td>
+<td>roles</td>
+<td>Crear tabla de roles</td>
+</tr>
+<tr>
+<td>000000</td>
+<td>sedes</td>
+<td>Crear tabla de sedes</td>
+</tr>
+<tr>
+<td>000000</td>
+<td>unidades</td>
+<td>Crear tabla de unidades</td>
+</tr>
+<tr>
+<td>000000</td>
+<td>users</td>
+<td>Crear tabla de usuarios</td>
+</tr>
+<tr>
+<td>000001</td>
+<td>cache</td>
+<td>Crear tablas de caché</td>
+</tr>
+<tr>
+<td>000002</td>
+<td>jobs</td>
+<td>Crear tablas de trabajos</td>
+</tr>
+<tr>
+<td>000003</td>
+<td>categorias</td>
+<td>Crear tabla de categorías</td>
+</tr>
+<tr>
+<td>000004</td>
+<td>campos_dinamicos</td>
+<td>Crear tabla de campos dinámicos</td>
+</tr>
+<tr>
+<td>000005</td>
+<td>items</td>
+<td>Crear tabla de ítems</td>
+</tr>
+<tr>
+<td>000006</td>
+<td>movimientos</td>
+<td>Crear tabla de movimientos</td>
+</tr>
+<tr>
+<td>000007</td>
+<td>alertas</td>
+<td>Crear tabla de alertas</td>
+</tr>
+<tr>
+<td>000008</td>
+<td>auditoria</td>
+<td>Crear tabla de auditoría</td>
+</tr>
+<tr>
+<td>000009</td>
+<td>tipos_items</td>
+<td>Crear tabla de tipos de ítem</td>
+</tr>
+<tr>
+<td>000010</td>
+<td>items</td>
+<td>Agregar tipo_item_id</td>
+</tr>
+<tr>
+<td>000011</td>
+<td>campos_dinamicos</td>
+<td>Agregar tipo_item_id y placeholder</td>
+</tr>
+<tr>
+<td>20260818</td>
+<td>personal_access_tokens</td>
+<td>Crear tabla de tokens Sanctum</td>
+</tr>
+<tr>
+<td>20260818</td>
+<td>sedes, unidades</td>
+<td>Agregar campo activa</td>
+</tr>
+<tr>
+<td>20260823</td>
+<td>items</td>
+<td>Hacer fecha_alta nullable</td>
+</tr>
+<tr>
+<td>20260823</td>
+<td>items</td>
+<td>Recodificar códigos existentes</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-rest---endpoints">6. API REST - Endpoints</h2>
+<h3 id="autenticación">6.1 Autenticación</h3>
+<table>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/api/login</code></td>
+<td>Iniciar sesión</td>
+<td>No</td>
+<td>Público</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/me</code></td>
+<td>Obtener usuario actual</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/logout</code></td>
+<td>Cerrar sesión</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dashboard">6.2 Dashboard</h3>
+<table>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/dashboard/stats</code></td>
+<td>Estadísticas generales</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+</tbody>
+</table>
+<h3 id="items-inventario-1">6.3 Items (Inventario)</h3>
+<table>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/items</code></td>
+<td>Listar ítems (paginado, 20/pág)</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/items</code></td>
+<td>Crear ítem (alta)</td>
+<td>Sí</td>
+<td>admin, jefe, carga</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/items/{id}</code></td>
+<td>Ver detalle de ítem</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/items/{id}</code></td>
+<td>Actualizar ítem</td>
+<td>Sí</td>
+<td>admin, jefe, carga</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/items/{id}</code></td>
+<td>Eliminar ítem</td>
+<td>Sí</td>
+<td>admin, jefe, carga</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parámetros de filtro para GET /api/items:</strong> -
+<code>search</code>: Búsqueda por código o valores dinámicos -
+<code>categoria_id</code>: Filtrar por categoría -
+<code>estado_conservacion</code>: Filtrar por estado de conservación -
+<code>estado</code>: Filtrar por estado (activo/pendiente/baja) -
+<code>unidad_id</code>: Filtrar por unidad - <code>page</code>: Número
+de página (default: 1)</p>
+<h3 id="categorías-1">6.4 Categorías</h3>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 28%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/categorias</code></td>
+<td>Listar categorías</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/categorias</code></td>
+<td>Crear categoría</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/categorias/{id}</code></td>
+<td>Actualizar categoría</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/categorias/{id}</code></td>
+<td>Eliminar categoría</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/categorias/{id}/campos</code></td>
+<td>Obtener campos dinámicos</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/categorias/{id}/campos</code></td>
+<td>Crear campo dinámico</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/categorias/{id}/tipos</code></td>
+<td>Obtener tipos de ítem</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/categorias/{id}/tipos</code></td>
+<td>Crear tipo de ítem</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="campos-dinámicos-1">6.5 Campos Dinámicos</h3>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 28%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PUT</td>
+<td><code>/api/campos-dinamicos/{id}</code></td>
+<td>Actualizar campo</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/campos-dinamicos/{id}</code></td>
+<td>Eliminar campo</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/campos-dinamicos/{id}/mover</code></td>
+<td>Reordenar campo</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tipos-de-item">6.6 Tipos de Item</h3>
+<table>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PUT</td>
+<td><code>/api/tipos-item/{id}</code></td>
+<td>Actualizar tipo</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/tipos-item/{id}</code></td>
+<td>Eliminar tipo</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/tipos-item/{id}/mover</code></td>
+<td>Reordenar tipo</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sedes-1">6.7 Sedes</h3>
+<table>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/sedes</code></td>
+<td>Listar sedes</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/sedes</code></td>
+<td>Crear sede</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/sedes/{id}</code></td>
+<td>Actualizar sede</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/sedes/{id}</code></td>
+<td>Eliminar sede</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="unidades-1">6.8 Unidades</h3>
+<table>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/unidades</code></td>
+<td>Listar unidades</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/unidades</code></td>
+<td>Crear unidad</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/api/unidades/{id}</code></td>
+<td>Actualizar unidad</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/api/unidades/{id}</code></td>
+<td>Eliminar unidad</td>
+<td>Sí</td>
+<td>admin</td>
+</tr>
+</tbody>
+</table>
+<h3 id="movimientos-1">6.9 Movimientos</h3>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 28%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/movimientos</code></td>
+<td>Listar movimientos (paginado, 25/pág)</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/movimientos/traslados</code></td>
+<td>Solicitar traslado</td>
+<td>Sí</td>
+<td>admin, jefe, carga</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/movimientos/bajas</code></td>
+<td>Solicitar baja</td>
+<td>Sí</td>
+<td>admin, jefe, carga</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/movimientos/{id}/aprobar</code></td>
+<td>Aprobar movimiento</td>
+<td>Sí</td>
+<td>admin, jefe</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/movimientos/{id}/rechazar</code></td>
+<td>Rechazar movimiento</td>
+<td>Sí</td>
+<td>admin, jefe</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parámetros de filtro para GET /api/movimientos:</strong> -
+<code>tipo</code>: Filtrar por tipo (alta/traslado/baja) -
+<code>estado</code>: Filtrar por estado (pendiente/aprobado/rechazado) -
+<code>item_id</code>: Filtrar por ítem</p>
+<h3 id="alertas-1">6.10 Alertas</h3>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 28%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/alertas</code></td>
+<td>Listar alertas (paginado, 50/pág)</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/alertas</code></td>
+<td>Crear alerta manual</td>
+<td>Sí</td>
+<td>admin, jefe</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/alertas/{id}/cerrar</code></td>
+<td>Cerrar alerta</td>
+<td>Sí</td>
+<td>admin, jefe</td>
+</tr>
+</tbody>
+</table>
+<h3 id="auditoría-1">6.11 Auditoría</h3>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 28%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/auditoria</code></td>
+<td>Listar registros (paginado, 50/pág)</td>
+<td>Sí</td>
+<td>admin, jefe</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Parámetros de filtro para GET /api/auditoria:</strong> -
+<code>entidad</code>: Filtrar por entidad - <code>accion</code>: Filtrar
+por acción - <code>user_id</code>: Filtrar por usuario -
+<code>desde</code>: Fecha inicio (YYYY-MM-DD) - <code>hasta</code>:
+Fecha fin (YYYY-MM-DD)</p>
+<h3 id="reportes">6.12 Reportes</h3>
+<table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 18%" />
+<col style="width: 24%" />
+<col style="width: 28%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th>Método</th>
+<th>Endpoint</th>
+<th>Descripción</th>
+<th>Autenticación</th>
+<th>Roles</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/reportes/resumen</code></td>
+<td>Datos agregados</td>
+<td>Sí</td>
+<td>admin, jefe</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/reportes/items</code></td>
+<td>Lista completa de ítems</td>
+<td>Sí</td>
+<td>admin, jefe</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="autenticación-y-autorización">7. Autenticación y
+Autorización</h2>
+<h3 id="autenticación-laravel-sanctum">7.1 Autenticación (Laravel
+Sanctum)</h3>
+<p>El sistema utiliza <strong>Laravel Sanctum</strong> para la
+autenticación basada en tokens.</p>
+<p><strong>Flujo de login:</strong> 1. El cliente envía
+<code>POST /api/login</code> con <code>{ dni, password }</code> 2. El
+servidor valida credenciales contra la tabla <code>users</code> 3. Se
+genera un token de acceso (Personal Access Token) 4. Se retorna
+<code>{ token, user: { id, name, dni, username, rol, sede } }</code> 5.
+El cliente almacena el token en <code>localStorage</code> bajo la clave
+<code>sagi_token</code> 6. Cada petición subsiguiente incluye
+<code>Authorization: Bearer {token}</code></p>
+<p><strong>Cierre de sesión:</strong> 1. El cliente envía
+<code>POST /api/logout</code> 2. El servidor revoca el token actual 3.
+El cliente limpia <code>localStorage</code></p>
+<h3 id="autorización-roles">7.2 Autorización (Roles)</h3>
+<p>El sistema implementa control de acceso basado en roles (RBAC)
+mediante el middleware <code>rol</code>.</p>
+<h4 id="roles-definidos">Roles Definidos</h4>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 17%" />
+<col style="width: 38%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th>Rol</th>
+<th>Slug</th>
+<th>Descripción</th>
+<th>Permisos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Administrador</td>
+<td><code>admin</code></td>
+<td>Acceso total</td>
+<td>CRUD completo sobre todas las entidades</td>
+</tr>
+<tr>
+<td>Jefe de Área</td>
+<td><code>jefe</code></td>
+<td>Gestión intermedia</td>
+<td>Ver todo, aprobar/rechazar movimientos, crear/cerrar alertas</td>
+</tr>
+<tr>
+<td>Personal de Carga</td>
+<td><code>carga</code></td>
+<td>Registro de datos</td>
+<td>Crear ítems, solicitar movimientos</td>
+</tr>
+<tr>
+<td>Personal de Consulta</td>
+<td><code>consulta</code></td>
+<td>Solo lectura</td>
+<td>Ver dashboard, inventario, movimientos, reportes</td>
+</tr>
+</tbody>
+</table>
+<h4 id="matriz-de-permisos">Matriz de Permisos</h4>
+<table>
+<thead>
+<tr>
+<th>Funcionalidad</th>
+<th>admin</th>
+<th>jefe</th>
+<th>carga</th>
+<th>consulta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dashboard</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Ver Inventario</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Crear Ítem</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Editar Ítem</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Eliminar Ítem</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Ver Detalle Ítem</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Ver Movimientos</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Solicitar Traslado</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Solicitar Baja</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Aprobar/Rechazar</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Ver Reportes</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Exportar Reportes</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Ver Alertas</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+</tr>
+<tr>
+<td>Crear Alerta</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Cerrar Alerta</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Gestionar Categorías</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Gestionar Sedes</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Gestionar Unidades</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Ver Auditoría</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+<tr>
+<td>Exportar Auditoría</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+</tr>
+</tbody>
+</table>
+<h3 id="usuarios-de-prueba">7.3 Usuarios de Prueba</h3>
+<table>
+<thead>
+<tr>
+<th>DNI</th>
+<th>Contraseña</th>
+<th>Rol</th>
+<th>Usuario</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10000001</td>
+<td>Admin1234</td>
+<td>admin</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>10000002</td>
+<td>Jefe1234</td>
+<td>jefe</td>
+<td>jefe</td>
+</tr>
+<tr>
+<td>10000003</td>
+<td>Carga1234</td>
+<td>carga</td>
+<td>carga</td>
+</tr>
+<tr>
+<td>10000004</td>
+<td>Consulta1234</td>
+<td>consulta</td>
+<td>consulta</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="lógica-de-negocio">8. Lógica de Negocio</h2>
+<h3 id="flujo-de-alta-de-ítem">8.1 Flujo de Alta de Ítem</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    ALTA DE ÍTEM                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1. Usuario crea ítem (POST /api/items)                     │
+│     └─&gt; Categoría: A7 (temporal de alta)                    │
+│                                                             │
+│  2. Se genera código único:                                 │
+│     └─&gt; {Cat}-{SedeId 2d}-{UnidadId 2d}-{Seq 6d}          │
+│     └─&gt; Ejemplo: A1-03-47-000001                           │
+│                                                             │
+│  3. Se crea movimiento &quot;alta&quot; con estado &quot;aprobado&quot;         │
+│                                                             │
+│  4. Se transfiere ítem de A7 a categoría real               │
+│     └─&gt; Se actualiza categoria_id                           │
+│                                                             │
+│  5. Se registra en auditoría                                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="flujo-de-traslado">8.2 Flujo de Traslado</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    TRASLADO DE ÍTEM                         │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1. Usuario solicita traslado (POST /api/movimientos/...)    │
+│     └─&gt; Se valida: ítem activo, destino != origen           │
+│                                                             │
+│  2. Se crea movimiento con estado &quot;pendiente&quot;               │
+│                                                             │
+│  3. Se crea alerta &quot;importante&quot;                             │
+│                                                             │
+│  4. Admin/Jefe aprueba o rechaza:                           │
+│     ├─&gt; Aprobar: se actualiza unidad_id del ítem           │
+│     └─&gt; Rechazar: se registra motivo_rechazo               │
+│                                                             │
+│  5. Se cierra la alerta asociada                            │
+│                                                             │
+│  6. Se registra en auditoría                                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="flujo-de-baja">8.3 Flujo de Baja</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    BAJA DE ÍTEM                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1. Usuario solicita baja (POST /api/movimientos/bajas)     │
+│                                                             │
+│  2. Se crea movimiento con estado &quot;pendiente&quot;               │
+│                                                             │
+│  3. Se crea alerta &quot;crítica&quot;                                │
+│                                                             │
+│  4. Admin/Jefe aprueba:                                     │
+│     ├─&gt; Se cambia estado del ítem a &quot;baja&quot;                 │
+│     └─&gt; Se cambia categoría a A8 (baja)                    │
+│                                                             │
+│  5. Se cierra la alerta asociada                            │
+│                                                             │
+│  6. Se registra en auditoría                                │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<h3 id="generación-de-código-único">8.4 Generación de Código Único</h3>
+<p>El código único de cada ítem sigue el formato:</p>
+<pre><code>{Categoría}-{IdSede}-{IdUnidad}-{Secuencial}</code></pre>
+<p><strong>Ejemplo:</strong> <code>A1-03-47-000001</code></p>
+<ul>
+<li><code>A1</code>: Código de categoría (Equipamiento Tecnológico)</li>
+<li><code>03</code>: ID de sede (2 dígitos)</li>
+<li><code>47</code>: ID de unidad (2 dígitos)</li>
+<li><code>000001</code>: Secuencial único (6 dígitos)</li>
+</ul>
+<p><strong>Algoritmo de generación:</strong> 1. Obtener código de
+categoría 2. Obtener ID de sede (formateado a 2 dígitos) 3. Obtener ID
+de unidad (formateado a 2 dígitos) 4. Buscar el último secuencial para
+esa combinación 5. Incrementar en 1 y formatear a 6 dígitos</p>
+<h3 id="sistema-de-campos-dinámicos">8.5 Sistema de Campos
+Dinámicos</h3>
+<p>Cada categoría puede tener campos personalizados que se aplican a sus
+ítems:</p>
+<ul>
+<li><strong>Campos generales</strong>: Aplican a todos los ítems de la
+categoría</li>
+<li><strong>Campos por tipo</strong>: Aplican solo a un tipo específico
+de ítem</li>
+</ul>
+<p><strong>Tipos de campo disponibles:</strong> - <code>texto</code>:
+Input de texto corto - <code>numero</code>: Input numérico -
+<code>fecha</code>: Selector de fecha - <code>select</code>: Lista
+desplegable (opciones en JSON) - <code>textarea</code>: Texto largo</p>
+<p>Los valores se almacenan en la columna <code>valores_dinamicos</code>
+(JSON) del ítem.</p>
+<hr />
+<h2 id="frontend---componentes-y-rutas">9. Frontend - Componentes y
+Rutas</h2>
+<h3 id="estructura-de-directorios">9.1 Estructura de Directorios</h3>
+<pre><code>frontend/src/
+├── components/
+│   ├── AuthContext.jsx      # Contexto de autenticación
+│   ├── Layout.jsx           # Shell de la aplicación
+│   ├── Modal.jsx            # Componente modal genérico
+│   ├── Aviso.jsx            # Banner de notificación
+│   ├── ItemForm.jsx         # Formulario de ítem
+│   └── ItemDetalle.jsx      # Vista de detalle de ítem
+├── pages/
+│   ├── Login.jsx            # Página de login
+│   ├── Dashboard.jsx        # Panel principal
+│   ├── Inventario.jsx       # Lista de inventario
+│   ├── Movimientos.jsx      # Gestión de movimientos
+│   ├── Categorias.jsx       # Gestión de categorías
+│   ├── Unidades.jsx         # Gestión de sedes/unidades
+│   ├── Alertas.jsx          # Gestión de alertas
+│   ├── Auditoria.jsx        # Registro de auditoría
+│   └── Reportes.jsx         # Reportes y exportación
+├── services/
+│   └── api.js               # Instancia Axios configurada
+├── styles/
+│   ├── auth.css             # Estilos de login
+│   ├── dashboard.css        # Estilos de dashboard/reportes
+│   ├── inventario.css       # Estilos de inventario/movimientos
+│   ├── categorias.css       # Estilos de categorías
+│   ├── form.css             # Estilos de formularios
+│   ├── modal.css            # Estilos de modales
+│   ├── aviso.css            # Estilos de avisos
+│   └── detalle.css          # Estilos de detalle
+└── index.css                # Estilos globales</code></pre>
+<h3 id="rutas">9.2 Rutas</h3>
+<table>
+<thead>
+<tr>
+<th>Ruta</th>
+<th>Componente</th>
+<th>Protección</th>
+<th>Roles Permitidos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/login</code></td>
+<td>Login</td>
+<td>Pública</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td><code>/</code></td>
+<td>Dashboard</td>
+<td>ProtectedRoute</td>
+<td>Todos autenticados</td>
+</tr>
+<tr>
+<td><code>/inventario</code></td>
+<td>Inventario</td>
+<td>ProtectedRoute</td>
+<td>Todos autenticados</td>
+</tr>
+<tr>
+<td><code>/categorias</code></td>
+<td>Categorias</td>
+<td>RoleRoute</td>
+<td>admin</td>
+</tr>
+<tr>
+<td><code>/unidades</code></td>
+<td>Unidades</td>
+<td>RoleRoute</td>
+<td>admin</td>
+</tr>
+<tr>
+<td><code>/movimientos</code></td>
+<td>Movimientos</td>
+<td>ProtectedRoute</td>
+<td>admin, jefe, carga</td>
+</tr>
+<tr>
+<td><code>/reportes</code></td>
+<td>Reportes</td>
+<td>ProtectedRoute</td>
+<td>admin, jefe</td>
+</tr>
+<tr>
+<td><code>/alertas</code></td>
+<td>Alertas</td>
+<td>ProtectedRoute</td>
+<td>admin, jefe, carga</td>
+</tr>
+<tr>
+<td><code>/auditoria</code></td>
+<td>Auditoria</td>
+<td>ProtectedRoute</td>
+<td>admin, jefe</td>
+</tr>
+</tbody>
+</table>
+<h3 id="componentes-principales">9.3 Componentes Principales</h3>
+<h4 id="layout.jsx">Layout.jsx</h4>
+<ul>
+<li>Shell de la aplicación con sidebar, topbar y área de contenido</li>
+<li>Sidebar responsive con navegación filtrada por rol</li>
+<li>Topbar con información de usuario y acciones</li>
+<li>Menú hamburguesa para móvil (&lt; 900px)</li>
+</ul>
+<h4 id="modal.jsx">Modal.jsx</h4>
+<ul>
+<li>Diálogo modal genérico</li>
+<li>Props: <code>open</code>, <code>title</code>, <code>onClose</code>,
+<code>children</code>, <code>wide</code></li>
+<li>Cierra con Escape y clic fuera</li>
+<li>Bloquea scroll del body</li>
+</ul>
+<h4 id="itemform.jsx">ItemForm.jsx</h4>
+<ul>
+<li>Formulario completo para crear/editar ítems</li>
+<li>Carga dinámica de campos según categoría y tipo seleccionado</li>
+<li>Validación de campos requeridos</li>
+<li>Soporte para fecha desconocida</li>
+</ul>
+<h4 id="itemdetalle.jsx">ItemDetalle.jsx</h4>
+<ul>
+<li>Vista de solo lectura del ítem</li>
+<li>Muestra datos generales y campos dinámicos</li>
+<li>Historial de movimientos asociados</li>
+</ul>
+<h3 id="servicios-api">9.4 Servicios (API)</h3>
+<p>El archivo <code>frontend/src/services/api.js</code> configura una
+instancia de Axios con:</p>
+<ul>
+<li><strong>Base URL</strong>: <code>/api</code> (proxy a
+<code>localhost:8000</code>)</li>
+<li><strong>Request Interceptor</strong>: Agrega header
+<code>Authorization: Bearer {token}</code></li>
+<li><strong>Response Interceptor</strong>: En caso de 401, limpia sesión
+y redirige a <code>/login</code></li>
+</ul>
+<hr />
+<h2 id="sistema-de-auditoría">10. Sistema de Auditoría</h2>
+<h3 id="acciones-registradas">10.1 Acciones Registradas</h3>
+<table>
+<thead>
+<tr>
+<th>Acción</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>login</code></td>
+<td>Inicio de sesión</td>
+</tr>
+<tr>
+<td><code>crear</code></td>
+<td>Creación de entidad</td>
+</tr>
+<tr>
+<td><code>editar</code></td>
+<td>Edición de entidad</td>
+</tr>
+<tr>
+<td><code>eliminar</code></td>
+<td>Eliminación de entidad</td>
+</tr>
+<tr>
+<td><code>aprobar</code></td>
+<td>Aprobación de movimiento</td>
+</tr>
+<tr>
+<td><code>rechazar</code></td>
+<td>Rechazo de movimiento</td>
+</tr>
+<tr>
+<td><code>solicitar</code></td>
+<td>Solicitud de movimiento</td>
+</tr>
+<tr>
+<td><code>mover</code></td>
+<td>Reordenamiento de elementos</td>
+</tr>
+<tr>
+<td><code>cerrar</code></td>
+<td>Cierre de alerta</td>
+</tr>
+<tr>
+<td><code>activar</code></td>
+<td>Activación de sede/unidad</td>
+</tr>
+<tr>
+<td><code>desactivar</code></td>
+<td>Desactivación de sede/unidad</td>
+</tr>
+</tbody>
+</table>
+<h3 id="entidades-auditadas">10.2 Entidades Auditadas</h3>
+<ul>
+<li>Usuarios (login)</li>
+<li>Items (crear, editar, eliminar)</li>
+<li>Categorías (crear, editar, eliminar)</li>
+<li>Campos Dinámicos (crear, editar, eliminar, mover)</li>
+<li>Tipos de Item (crear, editar, eliminar, mover)</li>
+<li>Sedes (crear, editar, eliminar, activar, desactivar)</li>
+<li>Unidades (crear, editar, eliminar, activar, desactivar)</li>
+<li>Movimientos (solicitar, aprobar, rechazar)</li>
+<li>Alertas (crear, cerrar)</li>
+</ul>
+<h3 id="estructura-del-registro">10.3 Estructura del Registro</h3>
+<p>Cada registro de auditoría contiene: - <code>user_id</code>: Usuario
+que realizó la acción - <code>accion</code>: Tipo de acción
+(crear/editar/eliminar/etc.) - <code>entidad</code>: Nombre de la
+entidad afectada - <code>entidad_id</code>: ID de la entidad (nullable)
+- <code>detalle</code>: JSON con información adicional (valores
+anteriores/nuevos, IP, etc.)</p>
+<hr />
+<h2 id="exportación-de-datos">11. Exportación de Datos</h2>
+<h3 id="reportes-1">11.1 Reportes</h3>
+<p>El módulo de reportes permite exportar:</p>
+<ul>
+<li><strong>Resumen por categoría</strong>: Código, nombre, cantidad de
+ítems</li>
+<li><strong>Resumen por estado de conservación</strong>: Estado,
+cantidad</li>
+<li><strong>Resumen por sede</strong>: Sede, cantidad</li>
+<li><strong>Resumen por unidad</strong>: Unidad, cantidad</li>
+<li><strong>Top 20 elementos</strong>: Elemento más frecuente</li>
+<li><strong>Movimientos por mes</strong>: Últimos 6 meses</li>
+</ul>
+<h3 id="formatos-de-exportación">11.2 Formatos de Exportación</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 18%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th>Formato</th>
+<th>Uso</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Excel (.xlsx)</td>
+<td>Reportes</td>
+<td>Una hoja por categoría con campos dinámicos</td>
+</tr>
+<tr>
+<td>CSV</td>
+<td>Reportes</td>
+<td>Separado por comas</td>
+</tr>
+<tr>
+<td>JSON</td>
+<td>Auditoría</td>
+<td>Formato estructurado</td>
+</tr>
+</tbody>
+</table>
+<h3 id="exportación-de-auditoría">11.3 Exportación de Auditoría</h3>
+<ul>
+<li><strong>Excel</strong>: Columnas [Fecha, Usuario, Acción, Entidad,
+Detalle]</li>
+<li><strong>JSON</strong>: Registros completos con toda la
+información</li>
+</ul>
+<hr />
+<h2 id="seguridad">12. Seguridad</h2>
+<h3 id="autenticación-1">12.1 Autenticación</h3>
+<ul>
+<li>Contraseñas hasheadas con bcrypt</li>
+<li>Tokens de acceso con Sanctum (Personal Access Tokens)</li>
+<li>Tokens almacenados en localStorage (no en cookies)</li>
+<li>Revocación de tokens al cerrar sesión</li>
+</ul>
+<h3 id="autorización">12.2 Autorización</h3>
+<ul>
+<li>Middleware <code>rol</code> verifica roles permitidos por
+endpoint</li>
+<li>Control de acceso basado en roles (RBAC)</li>
+<li>Validación de permisos en frontend (RoleRoute)</li>
+</ul>
+<h3 id="validación">12.3 Validación</h3>
+<ul>
+<li>Validación de datos en todos los endpoints de escritura</li>
+<li>Reglas de unicidad case-insensitive (sedes, unidades,
+categorías)</li>
+<li>Validación de campos dinámicos según categoría</li>
+<li>Protección contra inyección SQL (Eloquent ORM)</li>
+</ul>
+<h3 id="protección-de-datos">12.4 Protección de Datos</h3>
+<ul>
+<li>Auditoría completa de acciones</li>
+<li>Eliminación segura de ítems (limpieza de alertas y movimientos)</li>
+<li>Baja lógica de sedes y unidades (campo <code>activa</code>)</li>
+<li>Estados de ítem: activo, pendiente, baja</li>
+</ul>
+<hr />
+<h2 id="requisitos-de-instalación">13. Requisitos de Instalación</h2>
+<h3 id="requisitos-del-servidor">13.1 Requisitos del Servidor</h3>
+<ul>
+<li>PHP 8.2 o superior</li>
+<li>MySQL 8.x</li>
+<li>Composer</li>
+<li>Node.js 18+ y npm</li>
+<li>XAMPP (recomendado para desarrollo local)</li>
+</ul>
+<h3 id="instalación-del-backend">13.2 Instalación del Backend</h3>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> backend</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">composer</span> install</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> .env.example .env</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="ex">php</span> artisan key:generate</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="ex">php</span> artisan migrate</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="ex">php</span> artisan db:seed</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="ex">php</span> artisan serve <span class="at">--port</span><span class="op">=</span>8000</span></code></pre></div>
+<h3 id="instalación-del-frontend">13.3 Instalación del Frontend</h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> frontend</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run dev</span></code></pre></div>
+<h3 id="variables-de-entorno">13.4 Variables de Entorno</h3>
+<pre class="env"><code>APP_NAME=SAGI
+APP_ENV=local
+APP_KEY=base64:...
+APP_DEBUG=true
+APP_URL=http://localhost:5173
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sagi
+DB_USERNAME=root
+DB_PASSWORD=
+
+SANCTUM_STATEFUL_DOMAINS=localhost:5173</code></pre>
+<hr />
+<h2 id="apéndice-a-formato-del-código-único">Apéndice A: Formato del
+Código Único</h2>
+<pre><code>A1-03-47-000001
+│   │  │  │
+│   │  │  └─ Secuencial (6 dígitos)
+│   │  └──── ID Unidad (2 dígitos)
+│   └─────── ID Sede (2 dígitos)
+└─────────── Código Categoría (2 caracteres)</code></pre>
+<h2 id="apéndice-b-estados-del-sistema">Apéndice B: Estados del
+Sistema</h2>
+<h3 id="estados-de-ítem">Estados de Ítem</h3>
+<ul>
+<li><code>activo</code>: Ítem en uso normal</li>
+<li><code>pendiente</code>: Ítem esperando aprobación</li>
+<li><code>baja</code>: Ítem dado de baja</li>
+</ul>
+<h3 id="estados-de-movimiento">Estados de Movimiento</h3>
+<ul>
+<li><code>pendiente</code>: Esperando aprobación</li>
+<li><code>aprobado</code>: Movimiento ejecutado</li>
+<li><code>rechazado</code>: Movimiento denegado</li>
+</ul>
+<h3 id="estados-de-alerta">Estados de Alerta</h3>
+<ul>
+<li><code>abierta</code>: Alerta activa</li>
+<li><code>cerrada</code>: Alerta resuelta</li>
+</ul>
+<h3 id="estados-de-conservación">Estados de Conservación</h3>
+<ul>
+<li><code>Muy bueno</code>: Como nuevo</li>
+<li><code>Bueno</code>: Uso normal, sin daños</li>
+<li><code>Regular</code>: Desgaste moderado</li>
+<li><code>Malo</code>: Requiere reparación/reemplazo</li>
+</ul>
+<hr />
+<p><em>Documento generado el 23 de agosto de 2026</em> <em>SAGI v1.0 -
+Instituto de Seguridad Pública</em></p>
