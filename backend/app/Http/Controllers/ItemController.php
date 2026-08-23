@@ -70,6 +70,7 @@ class ItemController extends Controller
             'cantidad' => 'required|integer|min:1',
             'unidad_id' => ['required', 'integer', Rule::exists('unidades', 'id')],
             'motivo_alta' => 'required|string',
+            'fecha_alta' => ['nullable', 'date', 'before_or_equal:today'],
             'valores' => 'nullable|array',
         ]);
 
@@ -100,7 +101,7 @@ class ItemController extends Controller
                 'unidad_id' => $validated['unidad_id'],
                 'estado_conservacion' => $validated['estado_conservacion'],
                 'cantidad' => $validated['cantidad'],
-                'fecha_alta' => now()->toDateString(),
+                'fecha_alta' => $validated['fecha_alta'] ?? now()->toDateString(),
                 'valores_dinamicos' => $valores,
                 'estado' => 'activo',
             ]);

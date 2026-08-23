@@ -11,6 +11,8 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
   const [cantidad, setCantidad] = useState(item?.cantidad ?? 1)
   const [unidadId, setUnidadId] = useState(item?.unidad_id ?? '')
   const [motivoAlta, setMotivoAlta] = useState('')
+  const [fechaAlta, setFechaAlta] = useState(item?.fecha_alta ?? '')
+  const [fechaDesconocida, setFechaDesconocida] = useState(false)
   const [valores, setValores] = useState({})
   const [campos, setCampos] = useState([])
   const [tipos, setTipos] = useState([])
@@ -130,6 +132,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
       if (!esEdicion) {
         payload.motivo_alta = motivoAlta
         payload.unidad_id = Number(unidadId)
+        payload.fecha_alta = fechaDesconocida ? null : fechaAlta
       }
 
       if (esEdicion) {
@@ -220,6 +223,29 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
             required
           />
         </div>
+
+        {!esEdicion && (
+          <div className="field">
+            <label htmlFor="fecha-alta">Fecha de alta *</label>
+            <input
+              id="fecha-alta"
+              type="date"
+              value={fechaDesconocida ? '' : fechaAlta}
+              onChange={(e) => setFechaAlta(e.target.value)}
+              max={new Date().toISOString().slice(0, 10)}
+              disabled={fechaDesconocida}
+              required={!fechaDesconocida}
+            />
+            <label className="checkbox-inline">
+              <input
+                type="checkbox"
+                checked={fechaDesconocida}
+                onChange={(e) => setFechaDesconocida(e.target.checked)}
+              />
+              Fecha desconocida
+            </label>
+          </div>
+        )}
 
         {!esEdicion && (
           <div className="field">

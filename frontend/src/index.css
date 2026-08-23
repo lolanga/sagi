@@ -206,8 +206,9 @@ button {
   border-radius: var(--radius);
 }
 
-.table-wrap .table {
-  min-width: 700px;
+/* Solo las tablas principales de página fuerzan ancho minimo; las de tarjetas se adaptan */
+.content > .table-wrap > .table {
+  min-width: 640px;
 }
 
 @media (max-width: 900px) {
@@ -267,7 +268,7 @@ button {
     padding: 16px;
   }
 
-  .table-wrap .table {
+  .content > .table-wrap > .table {
     min-width: 0;
   }
 }

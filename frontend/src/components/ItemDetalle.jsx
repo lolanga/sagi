@@ -63,7 +63,7 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
             <div><dt>Cantidad</dt><dd>{item.cantidad}</dd></div>
             <div><dt>Unidad actual</dt><dd>{item.unidad?.nombre ?? '-'}{item.unidad?.sede ? ` (${item.unidad.sede.nombre})` : ''}</dd></div>
             <div><dt>Responsable</dt><dd>{item.responsable?.name ?? '-'}</dd></div>
-            <div><dt>Fecha de alta</dt><dd>{formatearFecha(item.fecha_alta)}</dd></div>
+            <div><dt>Fecha de alta</dt><dd>{item.fecha_alta ? formatearFecha(item.fecha_alta) : 'Desconocida'}</dd></div>
           </dl>
         </div>
 
