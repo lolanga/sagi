@@ -18,6 +18,8 @@ export default function Inventario() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [categoriaId, setCategoriaId] = useState('')
+  const [page, setPage] = useState(1)
+  const [lastPage, setLastPage] = useState(1)
   const [showAlta, setShowAlta] = useState(false)
   const [editando, setEditando] = useState(null)
   const [viendo, setViendo] = useState(null)
@@ -30,19 +32,22 @@ export default function Inventario() {
     const params = new URLSearchParams()
     if (search) params.set('search', search)
     if (categoriaId) params.set('categoria_id', categoriaId)
+    params.set('page', page)
     setLoading(true)
     api
       .get(`/items?${params.toString()}`)
       .then((res) => {
         setItems(res.data.data || [])
         setTotal(res.data.total || 0)
+        setLastPage(res.data.last_page || 1)
       })
       .catch(() => {
         setItems([])
         setTotal(0)
+        setLastPage(1)
       })
       .finally(() => setLoading(false))
-  }, [search, categoriaId])
+  }, [search, categoriaId, page])
 
   useEffect(() => {
     api.get('/categorias').then((res) => setCategorias(res.data.categorias || []))

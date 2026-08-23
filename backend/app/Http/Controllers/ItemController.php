@@ -44,7 +44,7 @@ class ItemController extends Controller
             $query->where('unidad_id', $request->integer('unidad_id'));
         }
 
-        $items = $query->paginate(25)->withQueryString();
+        $items = $query->paginate(20)->withQueryString();
 
         return response()->json($items);
     }

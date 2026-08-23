@@ -7,6 +7,7 @@ import Layout from '../components/Layout'
 import '../styles/inventario.css'
 
 const tiposMovimiento = [
+  { value: 'alta', label: 'Alta' },
   { value: 'traslado', label: 'Traslado' },
   { value: 'baja', label: 'Baja' },
 ]
