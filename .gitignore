@@ -21,3 +21,4 @@ backend/.phpunit.result.cache
 .idea/
 .vscode/
 *.swp
+*.log
