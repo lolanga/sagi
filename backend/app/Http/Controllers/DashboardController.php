@@ -18,7 +18,7 @@ class DashboardController extends Controller
         $total = Item::count();
         $activos = Item::where('estado', 'activo')->count();
         $pendientes = Movimiento::where('estado', 'pendiente')->count();
-        $alertas = Alerta::where('estado', 'activa')->count();
+        $alertas = Alerta::where('estado', 'abierta')->count();
 
         $porCategoria = Categoria::withCount(['items' => fn ($q) => $q->where('estado', 'activo')])
             ->orderBy('codigo')
