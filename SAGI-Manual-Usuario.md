@@ -1,28 +1,35 @@
+---
+title: "SAGI - Manual de Usuario"
+subtitle: "Sistema de Administración y Gestión de Inventarios"
+author: "Instituto de Seguridad Pública (ISeP)"
+date: "23 de agosto de 2026"
+version: "1.0"
+---
+
 # SAGI - Manual de Usuario
 
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 1.0
-Fecha: 23 de agosto de 2026
+Versión: 1.0 | Fecha: 23 de agosto de 2026
 
 ---
 
 ## Índice
 
-1. [Introducción](#1-introducción)
-2. [Requisitos del Sistema](#2-requisitos-del-sistema)
-3. [Acceso al Sistema](#3-acceso-al-sistema)
-4. [Interfaz General](#4-interfaz-general)
-5. [Dashboard](#5-dashboard)
-6. [Gestión de Inventario](#6-gestión-de-inventario)
-7. [Gestión de Movimientos](#7-gestión-de-movimientos)
-8. [Gestión de Alertas](#8-gestión-de-alertas)
-9. [Gestión de Categorías](#9-gestión-de-categorías)
-10. [Gestión de Sedes y Unidades](#10-gestión-de-sedes-y-unidades)
-11. [Reportes](#11-reportes)
-12. [Auditoría](#12-auditoría)
-13. [Preguntas Frecuentes](#13-preguntas-frecuentes)
+1. Introducción
+2. Requisitos del Sistema
+3. Acceso al Sistema
+4. Interfaz General
+5. Dashboard
+6. Gestión de Inventario
+7. Gestión de Movimientos
+8. Gestión de Alertas
+9. Gestión de Categorías
+10. Gestión de Sedes y Unidades
+11. Reportes
+12. Auditoría
+13. Preguntas Frecuentes
 
 ---
 
@@ -30,21 +37,23 @@ Fecha: 23 de agosto de 2026
 
 ### 1.1 ¿Qué es SAGI?
 
-SAGI (Sistema de Administración y Gestión de Inventarios) es una plataforma web diseñada para administrar y controlar los bienes muebles del Instituto de Seguridad Pública (ISeP). Permite:
+SAGI (Sistema de Administración y Gestión de Inventarios) es una plataforma web para administrar y controlar los bienes muebles del Instituto de Seguridad Pública (ISeP).
 
-- Registrar y mantener un inventario actualizado de todos los bienes
-- Controlar los movimientos de los ítems (altas, traslados, bajas)
-- Generar reportes para la toma de decisiones
-- Mantener un registro completo de todas las acciones realizadas
+| Funcionalidad | Descripción |
+|---------------|-------------|
+| Registro de ítems | Alta con campos dinámicos por categoría |
+| Control de movimientos | Altas, traslados, bajas con aprobación |
+| Reportes | Exportación a Excel, CSV, JSON |
+| Auditoría | Registro completo de acciones |
 
 ### 1.2 ¿Quién puede usar SAGI?
 
 | Rol | Funciones Principales |
 |-----|----------------------|
-| **Administrador** | Gestión completa del sistema, usuarios, categorías, sedes |
-| **Jefe de Área** | Aprobar movimientos, ver reportes, gestionar alertas |
-| **Personal de Carga** | Registrar ítems, solicitar movimientos |
-| **Personal de Consulta** | Solo visualizar información |
+| Administrador | Gestión completa del sistema, usuarios, categorías, sedes |
+| Jefe de Área | Aprobar movimientos, ver reportes, gestionar alertas |
+| Personal de Carga | Registrar ítems, solicitar movimientos |
+| Personal de Consulta | Solo visualizar información |
 
 ---
 
@@ -52,20 +61,20 @@ SAGI (Sistema de Administración y Gestión de Inventarios) es una plataforma we
 
 ### 2.1 Navegador Web
 
-SAGI funciona en cualquier navegador moderno:
+| Navegador | Versión Mínima |
+|-----------|----------------|
+| Google Chrome | 90 o superior |
+| Mozilla Firefox | 88 o superior |
+| Microsoft Edge | 90 o superior |
+| Safari | 14 o superior |
 
-- Google Chrome (versión 90 o superior)
-- Mozilla Firefox (versión 88 o superior)
-- Microsoft Edge (versión 90 o superior)
-- Safari (versión 14 o superior)
+### 2.2 Otros Requisitos
 
-### 2.2 Conexión a Internet
-
-Se requiere una conexión a internet estable para acceder al sistema.
-
-### 2.3 Resolución de Pantalla
-
-Se recomienda una resolución mínima de **1024 x 768 píxeles**. El sistema es responsive y se adapta a dispositivos móviles.
+| Requisito | Detalle |
+|-----------|---------|
+| Conexión a internet | Estable |
+| Resolución mínima | 1024 x 768 píxeles |
+| Dispositivo | Computador o móvil (responsive) |
 
 ---
 
@@ -74,115 +83,80 @@ Se recomienda una resolución mínima de **1024 x 768 píxeles**. El sistema es 
 ### 3.1 Iniciar Sesión
 
 1. Abra su navegador web
-2. Ingrese la URL del sistema: `http://localhost:5173` (desarrollo) o la URL de producción
+2. Ingrese la URL del sistema
 3. Verá la pantalla de inicio de sesión
 
-```
-┌─────────────────────────────────────┐
-│           SAGI                      │
-│   Sistema de Administración y       │
-│   Gestión de Inventarios            │
-│                                     │
-│   DNI: [_____________]              │
-│   Contraseña: [_____________]       │
-│                                     │
-│         [Iniciar Sesión]            │
-└─────────────────────────────────────┘
-```
+| Campo | Descripción |
+|-------|-------------|
+| DNI | Documento Nacional de Identidad |
+| Contraseña | Contraseña asignada por el administrador |
 
-4. Ingrese su **DNI** (Documento Nacional de Identidad)
-5. Ingrese su **contraseña**
-6. Haga clic en **"Iniciar Sesión"**
+4. Haga clic en **"Iniciar Sesión"**
 
 ### 3.2 Cerrar Sesión
 
-1. Haga clic en su nombre de usuario en la esquina superior derecha
+1. Haga clic en su nombre de usuario (esquina superior derecha)
 2. Seleccione **"Cerrar Sesión"**
 
 ### 3.3 ¿Olvidó su Contraseña?
 
-Si olvidó su contraseña, contacte al administrador del sistema para que pueda restablecerla.
+Contacte al administrador del sistema para restablecerla.
 
 ---
 
 ## 4. Interfaz General
 
-### 4.1 Layout de la Aplicación
+### 4.1 Elementos de la Pantalla
 
-Una vez que inicie sesión, verá la siguiente estructura:
+| Zona | Ubicación | Función |
+|------|-----------|---------|
+| Sidebar | Izquierda | Menú de navegación |
+| Topbar | Arriba | Título, usuario, cerrar sesión |
+| Contenido | Centro | Página actual |
 
-```
-┌──────────┬────────────────────────────────────────────┐
-│          │  ☰  Título de Página     Usuario  [Salir] │
-│ SAGI     ├────────────────────────────────────────────┤
-│          │                                            │
-│ Dashboard│           Contenido Principal              │
-│ Inventario│                                          │
-│ Movim.   │                                            │
-│ Reportes │                                            │
-│ Alertas  │                                            │
-│ Categor. │                                            │
-│ Sedes    │                                            │
-│ Auditoría│                                            │
-│          │                                            │
-│──────────│                                            │
-│ Departamento│                                         │
-│ Tecnología  │                                         │
-└──────────┴────────────────────────────────────────────┘
-```
+### 4.2 Menú Según Rol
 
-### 4.2 Barra Lateral (Sidebar)
+| Menú | Admin | Jefe | Carga | Consulta |
+|------|:-----:|:----:|:-----:|:--------:|
+| Dashboard | Si | Si | Si | Si |
+| Inventario | Si | Si | Si | Si |
+| Movimientos | Si | Si | Si | No |
+| Reportes | Si | Si | No | No |
+| Alertas | Si | Si | Si | No |
+| Categorías | Si | No | No | No |
+| Sedes y Unidades | Si | No | No | No |
+| Auditoría | Si | Si | No | No |
 
-La barra lateral contiene el menú de navegación. Los elementos que se muestran dependen de su rol:
+### 4.3 Dispositivos Móviles
 
-| Menú | Administrador | Jefe | Carga | Consulta |
-|------|:------------:|:----:|:-----:|:--------:|
-| Dashboard | ✓ | ✓ | ✓ | ✓ |
-| Inventario | ✓ | ✓ | ✓ | ✓ |
-| Movimientos | ✓ | ✓ | ✓ | ✗ |
-| Reportes | ✓ | ✓ | ✗ | ✗ |
-| Alertas | ✓ | ✓ | ✓ | ✗ |
-| Categorías | ✓ | ✗ | ✗ | ✗ |
-| Sedes y Unidades | ✓ | ✗ | ✗ | ✗ |
-| Auditoría | ✓ | ✓ | ✗ | ✗ |
-
-### 4.3 Barra Superior (Topbar)
-
-- **☰ (Hamburguesa)**: Abre/cierra el menú en dispositivos móviles
-- **Título**: Nombre de la página actual
-- **Nombre de usuario**: Muestra quién está conectado
-- **Cerrar sesión**: Botón para salir del sistema
+- En pantallas pequeñas, el sidebar se oculta
+- Use el botón de hamburguesa (☰) para abrir el menú
+- Las tablas se adaptan formato tarjeta
 
 ---
 
 ## 5. Dashboard
 
-El Dashboard es la pantalla principal que muestra un resumen del estado del inventario.
+El Dashboard muestra un resumen del estado del inventario.
 
 ### 5.1 Tarjetas de Estadísticas
 
-```
-┌──────────────┬──────────────┬──────────────┬──────────────┐
-│    Total     │   Activos    │  Pendientes  │   Alertas    │
-│     Ítems    │    Ítems     │  Movimientos │   Activas    │
-│      8       │      6       │      1       │      1       │
-└──────────────┴──────────────┴──────────────┴──────────────┘
-```
-
-- **Total de Ítems**: Cantidad total de ítems registrados
-- **Ítems activos**: Ítems en estado activo
-- **Movimientos pendientes**: Traslados o bajas esperando aprobación
-- **Alertas activas**: Alertas abiertas que requieren atención
+| Tarjeta | Descripción |
+|---------|-------------|
+| Total de Ítems | Cantidad total de ítems registrados |
+| Ítems activos | Ítems en estado activo |
+| Movimientos pendientes | Traslados o bajas esperando aprobación |
+| Alertas activas | Alertas abiertas que requieren atención |
 
 ### 5.2 Ítems por Categoría
 
-Debajo de las tarjetas se muestra una tabla con la cantidad de ítems por categoría:
+Tabla con la cantidad de ítems agrupados por categoría:
 
-| Código | Categoría | Ítems |
-|--------|-----------|-------|
-| A1 | Equipamiento Tecnológico | 3 |
-| A2 | Mobiliario de Oficina | 2 |
-| A3 | Elementos de Seguridad | 1 |
+| Columna | Descripción |
+|---------|-------------|
+| Código | Identificador de la categoría (A1, A2, etc.) |
+| Categoría | Nombre completo |
+| Ítems | Cantidad de ítems en esa categoría |
 
 ---
 
@@ -190,110 +164,71 @@ Debajo de las tarjetas se muestra una tabla con la cantidad de ítems por catego
 
 ### 6.1 Ver Lista de Ítems
 
-1. Haga clic en **"Inventario"** en el menú lateral
-2. Verá la tabla con todos los ítems registrados
+Haga clic en **"Inventario"** en el menú lateral.
 
-```
-┌─────────────┬───────────┬──────────────┬──────────┬──────┬─────────┬───────────────┬──────────┐
-│ Código      │ Categoría │ Detalle      │ Estado   │ Cant │ Unidad  │ Responsable   │ Acciones │
-├─────────────┼───────────┼──────────────┼──────────┼──────┼─────────┼───────────────┼──────────┤
-│ A1-03-47-...│ A1        │ Laptop Dell  │ Bueno    │ 1    │ TI      │ Juan Pérez    │ Ver Edit │
-│ A2-03-48-...│ A2        │ Escritorio   │ Regular  │ 2    │ Admin   │ María López  │ Ver Edit │
-└─────────────┴───────────┴──────────────┴──────────┴──────┴─────────┴───────────────┴──────────┘
-```
+| Columna | Descripción |
+|---------|-------------|
+| Código | Código único del ítem (ej: A1-03-47-000001) |
+| Categoría | Código de categoría |
+| Detalle | Campos dinámicos del ítem |
+| Estado | Estado de conservación |
+| Cant. | Cantidad |
+| Unidad | Unidad de destino |
+| Responsable | Persona responsable |
+| Acciones | Botones de acción |
 
 ### 6.2 Buscar Ítems
 
-1. En el campo de búsqueda, ingrese el **código** o **detalle** del ítem
-2. Los resultados se filtrán automáticamente
-3. También puede filtrar por **categoría** usando el menú desplegable
+| Filtro | Uso |
+|--------|-----|
+| Campo de búsqueda | Buscar por código o detalle |
+| Categoría (desplegable) | Filtrar por categoría específica |
 
 ### 6.3 Registrar Nuevo Ítem (Alta)
 
 1. Haga clic en **"+ Registrar alta"**
-2. Se abrirá un formulario modal
+2. Complete el formulario:
 
-```
-┌─────────────────────────────────────────────────┐
-│              Registrar alta de ítem              │
-├─────────────────────────────────────────────────┤
-│ Categoría: [Seleccionar...]                     │
-│ Elemento: [Seleccionar...] (según categoría)    │
-│ Estado conservación: [Muy bueno ▼]              │
-│ Cantidad: [1]                                   │
-│ Fecha de alta: [dd/mm/aaaa] ☐ Desconocida       │
-│ Unidad de destino: [Seleccionar...]             │
-│ Motivo de alta: [_________________]             │
-│                                                 │
-│        [Cancelar]        [Registrar]            │
-└─────────────────────────────────────────────────┘
-```
+| Campo | Requerido | Descripción |
+|-------|:---------:|-------------|
+| Categoría | Si | Seleccione la categoría |
+| Elemento | Si | Tipo de elemento (según categoría) |
+| Estado conservación | Si | Muy bueno, Bueno, Regular, Malo |
+| Cantidad | Si | Número de unidades |
+| Fecha de alta | No | Fecha de incorporación (puede marcar "Desocida") |
+| Unidad de destino | Si | Unidad organizacional |
+| Motivo de alta | Si | Razón del registro |
+| Campos dinámicos | Variable | Según categoría seleccionada |
 
-3. **Complete los campos**:
-   - **Categoría**: Seleccione la categoría del ítem
-   - **Elemento**: Seleccione el tipo de elemento (aparecerá según la categoría)
-   - **Estado de conservación**: Muy bueno, Bueno, Regular o Malo
-   - **Cantidad**: Número de unidades
-   - **Fecha de alta**: Fecha de incorporación (puede marcar "Desocida")
-   - **Unidad de destino**: Unidad organizacional donde se ubicará
-   - **Motivo de alta**: Razón del registro
-
-4. **Campos dinámicos**: Según la categoría seleccionada, aparecerán campos adicionales específicos (ej: Marca, Modelo, Serie, etc.)
-
-5. Haga clic en **"Registrar"**
-
-6. **El sistema generará automáticamente**:
-   - Un código único (ej: A1-03-47-000001)
-   - Un movimiento de alta aprobado
-   - Un registro de auditoría
+3. Haga clic en **"Registrar"**
+4. El sistema genera automáticamente:
+   - Código único (ej: A1-03-47-000001)
+   - Movimiento de alta aprobado
+   - Registro de auditoría
 
 ### 6.4 Ver Detalle de un Ítem
 
 1. Haga clic en **"Ver"** en la columna de Acciones
-2. Se abrirá un modal con información completa
+2. Verá información completa del ítem:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Detalle A1-03-47-000001                  │
-├─────────────────────────────────────────────────────────────────┤
-│ Datos del Ítem                                                  │
-│ ─────────────                                                   │
-│ Código: A1-03-47-000001                                         │
-│ Categoría: Equipamiento Tecnológico                             │
-│ Elemento: Laptop                                                │
-│ Estado: Activo                                                  │
-│ Conservación: Bueno                                             │
-│ Cantidad: 1                                                     │
-│ Unidad: TI                                                      │
-│ Responsable: Juan Pérez                                         │
-│ Fecha de alta: 15/08/2026                                       │
-│                                                                 │
-│ Detalles Adicionales                                            │
-│ ──────────────────                                              │
-│ Marca: Dell                                                     │
-│ Modelo: Latitude 5520                                           │
-│ Número de serie: ABC123456                                      │
-│                                                                 │
-│ Historial de Movimientos                                        │
-│ ─────────────────────                                           │
-│ 15/08/2026  Alta     -         → TI    Solicitó: Admin   OK    │
-└─────────────────────────────────────────────────────────────────┘
-```
+| Sección | Contenido |
+|---------|-----------|
+| Datos del Ítem | Código, categoría, elemento, estado, conservación, cantidad, unidad, responsable, fecha |
+| Detalles Adicionales | Campos dinámicos específicos de la categoría |
+| Historial de Movimientos | Lista de todos los movimientos del ítem |
 
 ### 6.5 Editar un Ítem
 
 1. Haga clic en **"Editar"** en la columna de Acciones
-2. Se abrirá el formulario con los datos actuales
-3. Modifique los campos que desee
-4. Haga clic en **"Guardar"**
+2. Modifique los campos que desee
+3. Haga clic en **"Guardar"**
 
 ### 6.6 Eliminar un Ítem
 
 1. Haga clic en **"Eliminar"** en la columna de Acciones
-2. Aparecerá una confirmación de seguridad
-3. Haga clic en **"Eliminar"** para confirmar
+2. Confirme la eliminación
 
-> **Nota**: La eliminación es permanente y eliminará todos los movimientos asociados.
+**Nota:** La eliminación es permanente y eliminará los movimientos asociados.
 
 ---
 
@@ -305,69 +240,66 @@ Los movimientos registran los cambios de ubicación o estado de los ítems.
 
 | Tipo | Descripción |
 |------|-------------|
-| **Alta** | Registro inicial de un ítem |
-| **Traslado** | Cambio de unidad de destino |
-| **Baja** | Retiro del inventario |
+| Alta | Registro inicial de un ítem |
+| Traslado | Cambio de unidad de destino |
+| Baja | Retiro del inventario |
 
 ### 7.2 Ver Lista de Movimientos
 
-1. Haga clic en **"Movimientos"** en el menú lateral
-2. Use los filtros para buscar:
-   - **Tipo**: Alta, Traslado o Baja
-   - **Estado**: Pendiente, Aprobado o Rechazado
+Haga clic en **"Movimientos"** en el menú lateral.
 
-```
-┌──────────────┬────────┬─────────────┬──────────────────┬──────────┬────────────┬──────────┐
-│ Fecha        │ Tipo   │ Ítem        │ Origen → Destino │ Estado   │ Solicitante│ Acciones │
-├──────────────┼────────┼─────────────┼──────────────────┼──────────┼────────────┼──────────┤
-│ 15/08/2026   │ Alta   │ A1-03-47... │ - → TI           │ Aprobado │ Admin      │          │
-│ 20/08/2026   │ Trasl. │ A2-03-48... │ Admin → RRHH     │ Pendiente│ Jefe       │ Apro Rech│
-└──────────────┴────────┴─────────────┴──────────────────┴──────────┴────────────┴──────────┘
-```
+| Filtro | Opciones |
+|--------|----------|
+| Tipo | Alta, Traslado, Baja |
+| Estado | Pendiente, Aprobado, Rechazado |
+
+| Columna | Descripción |
+|---------|-------------|
+| Fecha | Fecha del movimiento |
+| Tipo | Alta, Traslado o Baja |
+| Ítem | Código del ítem afectado |
+| Origen → Destino | Unidades involucradas |
+| Estado | Pendiente, Aprobado o Rechazado |
+| Solicitante | Quien realizó la solicitud |
+| Acciones | Aprobar / Rechazar (solo pendientes) |
 
 ### 7.3 Solicitar Traslado
 
 1. Haga clic en **"+ Nueva solicitud"**
-2. Seleccione **"Traslado"** como tipo de movimiento
+2. Seleccione **"Traslado"**
 3. Seleccione el **ítem** a trasladar
 4. Seleccione la **unidad de destino**
-5. Ingrese el **motivo** del traslado
+5. Ingrese el **motivo**
 6. Haga clic en **"Registrar"**
 
-> **Nota**: Se creará una alerta para que un administrador o jefe apruebe el traslado.
+**Nota:** Se creará una alerta para aprobación.
 
 ### 7.4 Solicitar Baja
 
 1. Haga clic en **"+ Nueva solicitud"**
-2. Seleccione **"Baja"** como tipo de movimiento
-3. Seleccione el **ítem** a dar de baja
-4. Ingrese el **motivo** de la baja
+2. Seleccione **"Baja"**
+3. Seleccione el **ítem**
+4. Ingrese el **motivo**
 5. Haga clic en **"Registrar"**
 
-> **Nota**: La baja tiene prioridad crítica y requiere aprobación.
+**Nota:** La baja tiene prioridad crítica.
 
 ### 7.5 Aprobar o Rechazar Movimiento
 
-**Solo administradores y jefes pueden realizar esta acción.**
+**Solo administradores y jefes.**
 
 1. Busque el movimiento con estado **"Pendiente"**
 2. Haga clic en **"Aprobar"** o **"Rechazar"**
 
-**Al aprobar:**
-- El traslado cambia la unidad del ítem
-- La baja cambia el estado del ítem a "baja"
-- Se cierra la alerta asociada
-
-**Al rechazar:**
-- Se solicita un motivo de rechazo
-- El movimiento queda registrado como rechazado
-- Se cierra la alerta asociada
+| Acción | Resultado |
+|--------|-----------|
+| Aprobar traslado | Cambia la unidad del ítem |
+| Aprobar baja | Estado del ítem = "baja", categoría = A8 |
+| Rechazar | Se registra motivo, movimiento queda como rechazado |
 
 ---
 
 ## 8. Gestión de Alertas
-
-Las alertas notifican sobre eventos que requieren atención.
 
 ### 8.1 Tipos de Alerta
 
@@ -381,272 +313,216 @@ Las alertas notifican sobre eventos que requieren atención.
 
 | Prioridad | Descripción |
 |-----------|-------------|
-| **Crítica** | Requiere atención inmediata (bajas) |
-| **Importante** | Requiere atención pronto (traslados) |
-| **Informativa** | Solo informativa |
+| Crítica | Requiere atención inmediata (bajas) |
+| Importante | Requiere atención pronto (traslados) |
+| Informativa | Solo informativa |
 
 ### 8.3 Ver Alertas
 
-1. Haga clic en **"Alertas"** en el menú lateral
-2. Use el filtro de **Estado** para ver abiertas o cerradas
+Haga clic en **"Alertas"** en el menú lateral.
 
-```
-┌──────────────┬────────────┬──────────────────────────────────┬──────────┬──────────┐
-│ Fecha        │ Prioridad  │ Mensaje                          │ Ítem     │ Estado   │
-├──────────────┼────────────┼──────────────────────────────────┼──────────┼──────────┤
-│ 20/08/2026   │ Importante │ Traslado pendiente de revisión   │ A2-03-.. │ Abierta  │
-│ 18/08/2026   │ Crítica    │ Baja pendiente de aprobación     │ A3-03-.. │ Cerrada  │
-└──────────────┴────────────┴──────────────────────────────────┴──────────┴──────────┘
-```
+| Filtro | Opciones |
+|--------|----------|
+| Estado | Abiertas, Cerradas |
+
+| Columna | Descripción |
+|---------|-------------|
+| Fecha | Creación de la alerta |
+| Prioridad | Crítica, Importante, Informativa |
+| Mensaje | Descripción de la alerta |
+| Ítem | Ítem relacionado (si aplica) |
+| Estado | Abierta o Cerrada |
 
 ### 8.4 Crear Alerta Manual (Admin/Jefe)
 
 1. Haga clic en **"+ Nueva alerta"**
-2. Ingrese el **mensaje**
-3. Seleccione la **prioridad**
-4. Seleccione la **unidad**
-5. Opcionalmente, seleccione un **ítem** relacionado
-6. Haga clic en **"Crear"**
+2. Complete el formulario:
+
+| Campo | Descripción |
+|-------|-------------|
+| Mensaje | Descripción de la alerta |
+| Prioridad | Crítica, Importante o Informativa |
+| Unidad | Unidad afectada |
+| Ítem | Opcional, ítem relacionado |
+
+3. Haga clic en **"Crear"**
 
 ### 8.5 Cerrar Alerta (Admin/Jefe)
 
 1. Busque la alerta abierta
 2. Haga clic en **"Cerrar"**
-3. La alerta cambiará a estado "Cerrada"
 
 ---
 
 ## 9. Gestión de Categorías
 
-> **Solo administradores pueden acceder a esta función.**
+**Solo administradores pueden acceder.**
 
-### 9.1 Estructura de Categorías
+### 9.1 Panel de Categorías
 
-Cada categoría tiene:
-- **Código**: Identificador único (ej: A1)
-- **Nombre**: Descriptivo (ej: Equipamiento Tecnológico)
-- **Elementos**: Tipos de ítems dentro de la categoría
-- **Campos dinámicos**: Información adicional para los ítems
+| Zona | Contenido |
+|------|-----------|
+| Lista de categorías | Seleccionar categoría para ver/editar |
+| Campos dinámicos | Crear, editar, reordenar campos |
+| Elementos | Crear, editar, reordenar tipos de ítem |
 
-### 9.2 Panel de Categorías
+### 9.2 Crear Categoría
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  Categorías                                                         │
-│  ┌──────────────┐  ┌─────────────────────────────────────────────┐  │
-│  │ A1 - Equip.  │  │  A1 - Equipamiento Tecnológico              │  │
-│  │ A2 - Mobili. │  │                                             │  │
-│  │ A3 - Segur.  │  │  Ámbito: [General ▼]                       │  │
-│  │ A4 - Vehíc.  │  │                                             │  │
-│  │ A5 - Herram. │  │  Campos dinámicos                          │  │
-│  │ A6 - Bibliog.│  │  ┌───────┬────────┬──────┬─────┐          │  │
-│  │              │  │  │ Nombre│ Tipo   │ Req  │     │          │  │
-│  │              │  │  ├───────┼────────┼──────┼─────┤          │  │
-│  │              │  │  │ Marca │ Texto  │  ✓   │ ↑ ↓ │          │  │
-│  │              │  │  │Modelo │ Texto  │  ✓   │ ↑ ↓ │          │  │
-│  │              │  │  │Serie  │ Texto  │      │ ↑ ↓ │          │  │
-│  │              │  │  └───────┴────────┴──────┴─────┘          │  │
-│  │              │  │                                             │  │
-│  │              │  │  [+ Nuevo campo]                            │  │
-│  │              │  │                                             │  │
-│  │              │  │  Elementos                                  │  │
-│  │              │  │  ┌───────────┬──────────┐                  │  │
-│  │              │  │  │ Nombre    │          │                  │  │
-│  │              │  │  ├───────────┼──────────┤                  │  │
-│  │              │  │  │ Laptop    │ ↑ ↓ Edit │                  │  │
-│  │              │  │  │ Desktop   │ ↑ ↓ Edit │                  │  │
-│  │              │  │  │ Tablet    │ ↑ ↓ Edit │                  │  │
-│  │              │  │  └───────────┴──────────┘                  │  │
-│  │              │  │                                             │  │
-│  │              │  │  [+ Nuevo elemento]                         │  │
-│  └──────────────┘  └─────────────────────────────────────────────┘  │
-│                                                                     │
-│  ┌──────────────────────────────────────────────┐                   │
-│  │  Nueva Categoría: [Código] [Nombre] [Crear]  │                   │
-│  └──────────────────────────────────────────────┘                   │
-└─────────────────────────────────────────────────────────────────────┘
-```
+1. En el formulario inferior, ingrese:
+   - **Código** (ej: A9)
+   - **Nombre**
+2. Haga clic en **"Crear"**
 
-### 9.3 Crear Categoría
+### 9.3 Gestionar Campos Dinámicos
 
-1. En el panel inferior, ingrese el **código** (ej: A9)
-2. Ingrese el **nombre**
-3. Haga clic en **"Crear"**
-
-### 9.4 Agregar Campo Dinámico
-
+**Crear campo:**
 1. Seleccione la categoría
-2. Seleccione el **ámbito** (General o un elemento específico)
+2. Seleccione el **ámbito** (General o elemento específico)
 3. Haga clic en **"+ Nuevo campo"**
-4. Ingrese el **nombre** del campo
-5. Seleccione el **tipo** (texto, número, fecha, select, textarea)
-6. Si eligió "select", ingrese las **opciones** separadas por comas
-7. Marque si es **requerido**
-8. Haga clic en **"Crear"**
+4. Configure:
 
-### 9.5 Agregar Elemento
+| Campo | Descripción |
+|-------|-------------|
+| Nombre | Nombre del campo |
+| Tipo | texto, numero, fecha, select, textarea |
+| Opciones | Para tipo "select", separadas por comas |
+| Requerido | Si es obligatorio |
 
+5. Haga clic en **"Crear"**
+
+**Editar campo:**
+1. Haga clic en **"Editar"**
+2. Modifique los datos
+3. Haga clic en **"Guardar"**
+
+**Reordenar:**
+Use las flechas **↑** y **↓** para cambiar el orden.
+
+### 9.4 Gestionar Elementos
+
+**Crear elemento:**
 1. Seleccione la categoría
 2. Haga clic en **"+ Nuevo elemento"**
 3. Ingrese el **nombre**
 4. Haga clic en **"Crear"**
 
-### 9.6 Editar Campo o Elemento
-
-1. Haga clic en **"Editar"** junto al campo o elemento
-2. Modifique los datos
+**Editar elemento:**
+1. Haga clic en **"Editar"**
+2. Modifique el nombre
 3. Haga clic en **"Guardar"**
-
-### 9.7 Reordenar Campos/Elementos
-
-Use las flechas **↑** y **↓** para cambiar el orden de aparición.
 
 ---
 
 ## 10. Gestión de Sedes y Unidades
 
-> **Solo administradores pueden acceder a esta función.**
+**Solo administradores pueden acceder.**
 
 ### 10.1 Sedes
 
 Las sedes representan las ubicaciones físicas del instituto.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Sedes                                                       │
-│  ┌────────────────────┬────────────────────┬──────────────┐  │
-│  │    Sede Central    │    Sede Norte      │ + Nueva Sede │  │
-│  │    IdSede 01       │    IdSede 02       │              │  │
-│  │ [_____________]    │ [_____________]    │ [______]     │  │
-│  │ [Desactivar] [×]   │ [Desactivar] [×]   │ [Crear]      │  │
-│  └────────────────────┴────────────────────┴──────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-```
-
-#### Crear Sede
-1. En el formulario "Nueva Sede", ingrese el **nombre**
-2. Haga clic en **"Crear"**
-
-#### Editar Sede
-1. Modifique el nombre directamente en el campo de texto
-2. Los cambios se guardan automáticamente
-
-#### Desactivar/Activar Sede
-- Haga clic en **"Desactivar"** para deshabilitar la sede
-- Haga clic en **"Activar"** para habilitarla nuevamente
-
-> **Nota**: Las sedes inactivas no aparecen en los formularios de selección.
+| Acción | Descripción |
+|--------|-------------|
+| Crear sede | Ingrese nombre en "Nueva Sede" y haga clic en "Crear" |
+| Editar sede | Modifique el nombre directamente en el campo de texto |
+| Desactivar | Haga clic en "Desactivar" (no aparece en formularios) |
+| Activar | Haga clic en "Activar" para habilitar nuevamente |
 
 ### 10.2 Unidades
 
-Las unidades son departmentos o áreas dentro de cada sede.
+Las unidades son departamentos o áreas dentro de cada sede.
 
-```
-┌────────────────────────────────────────────────────────────────────────────┐
-│  Unidades                                      [Buscar...] ☐ Ver inactivas │
-├────────────┬───────────────────────────────────────────────────────────────┤
-│ IdUnidad   │ Sede    │ Nombre                    │ Activo │ Acciones       │
-├────────────┼─────────┼───────────────────────────┼────────┼────────────────┤
-│ 01         │ Central │ [Tecnología_________]     │ ✓      │ Desactivar [×] │
-│ 02         │ Central │ [Administración_____]     │ ✓      │ Desactivar [×] │
-│ 03         │ Norte   │ [Operaciones________]     │ ✓      │ Desactivar [×] │
-└────────────┴─────────┴───────────────────────────┴────────┴────────────────┘
-```
+| Columna | Descripción |
+|---------|-------------|
+| IdUnidad | Identificador de la unidad |
+| Sede | Sede a la que pertenece |
+| Nombre | Nombre de la unidad |
+| Activo | Estado de la unidad |
+| Acciones | Desactivar, Eliminar |
 
-#### Crear Unidad
+**Crear unidad:**
 1. Haga clic en **"+ Nueva unidad"**
 2. Seleccione la **sede**
 3. Ingrese el **nombre**
 4. Haga clic en **"Crear"**
 
-#### Editar Unidad
-1. Modifique el nombre directamente en el campo de texto
-2. Los cambios se guardan automáticamente
+**Editar unidad:**
+- Modifique el nombre directamente en el campo de texto
 
-#### Desactivar/Activar Unidad
-- Haga clic en **"Desactivar"** para deshabilitar la unidad
-- Haga clic en **"Activar"** para habilitarla nuevamente
+**Filtros:**
 
-#### Mostrar Unidades Inactivas
-- Marque la casilla **"Ver inactivas"** para incluir unidades desactivadas en la lista
+| Filtro | Descripción |
+|--------|-------------|
+| Buscar | Filtrar por nombre |
+| Ver inactivas | Incluir unidades desactivadas |
 
 ---
 
 ## 11. Reportes
 
-> **Solo administradores y jefes pueden acceder a esta función.**
+**Solo administradores y jefes pueden acceder.**
 
 ### 11.1 Tipos de Reporte
 
-El sistema genera 6 tipos de reportes:
+| Reporte | Contenido |
+|---------|-----------|
+| Por Categoría | Código, nombre, cantidad de ítems |
+| Por Estado | Estado de conservación, cantidad |
+| Por Sede | Sede, cantidad |
+| Por Unidad | Unidad, cantidad |
+| Por Elemento | Los 20 elementos más frecuentes |
+| Movimientos | Movimientos por mes (últimos 6 meses) |
 
-| Reporte | Descripción |
-|---------|-------------|
-| **Por Categoría** | Cantidad de ítems en cada categoría |
-| **Por Estado** | Distribución por estado de conservación |
-| **Por Sede** | Ítems por ubicación física |
-| **Por Unidad** | Ítems por unidad organizacional |
-| **Por Elemento** | Los 20 elementos más frecuentes |
-| **Movimientos** | Movimientos por mes (últimos 6 meses) |
+### 11.2 Exportar Datos
 
-### 11.2 Ver Reportes
-
-1. Haga clic en **"Reportes"** en el menú lateral
-2. Verá las tablas con los datos agregados
-
-### 11.3 Exportar a Excel
-
-1. Haga clic en **"Exportar Excel"** en la parte superior
-2. Se descargará un archivo `.xlsx` con:
-   - Una hoja por categoría
-   - Columnas de campos dinámicos
-   - Filtros automáticos
-
-### 11.4 Exportar a CSV
-
-1. Haga clic en **"Exportar CSV"**
-2. Se descargará un archivo `.csv` con todos los ítems
+| Formato | Botón | Contenido |
+|---------|-------|-----------|
+| Excel (.xlsx) | "Exportar Excel" | Hoja por categoría con campos dinámicos |
+| CSV | "Exportar CSV" | Todos los ítems, separado por comas |
 
 ---
 
 ## 12. Auditoría
 
-> **Solo administradores y jefes pueden acceder a esta función.**
+**Solo administradores y jefes pueden acceder.**
 
 ### 12.1 ¿Qué se Registra?
 
-El sistema registra automáticamente:
+| Categoría | Acciones |
+|-----------|----------|
+| Sesiones | login |
+| Ítems | crear, editar, eliminar |
+| Categorías | crear, editar, eliminar |
+| Campos dinámicos | crear, editar, eliminar, mover |
+| Tipos de ítem | crear, editar, eliminar, mover |
+| Sedes | crear, editar, eliminar, activar, desactivar |
+| Unidades | crear, editar, eliminar, activar, desactivar |
+| Movimientos | solicitar, aprobar, rechazar |
+| Alertas | crear, cerrar |
 
-- Inicios y cierres de sesión
-- Creación, edición y eliminación de ítems
-- Creación, edición y eliminación de categorías
-- Creación, edición y eliminación de campos dinámicos
-- Solicitudes de movimiento
-- Aprobaciones y rechazos
-- Creación y cierre de alertas
-- Activación y desactivación de sedes/unidades
+### 12.2 Ver Registro
 
-### 12.2 Ver Registro de Auditoría
+Haga clic en **"Auditoría"** en el menú lateral.
 
-1. Haga clic en **"Auditoría"** en el menú lateral
-2. Use los filtros para buscar:
-   - **Entidad**: Tipo de elemento (Item, Categoria, etc.)
-   - **Acción**: Tipo de acción (crear, editar, eliminar, etc.)
+| Filtro | Opciones |
+|--------|----------|
+| Entidad | Item, Categoria, CampoDinamico, etc. |
+| Acción | crear, editar, eliminar, aprobar, etc. |
 
-```
-┌──────────────┬────────────┬──────────┬───────────┬─────────────────────────────┐
-│ Fecha        │ Usuario    │ Acción   │ Entidad   │ Detalle                     │
-├──────────────┼────────────┼──────────┼───────────┼─────────────────────────────┤
-│ 23/08 10:15  │ admin      │ crear    │ Item      │ Código: A1-03-47-000001     │
-│ 23/08 10:14  │ admin      │ login    │ -         │ IP: 192.168.1.100           │
-│ 22/08 16:30  │ jefe       │ aprobar  │ Movimiento│ Traslado #12 aprobado       │
-└──────────────┴────────────┴──────────┴───────────┴─────────────────────────────┘
-```
+| Columna | Descripción |
+|---------|-------------|
+| Fecha | Fecha y hora de la acción |
+| Usuario | Quién realizó la acción |
+| Acción | Tipo de acción realizada |
+| Entidad | Entidad afectada |
+| Detalle | Información adicional |
 
 ### 12.3 Exportar Auditoría
 
-1. Haga clic en **"Exportar Excel"** o **"Exportar JSON"**
-2. Se descargará un archivo con todos los registros filtrados
+| Formato | Botón |
+|---------|-------|
+| Excel | "Exportar Excel" |
+| JSON | "Exportar JSON" |
 
 ---
 
@@ -654,64 +530,51 @@ El sistema registra automáticamente:
 
 ### ¿Cómo cambio mi contraseña?
 
-Contacte al administrador del sistema para solicitar un cambio de contraseña.
+Contacte al administrador del sistema.
 
-### ¿Por qué no veo ciertas opciones en el menú?
+### ¿Por qué no veo ciertas opciones?
 
-Las opciones del menú dependen de su rol. Si necesita acceso adicional, contacte al administrador.
-
-### ¿Qué hago si un ítem no aparece en la lista?
-
-1. Verifique los filtros de búsqueda
-2. Asegúrese de que el ítem esté en estado "activo"
-3. Si el ítem fue eliminado, ya no estará disponible
-
-### ¿Puedo recuperar un ítem eliminado?
-
-No, la eliminación es permanente. Si necesita restaurar un ítem, deberá crear uno nuevo.
+Las opciones dependen de su rol. Solicite acceso al administrador.
 
 ### ¿Cómo funciona el código único?
 
-El código sigue el formato: `Categoría-Sede-Unidad-Secuencial`
-Ejemplo: `A1-03-47-000001`
-- A1 = Categoría (Equipamiento Tecnológico)
-- 03 = ID de Sede
-- 47 = ID de Unidad
-- 000001 = Secuencial
+**Formato:** `Categoría-Sede-Unidad-Secuencial`
+
+**Ejemplo:** `A1-03-47-000001`
+
+| Parte | Significado |
+|-------|-------------|
+| A1 | Categoría (Equipamiento Tecnológico) |
+| 03 | ID de Sede |
+| 47 | ID de Unidad |
+| 000001 | Secuencial |
+
+### ¿Puedo recuperar un ítem eliminado?
+
+No, la eliminación es permanente. Debe crear uno nuevo.
 
 ### ¿Qué pasa si rechazo un movimiento?
 
-El movimiento queda registrado como "rechazado" con el motivo. El ítem mantiene su ubicación actual.
+El movimiento queda registrado como rechazado. El ítem mantiene su ubicación.
 
-### ¿Puedo crear ítems sin fecha de alta?
+### ¿Puedo crear ítems sin fecha?
 
-Sí, puede marcar la casilla "Fecha desconocida" al registrar un ítem.
+Sí, marque la casilla "Fecha desconocida".
 
-### ¿Cómo creo campos personalizados para una categoría?
+### ¿Cómo creo campos personalizados?
 
-1. Vaya a **Categorías** (solo admin)
-2. Seleccione la categoría
-3. Haga clic en **"+ Nuevo campo"**
-4. Configure nombre, tipo y opciones
+Vaya a **Categorías** (solo admin), seleccione la categoría y haga clic en **"+ Nuevo campo"**.
 
-### ¿Las sedes y unidades inactivas afectan el inventario?
+### ¿Las sedes inactivas afectan el inventario?
 
-No, las sedes y unidades inactivas simplemente no aparecen en los formularios de selección. Los ítems existentes mantienen su referencia.
+No, solo desaparecen de los formularios de selección.
 
 ### ¿Cómo funciona la paginación?
 
-Los ítems se muestran 20 por página. Use los botones "Anterior" y "Siguiente" para navegar.
-
----
-
-## Información de Contacto
-
-Para soporte técnico o consultas sobre el sistema, contacte:
-
-**Departamento de Tecnología, Desarrollo e Innovación**
-Instituto de Seguridad Pública (ISeP)
+Los ítems se muestran 20 por página. Use "Anterior" y "Siguiente" para navegar.
 
 ---
 
 *Manual de Usuario - SAGI v1.0*
 *Fecha: 23 de agosto de 2026*
+*Instituto de Seguridad Pública*
