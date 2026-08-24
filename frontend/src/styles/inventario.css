@@ -364,3 +364,98 @@
     width: 100%;
   }
 }
+
+/* ============================================
+   UNIDADES - FORMATO TARJETAS / KANBAN
+   ============================================ */
+
+.unidades-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.unidad-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.unidad-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.unidad-card.inactiva {
+  opacity: 0.55;
+}
+
+.unidad-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, var(--color-primary), #1a365d);
+  color: white;
+}
+
+.unidad-id {
+  font-size: 13px;
+  font-weight: 700;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.unidad-sede {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.unidad-card-body {
+  padding: 16px;
+}
+
+.unidad-card-body .editable-input {
+  width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.unidad-card-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.unidad-card-footer .editable-select {
+  width: 100%;
+  font-size: 13px;
+}
+
+.unidad-card-footer .row-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .unidades-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 1200px) {
+  .unidades-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}

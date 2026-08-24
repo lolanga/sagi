@@ -259,64 +259,53 @@ export default function Unidades() {
               <p>No hay unidades que coincidan con la búsqueda.</p>
             </div>
           ) : (
-            <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>IdUnidad</th>
-                  <th>Nombre</th>
-                  <th>Sede</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {unidadesFiltradas.map((u) => (
-                  <tr key={u.id} className={u.activa ? '' : 'inactiva'}>
-                    <td data-label="IdUnidad"><strong>{String(u.id).padStart(2, '0')}</strong></td>
-                    <td data-label="Nombre">
-                      <input
-                        className="editable-input"
-                        type="text"
-                        defaultValue={u.nombre}
-                        onBlur={async (e) => {
-                          const valor = e.target.value.trim()
-                          if (valor && valor !== u.nombre) {
-                            const ok = await guardarUnidad(u, { nombre: valor })
-                            if (!ok) e.target.value = u.nombre
-                          } else {
-                            e.target.value = u.nombre
-                          }
-                        }}
-                      />
-                    </td>
-                    <td data-label="Sede">
-                      <select
-                        className="editable-select"
-                        value={u.sede_id}
-                        onChange={async (e) => {
-                          const ok = await guardarUnidad(u, { sede_id: Number(e.target.value) })
-                          if (!ok) e.target.value = u.sede_id
-                        }}
-                      >
-                        {sedes.map((s) => (
-                          <option key={s.id} value={s.id}>{s.nombre}{s.activa ? '' : ' (inactiva)'}</option>
-                        ))}
-                      </select>
-                    </td>
-                    <td data-label="Acciones">
-                      {puedeGestionar && (
-                        <div className="row-actions">
-                          <button className="btn-link" onClick={() => toggleUnidad(u)}>
-                            {u.activa ? 'Desactivar' : 'Activar'}
-                          </button>
-                          <button className="btn-link btn-link-danger" onClick={() => eliminarUnidad(u)}>Eliminar</button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="unidades-grid">
+              {unidadesFiltradas.map((u) => (
+                <div key={u.id} className={`unidad-card ${u.activa ? '' : 'inactiva'}`}>
+                  <div className="unidad-card-header">
+                    <span className="unidad-id">{String(u.id).padStart(2, '0')}</span>
+                    <span className="unidad-sede">{sedeDe(u.sede_id)}</span>
+                  </div>
+                  <div className="unidad-card-body">
+                    <input
+                      className="editable-input"
+                      type="text"
+                      defaultValue={u.nombre}
+                      onBlur={async (e) => {
+                        const valor = e.target.value.trim()
+                        if (valor && valor !== u.nombre) {
+                          const ok = await guardarUnidad(u, { nombre: valor })
+                          if (!ok) e.target.value = u.nombre
+                        } else {
+                          e.target.value = u.nombre
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="unidad-card-footer">
+                    <select
+                      className="editable-select"
+                      value={u.sede_id}
+                      onChange={async (e) => {
+                        const ok = await guardarUnidad(u, { sede_id: Number(e.target.value) })
+                        if (!ok) e.target.value = u.sede_id
+                      }}
+                    >
+                      {sedes.map((s) => (
+                        <option key={s.id} value={s.id}>{s.nombre}{s.activa ? '' : ' (inactiva)'}</option>
+                      ))}
+                    </select>
+                    {puedeGestionar && (
+                      <div className="row-actions">
+                        <button className="btn-link" onClick={() => toggleUnidad(u)}>
+                          {u.activa ? 'Desactivar' : 'Activar'}
+                        </button>
+                        <button className="btn-link btn-link-danger" onClick={() => eliminarUnidad(u)}>Eliminar</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </>
