@@ -1,16 +1,20 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import api from '../services/api'
 import Aviso from '../components/Aviso'
 import Modal from '../components/Modal'
 import ItemForm from '../components/ItemForm'
 import ItemDetalle from '../components/ItemDetalle'
 import Layout from '../components/Layout'
+import Skeleton from '../components/Skeleton'
+import EmptyState from '../components/EmptyState'
 import '../styles/inventario.css'
 
 export default function Inventario() {
   const { user } = useAuth()
+  const toast = useToast()
   const [items, setItems] = useState([])
   const [categorias, setCategorias] = useState([])
   const [unidades, setUnidades] = useState([])
@@ -25,6 +29,9 @@ export default function Inventario() {
   const [viendo, setViendo] = useState(null)
   const [eliminando, setEliminando] = useState(null)
   const [error, setError] = useState('')
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [sortKey, setSortKey] = useState('')
+  const [sortDir, setSortDir] = useState('asc')
 
   const puedeEditar = ['admin', 'jefe', 'carga'].includes(user?.rol?.slug)
 
@@ -64,9 +71,11 @@ export default function Inventario() {
     try {
       await api.delete(`/items/${eliminando.id}`)
       setEliminando(null)
+      toast.success('Ítem eliminado correctamente')
       cargarItems()
     } catch (err) {
       setError(err.response?.data?.message || 'Error al eliminar el ítem')
+      toast.error(err.response?.data?.message || 'Error al eliminar el ítem')
     }
   }
 
@@ -85,6 +94,35 @@ export default function Inventario() {
     return detalles.join(' · ') || '-'
   }
 
+  const handleSort = (key) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortKey(key)
+      setSortDir('asc')
+    }
+  }
+
+  const sortedItems = [...items].sort((a, b) => {
+    if (!sortKey) return 0
+    let aVal, bVal
+    switch (sortKey) {
+      case 'codigo_unico': aVal = a.codigo_unico; bVal = b.codigo_unico; break
+      case 'categoria': aVal = a.categoria?.codigo || ''; bVal = b.categoria?.codigo || ''; break
+      case 'estado': aVal = a.estado; bVal = b.estado; break
+      case 'estado_conservacion': aVal = a.estado_conservacion; bVal = b.estado_conservacion; break
+      case 'cantidad': aVal = a.cantidad; bVal = b.cantidad; break
+      case 'unidad': aVal = a.unidad?.nombre || ''; bVal = b.unidad?.nombre || ''; break
+      case 'responsable': aVal = a.responsable?.name || ''; bVal = b.responsable?.name || ''; break
+      default: return 0
+    }
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase()
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase()
+    if (aVal < bVal) return sortDir === 'asc' ? -1 : 1
+    if (aVal > bVal) return sortDir === 'asc' ? 1 : -1
+    return 0
+  })
+
   return (
     <Layout
       title="Inventario"
@@ -102,82 +140,153 @@ export default function Inventario() {
       }
     >
       <div className="filters-bar">
-        <input
-          className="search-input"
-          type="text"
-          placeholder="Ej. SAGI-000001 o escritorio"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <select
-          className="filter-select"
-          value={categoriaId}
-          onChange={(e) => setCategoriaId(e.target.value)}
-        >
-          <option value="">Todas las categorías</option>
-          {categorias
-            .filter((c) => !c.es_transitoria)
-            .map((c) => (
-              <option key={c.id} value={c.id}>{c.codigo} – {c.nombre}</option>
-            ))}
-        </select>
-        <span className="result-count">{total} ítems</span>
+        <div className="filters-search-row">
+          <input
+            className="search-input"
+            type="text"
+            placeholder="Ej. SAGI-000001 o escritorio"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button
+            className="btn btn-secondary filters-toggle"
+            onClick={() => setFiltersOpen(!filtersOpen)}
+            type="button"
+            aria-label="Filtros"
+          >
+            {filtersOpen ? 'Ocultar filtros' : 'Filtros'}
+          </button>
+        </div>
+        <div className={`filters-extra ${filtersOpen ? 'filters-extra--open' : ''}`}>
+          <select
+            className="filter-select"
+            value={categoriaId}
+            onChange={(e) => setCategoriaId(e.target.value)}
+          >
+            <option value="">Todas las categorías</option>
+            {categorias
+              .filter((c) => !c.es_transitoria)
+              .map((c) => (
+                <option key={c.id} value={c.id}>{c.codigo} – {c.nombre}</option>
+              ))}
+          </select>
+          <span className="result-count">{total} ítems</span>
+        </div>
       </div>
 
       {loading ? (
-        <p className="muted">Cargando...</p>
+        <>
+          <Skeleton type="table" rows={6} cols={9} />
+          <Skeleton type="card" rows={4} />
+        </>
       ) : items.length === 0 ? (
-        <div className="placeholder">
-          <h2>Sin resultados</h2>
-          <p>No hay ítems que coincidan con la búsqueda. Registra un alta para comenzar.</p>
-        </div>
+        <EmptyState
+          icon={search ? 'search' : 'inventory'}
+          title={search ? 'Sin resultados' : 'Inventario vacío'}
+          description={search
+            ? 'No hay ítems que coincidan con la búsqueda. Prueba con otros términos.'
+            : 'No hay ítems registrados. Comienza registrando un alta.'
+          }
+          action={!search && puedeEditar ? (
+            <button className="btn btn-primary" onClick={() => setShowAlta(true)}>
+              + Registrar primer ítem
+            </button>
+          ) : null}
+        />
       ) : (
-        <div className="table-wrap">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Categoría</th>
-              <th>Detalle</th>
-              <th>Estado</th>
-              <th>Conservación</th>
-              <th>Cant.</th>
-              <th>Unidad</th>
-              <th>Responsable</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id} className={item.estado === 'baja' ? 'fila-baja' : ''}>
-                <td data-label="Código"><strong>{item.codigo_unico}</strong></td>
-                <td data-label="Categoría">{item.categoria?.codigo}</td>
-                <td data-label="Detalle">{formatValores(item)}</td>
-                <td data-label="Estado">
+        <>
+          <div className="table-wrap desktop-only">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th onClick={() => handleSort('codigo_unico')} className="sortable-th">
+                    Código {sortKey === 'codigo_unico' && (sortDir === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th onClick={() => handleSort('categoria')} className="sortable-th">
+                    Categoría {sortKey === 'categoria' && (sortDir === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th>Detalle</th>
+                  <th onClick={() => handleSort('estado')} className="sortable-th">
+                    Estado {sortKey === 'estado' && (sortDir === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th onClick={() => handleSort('estado_conservacion')} className="sortable-th">
+                    Conservación {sortKey === 'estado_conservacion' && (sortDir === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th onClick={() => handleSort('cantidad')} className="sortable-th">
+                    Cant. {sortKey === 'cantidad' && (sortDir === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th onClick={() => handleSort('unidad')} className="sortable-th">
+                    Unidad {sortKey === 'unidad' && (sortDir === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th onClick={() => handleSort('responsable')} className="sortable-th">
+                    Responsable {sortKey === 'responsable' && (sortDir === 'asc' ? '▲' : '▼')}
+                  </th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedItems.map((item) => (
+                  <tr key={item.id} className={item.estado === 'baja' ? 'fila-baja' : ''}>
+                    <td data-label="Código"><strong>{item.codigo_unico}</strong></td>
+                    <td data-label="Categoría">{item.categoria?.codigo}</td>
+                    <td data-label="Detalle">{formatValores(item)}</td>
+                    <td data-label="Estado">
+                      <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
+                    </td>
+                    <td data-label="Conservación">
+                      <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
+                    </td>
+                    <td data-label="Cant.">{item.cantidad}</td>
+                    <td data-label="Unidad">{item.unidad?.nombre ?? '-'}</td>
+                    <td data-label="Responsable">{item.responsable?.name}</td>
+                    <td data-label="Acciones">
+                      <div className="row-actions">
+                        <button className="btn-link btn-link-ver" onClick={() => setViendo(item)}>Ver</button>
+                        {puedeEditar && item.estado !== 'baja' && (
+                          <>
+                            <button className="btn-link btn-link-editar" onClick={() => setEditando(item)}>Editar</button>
+                            <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)}>Eliminar</button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="cards-grid mobile-only">
+            {sortedItems.map((item) => (
+              <div key={item.id} className={`item-card ${item.estado === 'baja' ? 'item-card-baja' : ''}`}>
+                <div className="item-card-header">
+                  <span className="item-card-codigo">{item.codigo_unico}</span>
                   <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
-                </td>
-                <td data-label="Conservación">
-                  <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
-                </td>
-                <td data-label="Cant.">{item.cantidad}</td>
-                <td data-label="Unidad">{item.unidad?.nombre ?? '-'}</td>
-                <td data-label="Responsable">{item.responsable?.name}</td>
-                <td data-label="Acciones">
-                  <div className="row-actions">
-                    <button className="btn-link btn-link-ver" onClick={() => setViendo(item)}>Ver</button>
-                    {puedeEditar && item.estado !== 'baja' && (
-                      <>
-                        <button className="btn-link btn-link-editar" onClick={() => setEditando(item)}>Editar</button>
-                        <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)}>Eliminar</button>
-                      </>
-                    )}
+                </div>
+                <div className="item-card-body">
+                  <p className="item-card-detalle">{formatValores(item) || 'Sin detalle'}</p>
+                  <div className="item-card-meta">
+                    <span>{item.categoria?.codigo}</span>
+                    <span>{item.unidad?.nombre ?? '-'}</span>
                   </div>
-                </td>
-              </tr>
+                  <div className="item-card-meta">
+                    <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
+                    <span>Cant: {item.cantidad}</span>
+                  </div>
+                </div>
+                <div className="item-card-footer">
+                  <button className="btn btn-sm btn-secondary" onClick={() => setViendo(item)}>Ver</button>
+                  {puedeEditar && item.estado !== 'baja' && (
+                    <>
+                      <button className="btn btn-sm btn-secondary" onClick={() => setEditando(item)}>Editar</button>
+                      <button className="btn btn-sm btn-danger" onClick={() => setEliminando(item)}>Eliminar</button>
+                    </>
+                  )}
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-        </div>
+          </div>
+        </>
       )}
 
       {lastPage > 1 && (
