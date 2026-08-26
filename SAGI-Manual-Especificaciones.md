@@ -3,7 +3,7 @@ title: "SAGI - Manual de Especificaciones Técnicas"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
 date: "26 de agosto de 2026"
-version: "1.1"
+version: "2.0"
 ---
 
 # SAGI - Manual de Especificaciones Técnicas
@@ -11,7 +11,7 @@ version: "1.1"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 1.1 | Fecha: 26 de agosto de 2026 | Estado: Producción
+Versión: 2.0 | Fecha: 26 de agosto de 2026 | Estado: Producción
 
 ---
 
@@ -871,5 +871,43 @@ npm run dev
 
 ---
 
+## 14. Changelog v2.0
+
+### Mejoras de UI/UX
+- Sidebar jerárquico con 4 bloques temáticos (Operaciones, Inventario, Configuración, Control)
+- Iconos SVG en cada item del menú
+- Sidebar colapsable en desktop (botón ‹)
+- Grupos colapsables (acordeón)
+- Bottom nav en móvil para accesos rápidos
+- Active route con NavLink (resalta página actual)
+- Badge de alertas dinámico con contador
+- Cards en móvil + tabla en desktop
+- Filtros colapsables en móvil
+- Skeleton loading (reemplaza "Cargando...")
+- Sticky header en tablas
+- Empty states ilustrados (SVG)
+- Toast notifications para acciones
+- Ordenar columnas por click
+
+### Depuración de Código
+- Eliminado `hasRole` muerto de AuthContext
+- Eliminado import duplicado de `index.css` en Layout.jsx
+- Extraído `extractApiError()` como utilidad compartida
+- Extraído componente `Pagination` reutilizable
+- Extraído componente `EmptyState` reutilizable
+- Eliminados CSS classes duplicadas (`.badge-pendiente`, `.badge-baja`, `.editable-row`, `.scope-label`)
+- Eliminado `.topbar-actions` duplicado de inventario.css
+- Renombrado `.cards-grid` → `.stats-grid` en dashboard.css (evita colisión)
+- Agregadas CSS variables faltantes (`--color-info`, `--color-text-secondary`, `--color-card`)
+
+### Backend
+- Eliminados métodos muertos `esAdmin()` y `esJefe()` de User model
+- Eliminado import `UserFactory` no utilizado de User model
+- Eliminado trait `Notifiable` no utilizado de User model
+- Eliminado import `DB` no utilizado de CategoriaController
+- Eliminadas variables `$user` no utilizadas en DashboardController y ReporteController
+
+---
+
 *Documento generado el 26 de agosto de 2026*
-*SAGI v1.1 - Instituto de Seguridad Pública*
+*SAGI v2.0 - Instituto de Seguridad Pública*

@@ -3,7 +3,7 @@ title: "SAGI - Manual de Usuario"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
 date: "26 de agosto de 2026"
-version: "1.1"
+version: "2.0"
 ---
 
 # SAGI - Manual de Usuario
@@ -11,7 +11,7 @@ version: "1.1"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 1.1 | Fecha: 26 de agosto de 2026
+Versión: 2.0 | Fecha: 26 de agosto de 2026
 
 ---
 
@@ -110,31 +110,49 @@ Contacte al administrador del sistema para restablecerla.
 
 | Zona | Ubicación | Función |
 |------|-----------|---------|
-| Sidebar | Izquierda | Menú de navegación |
+| Sidebar | Izquierda | Menú de navegación jerárquico con iconos |
 | Topbar | Arriba | Título, botón de tema (oscuro/claro), usuario, cambio de contraseña, cerrar sesión |
 | Contenido | Centro | Página actual |
+| Bottom Nav | Abajo (móvil) | Accesos rápidos a Operaciones e Inventario |
 
-### 4.2 Menú Según Rol
+### 4.2 Menú Jerárquico
+
+El menú se organiza en 4 bloques temáticos:
+
+| Bloque | Módulos |
+|--------|---------|
+| **Operaciones** | Dashboard, Alertas |
+| **Inventario** | Inventario, Movimientos |
+| **Configuración** | Categorías, Sedes y Unidades |
+| **Control** | Reportes, Auditoría |
+
+### 4.3 Menú Según Rol
 
 | Menú | Admin | Jefe | Carga | Consulta |
 |------|:-----:|:----:|:-----:|:--------:|
 | Dashboard | Si | Si | Si | Si |
-| Dashboard Backup | Si | No | No | No |
+| Alertas | Si | Si | Si | No |
 | Inventario | Si | Si | Si | Si |
 | Movimientos | Si | Si | Si | No |
-| Reportes | Si | Si | No | No |
-| Reportes PDF | Si | Si | No | No |
-| Alertas | Si | Si | Si | No |
 | Categorías | Si | No | No | No |
 | Sedes y Unidades | Si | No | No | No |
+| Reportes | Si | Si | No | No |
 | Auditoría | Si | Si | No | No |
-| Cambiar Contraseña | Si | Si | Si | Si |
 
-### 4.3 Dispositivos Móviles
+### 4.4 Funcionalidades del Menú
 
-- En pantallas pequeñas, el sidebar se oculta
-- Use el botón de hamburguesa (☰) para abrir el menú
-- Las tablas se adaptan formato tarjeta
+- **Colapsar sidebar**: Click en el botón `‹` para maximizar área de trabajo
+- **Expandir/colapsar grupos**: Click en el nombre del bloque temático
+- **Active route**: La página actual se resalta en azul
+- **Badge de alertas**: Muestra contador de alertas abiertas
+
+### 4.5 Dispositivos Móviles
+
+- **Bottom nav**: Accesos rápidos a Dashboard, Alertas, Inventario, Movimientos
+- **Hamburguesa**: Abre el drawer con todos los módulos
+- **Filtros colapsables**: Botón "Filtros" para expandir/ocultar
+- **Cards**: Los ítems se muestran como tarjetas en lugar de tabla
+- **Skeleton loading**: Animación de carga en lugar de texto
 
 ---
 
@@ -606,6 +624,28 @@ Los ítems se muestran 20 por página. Use "Anterior" y "Siguiente" para navegar
 
 ---
 
-*Manual de Usuario - SAGI v1.1*
+## Changelog v2.0
+
+### Nuevas Funcionalidades
+- **Sidebar jerárquico**: Menú organizado en 4 bloques temáticos
+- **Iconos SVG**: Cada módulo tiene un icono visual
+- **Sidebar colapsable**: Maximice el área de trabajo con el botón `‹`
+- **Bottom nav en móvil**: Accesos rápidos a las funciones principales
+- **Active route**: La página actual se resalta automáticamente
+- **Badge de alertas**: Contador de alertas abiertas en el menú
+- **Skeleton loading**: Animación de carga moderna
+- **Empty states ilustrados**: Mensajes vacíos con iconos SVG
+- **Toast notifications**: Confirmaciones emergentes para acciones
+- **Ordenar columnas**: Click en encabezados de tabla para ordenar
+
+### Mejoras de UX
+- **Cards en móvil**: Ítems como tarjetas en lugar de tabla
+- **Filtros colapsables**: Ocultar/mostrar filtros en móvil
+- **Sticky header**: Encabezado de tabla fijo al hacer scroll
+- **Touch area mejorado**: Botones mínimo 44x44px en móvil
+
+---
+
+*Manual de Usuario - SAGI v2.0*
 *Fecha: 26 de agosto de 2026*
 *Instituto de Seguridad Pública*
