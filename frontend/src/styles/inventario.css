@@ -491,14 +491,14 @@
   display: block;
 }
 .mobile-only {
-  display: none;
+  display: none !important;
 }
 @media (max-width: 768px) {
   .desktop-only {
     display: none !important;
   }
   .mobile-only {
-    display: block !important;
+    display: grid !important;
   }
 }
 
