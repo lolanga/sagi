@@ -12,7 +12,15 @@
   --color-white: #232937;
   --radius: 8px;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --login-gradient: linear-gradient( 135deg, var(--login-blue) 0%, var(--login-cyan) 48%, var(--login-green) 100% );
+}
+
+[data-theme="light"] {
+  --color-text: #1a202c;
+  --color-muted: #718096;
+  --color-border: #e2e8f0;
+  --color-bg: #f7fafc;
+  --color-white: #ffffff;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 

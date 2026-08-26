@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import '../index.css'
@@ -21,6 +21,14 @@ function hasAccess(user, roles) {
 export default function Layout({ title, actions, children, back }) {
   const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [theme, setTheme] = useState(() => localStorage.getItem('sagi_theme') || 'dark')
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('sagi_theme', theme)
+  }, [theme])
+
+  const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
   const closeMenu = () => setMenuOpen(false)
 
@@ -73,6 +81,9 @@ export default function Layout({ title, actions, children, back }) {
           </div>
           <div className="topbar-actions">
             {actions}
+            <button className="btn btn-secondary" onClick={toggleTheme} title="Cambiar tema">
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
             <button className="btn btn-secondary" onClick={logout}>
               Cerrar sesión
             </button>
