@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as XLSX from 'xlsx'
-import jsPDF from 'jspdf'
-import 'jspdf-autotable'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import api from '../services/api'
 import Aviso from '../components/Aviso'
 import Layout from '../components/Layout'
@@ -162,13 +162,13 @@ export default function Reportes() {
       doc.text('SAGI - Reporte de Inventario', 14, 15)
       doc.setFontSize(10)
       doc.text(`Generado: ${new Date().toLocaleDateString()}`, 14, 22)
-      doc.text(`Total: ${items.length} ítems`, 14, 28)
+      doc.text(`Total: ${items.length} items`, 14, 28)
 
       const columnas = [
-        { header: 'Código', dataKey: 'codigo' },
+        { header: 'Codigo', dataKey: 'codigo' },
         { header: 'Elemento', dataKey: 'elemento' },
         { header: 'Estado', dataKey: 'estado' },
-        { header: 'Conservación', dataKey: 'conservacion' },
+        { header: 'Conservacion', dataKey: 'conservacion' },
         { header: 'Cant.', dataKey: 'cantidad' },
         { header: 'Sede', dataKey: 'sede' },
         { header: 'Unidad', dataKey: 'unidad' },
@@ -180,13 +180,13 @@ export default function Reportes() {
         elemento: i.tipo_item?.nombre ?? '',
         estado: i.estado,
         conservacion: i.estado_conservacion,
-        cantidad: i.cantidad,
+        cantidad: String(i.cantidad),
         sede: i.unidad?.sede?.nombre ?? '',
         unidad: i.unidad?.nombre ?? '',
         responsable: i.responsable?.name ?? '',
       }))
 
-      doc.autoTable({
+      autoTable(doc, {
         startY: 35,
         columns: columnas,
         body: filas,
