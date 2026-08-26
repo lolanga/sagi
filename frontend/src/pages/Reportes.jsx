@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import api from '../services/api'
+import { extractApiError } from '../utils/helpers'
 import Aviso from '../components/Aviso'
 import Layout from '../components/Layout'
 import '../styles/dashboard.css'
@@ -113,7 +114,7 @@ export default function Reportes() {
 
       XLSX.writeFile(wb, `inventario-${new Date().toISOString().slice(0, 10)}.xlsx`)
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al exportar')
+      setError(extractApiError(err, 'Error al exportar'))
     }
   }
 
@@ -146,7 +147,7 @@ export default function Reportes() {
       a.click()
       URL.revokeObjectURL(url)
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al exportar')
+      setError(extractApiError(err, 'Error al exportar'))
     }
   }
 

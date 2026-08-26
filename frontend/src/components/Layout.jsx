@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import Modal from './Modal'
 import Aviso from './Aviso'
-import '../index.css'
 
 const navGroups = [
   {

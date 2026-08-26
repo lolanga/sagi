@@ -28,13 +28,8 @@ export function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
-  const hasRole = useCallback(
-    (slug) => user?.rol?.slug === slug,
-    [user]
-  )
-
   return (
-    <AuthContext.Provider value={{ user, login, logout, hasRole }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

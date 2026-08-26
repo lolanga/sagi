@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import { extractApiError } from '../utils/helpers'
 import Aviso from '../components/Aviso'
+import EmptyState from '../components/EmptyState'
 import Modal from '../components/Modal'
 import Layout from '../components/Layout'
 import '../styles/inventario.css'
@@ -67,10 +69,7 @@ export default function Alertas() {
       setItemId('')
       cargar()
     } catch (err) {
-      const msg = err.response?.data?.message
-      const errors = err.response?.data?.errors
-      const first = errors ? Object.values(errors)[0]?.[0] : null
-      setError(first || msg || 'Error al crear la alerta')
+      setError(extractApiError(err, 'Error al crear la alerta'))
     }
   }
 
@@ -79,7 +78,7 @@ export default function Alertas() {
       await api.post(`/alertas/${a.id}/cerrar`, {})
       cargar()
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al cerrar la alerta')
+      setError(extractApiError(err, 'Error al cerrar la alerta'))
     }
   }
 
@@ -107,10 +106,11 @@ export default function Alertas() {
       {loading ? (
         <p className="muted">Cargando...</p>
       ) : alertas.length === 0 ? (
-        <div className="placeholder">
-          <h2>Sin alertas</h2>
-          <p>No hay alertas que coincidan con el filtro.</p>
-        </div>
+        <EmptyState
+          icon="alert"
+          title="Sin alertas"
+          description="No hay alertas que coincidan con el filtro."
+        />
       ) : (
         <div className="table-wrap">
         <table className="table">

@@ -29,7 +29,7 @@ export default function Dashboard() {
         <p className="muted">Cargando...</p>
       ) : (
         <>
-          <div className="cards-grid">
+          <div className="stats-grid">
             <div className="stat-card">
               <div>
                 <h2>{stats.total}</h2>

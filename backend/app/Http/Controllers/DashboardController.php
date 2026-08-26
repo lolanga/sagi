@@ -14,8 +14,6 @@ class DashboardController extends Controller
 {
     public function stats(Request $request): JsonResponse
     {
-        $user = $request->user();
-
         $total = Item::count();
         $activos = Item::where('estado', 'activo')->count();
         $pendientes = Movimiento::where('estado', 'pendiente')->count();

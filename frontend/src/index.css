@@ -5,21 +5,26 @@
   --color-accent: #f57c00;
   --color-success: #4caf50;
   --color-danger: #ef5350;
+  --color-info: #29b6f6;
   --color-text: #e8ecf1;
+  --color-text-secondary: #b0bec5;
   --color-muted: #9aa4b2;
   --color-border: #3a4150;
   --color-bg: #1a1f2b;
   --color-white: #232937;
+  --color-card: #2a3040;
   --radius: 8px;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 [data-theme="light"] {
   --color-text: #1a202c;
+  --color-text-secondary: #4a5568;
   --color-muted: #718096;
   --color-border: #e2e8f0;
   --color-bg: #f7fafc;
   --color-white: #ffffff;
+  --color-card: #ffffff;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 

@@ -145,12 +145,6 @@
   font-size: 14px;
 }
 
-.scope-label {
-  font-size: 13px;
-  font-weight: 600;
-  align-self: center;
-}
-
 @media (max-width: 900px) {
   .categorias-grid {
     grid-template-columns: 1fr;

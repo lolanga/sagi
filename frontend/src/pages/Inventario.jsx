@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import api from '../services/api'
+import { extractApiError } from '../utils/helpers'
 import Aviso from '../components/Aviso'
 import Modal from '../components/Modal'
 import ItemForm from '../components/ItemForm'
@@ -10,6 +11,7 @@ import ItemDetalle from '../components/ItemDetalle'
 import Layout from '../components/Layout'
 import Skeleton from '../components/Skeleton'
 import EmptyState from '../components/EmptyState'
+import Pagination from '../components/Pagination'
 import '../styles/inventario.css'
 
 export default function Inventario() {
@@ -74,8 +76,9 @@ export default function Inventario() {
       toast.success('Ítem eliminado correctamente')
       cargarItems()
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al eliminar el ítem')
-      toast.error(err.response?.data?.message || 'Error al eliminar el ítem')
+      const msg = extractApiError(err, 'Error al eliminar el ítem')
+      setError(msg)
+      toast.error(msg)
     }
   }
 
@@ -289,25 +292,7 @@ export default function Inventario() {
         </>
       )}
 
-      {lastPage > 1 && (
-        <div className="pagination">
-          <button
-            className={page === 1 ? 'btn btn-secondary disabled' : 'btn btn-secondary'}
-            onClick={() => setPage((page) => page - 1)}
-            disabled={page === 1}
-            aria-label="Página anterior">
-            Anterior
-          </button>
-          <span>Página {page} de {lastPage}</span>
-          <button
-            className={page === lastPage ? 'btn btn-secondary disabled' : 'btn btn-secondary'}
-            onClick={() => setPage((page) => page + 1)}
-            disabled={page === lastPage}
-            aria-label="Página siguiente">
-            Siguiente
-          </button>
-        </div>
-      )}
+      <Pagination page={page} lastPage={lastPage} onPageChange={setPage} />
 
       <Modal open={showAlta} title="Registrar alta de ítem" onClose={() => setShowAlta(false)} wide>
         <ItemForm

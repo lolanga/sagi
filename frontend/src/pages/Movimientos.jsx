@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import { extractApiError } from '../utils/helpers'
 import Aviso from '../components/Aviso'
+import EmptyState from '../components/EmptyState'
 import Modal from '../components/Modal'
 import Layout from '../components/Layout'
 import '../styles/inventario.css'
@@ -73,10 +75,7 @@ export default function Movimientos() {
       setMotivo('')
       cargar()
     } catch (err) {
-      const msg = err.response?.data?.message
-      const errors = err.response?.data?.errors
-      const first = errors ? Object.values(errors)[0]?.[0] : null
-      setError(first || msg || 'Error al crear el movimiento')
+      setError(extractApiError(err, 'Error al crear el movimiento'))
     }
   }
 
@@ -85,7 +84,7 @@ export default function Movimientos() {
       await api.post(`/movimientos/${m.id}/aprobar`, {})
       cargar()
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al aprobar')
+      setError(extractApiError(err, 'Error al aprobar'))
     }
   }
 
@@ -98,7 +97,7 @@ export default function Movimientos() {
       setMotivoRechazo('')
       cargar()
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al rechazar')
+      setError(extractApiError(err, 'Error al rechazar'))
     }
   }
 
@@ -133,10 +132,11 @@ export default function Movimientos() {
       {loading ? (
         <p className="muted">Cargando...</p>
       ) : movimientos.length === 0 ? (
-        <div className="placeholder">
-          <h2>Sin movimientos</h2>
-          <p>No hay movimientos registrados. Crea una solicitud de traslado o baja.</p>
-        </div>
+        <EmptyState
+          icon="inventory"
+          title="Sin movimientos"
+          description="No hay movimientos registrados. Crea una solicitud de traslado o baja."
+        />
       ) : (
         <div className="table-wrap">
         <table className="table">

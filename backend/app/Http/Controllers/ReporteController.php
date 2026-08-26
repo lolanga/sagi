@@ -13,8 +13,6 @@ class ReporteController extends Controller
 {
     public function resumen(Request $request): JsonResponse
     {
-        $user = $request->user();
-
         $porCategoria = Categoria::withCount(['items' => fn ($q) => $q->where('estado', 'activo')])
             ->orderBy('codigo')
             ->get()
