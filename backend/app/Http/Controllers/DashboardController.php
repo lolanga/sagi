@@ -8,6 +8,7 @@ use App\Models\Item;
 use App\Models\Movimiento;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Process;
 
 class DashboardController extends Controller
 {
@@ -38,5 +39,55 @@ class DashboardController extends Controller
             ],
             'por_categoria' => $porCategoria,
         ]);
+    }
+
+    public function backup(): JsonResponse
+    {
+        $date = date('Y-m-d_H-i-s');
+        $filename = "backup_sagi_{$date}.sql";
+        $path = storage_path("app/backups/{$filename}");
+
+        if (!is_dir(storage_path('app/backups'))) {
+            mkdir(storage_path('app/backups'), 0755, true);
+        }
+
+        $host = config('database.connections.mysql.host');
+        $port = config('database.connections.mysql.port');
+        $database = config('database.connections.mysql.database');
+        $username = config('database.connections.mysql.username');
+        $password = config('database.connections.mysql.password');
+
+        $command = sprintf(
+            'mysqldump -h %s -P %s -u %s %s > %s',
+            escapeshellarg($host),
+            escapeshellarg($port),
+            escapeshellarg($username),
+            escapeshellarg($database),
+            escapeshellarg($path)
+        );
+
+        if ($password) {
+            $command = sprintf(
+                'mysqldump -h %s -P %s -u %s -p%s %s > %s',
+                escapeshellarg($host),
+                escapeshellarg($port),
+                escapeshellarg($username),
+                escapeshellarg($password),
+                escapeshellarg($database),
+                escapeshellarg($path)
+            );
+        }
+
+        $result = Process::run($command);
+
+        if ($result->successful()) {
+            return response()->json([
+                'message' => 'Backup creado correctamente',
+                'file' => $filename,
+                'size' => filesize($path),
+            ]);
+        }
+
+        return response()->json(['message' => 'Error al crear backup'], 500);
     }
 }

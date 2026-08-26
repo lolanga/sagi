@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+    Route::post('/dashboard/backup', [DashboardController::class, 'backup'])->middleware('rol:admin');
 
     // Auditoría
     Route::get('/auditoria', [AuditoriaController::class, 'index'])->middleware('rol:admin,jefe');
