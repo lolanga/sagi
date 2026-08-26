@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import * as XLSX from 'xlsx'
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
 import api from '../services/api'
 import Aviso from '../components/Aviso'
 import Layout from '../components/Layout'
@@ -148,14 +150,67 @@ export default function Reportes() {
     }
   }
 
+  const exportarPdf = async () => {
+    setError('')
+    try {
+      const res = await api.get('/reportes/items')
+      const items = res.data || []
+
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
+
+      doc.setFontSize(18)
+      doc.text('SAGI - Reporte de Inventario', 14, 15)
+      doc.setFontSize(10)
+      doc.text(`Generado: ${new Date().toLocaleDateString()}`, 14, 22)
+      doc.text(`Total: ${items.length} ítems`, 14, 28)
+
+      const columnas = [
+        { header: 'Código', dataKey: 'codigo' },
+        { header: 'Elemento', dataKey: 'elemento' },
+        { header: 'Estado', dataKey: 'estado' },
+        { header: 'Conservación', dataKey: 'conservacion' },
+        { header: 'Cant.', dataKey: 'cantidad' },
+        { header: 'Sede', dataKey: 'sede' },
+        { header: 'Unidad', dataKey: 'unidad' },
+        { header: 'Responsable', dataKey: 'responsable' },
+      ]
+
+      const filas = items.map((i) => ({
+        codigo: i.codigo_unico,
+        elemento: i.tipo_item?.nombre ?? '',
+        estado: i.estado,
+        conservacion: i.estado_conservacion,
+        cantidad: i.cantidad,
+        sede: i.unidad?.sede?.nombre ?? '',
+        unidad: i.unidad?.nombre ?? '',
+        responsable: i.responsable?.name ?? '',
+      }))
+
+      doc.autoTable({
+        startY: 35,
+        columns: columnas,
+        body: filas,
+        styles: { fontSize: 8, cellPadding: 2 },
+        headStyles: { fillColor: [74, 143, 212] },
+        alternateRowStyles: { fillColor: [240, 245, 250] },
+        margin: { top: 35 },
+      })
+
+      doc.save(`inventario-${new Date().toISOString().slice(0, 10)}.pdf`)
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al exportar PDF')
+    }
+  }
+
   return (
     <Layout
       title="Reportes"
       back="/"
       actions={
         <>
-          <button className="btn btn-primary" onClick={exportarExcel}>Exportar inventario (Excel)</button>
+          <button className="btn btn-primary" onClick={exportarExcel}>Excel</button>
           <button className="btn btn-secondary" onClick={exportarCsv}>CSV</button>
+          <button className="btn btn-secondary" onClick={exportarPdf}>PDF</button>
         </>
       }
     >
