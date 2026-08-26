@@ -140,6 +140,7 @@ export default function Inventario() {
               <th>Categoría</th>
               <th>Detalle</th>
               <th>Estado</th>
+              <th>Conservación</th>
               <th>Cant.</th>
               <th>Unidad</th>
               <th>Responsable</th>
@@ -148,11 +149,14 @@ export default function Inventario() {
           </thead>
           <tbody>
             {items.map((item) => (
-              <tr key={item.id}>
+              <tr key={item.id} className={item.estado === 'baja' ? 'fila-baja' : ''}>
                 <td data-label="Código"><strong>{item.codigo_unico}</strong></td>
                 <td data-label="Categoría">{item.categoria?.codigo}</td>
                 <td data-label="Detalle">{formatValores(item)}</td>
                 <td data-label="Estado">
+                  <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
+                </td>
+                <td data-label="Conservación">
                   <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
                 </td>
                 <td data-label="Cant.">{item.cantidad}</td>
@@ -161,7 +165,7 @@ export default function Inventario() {
                 <td data-label="Acciones">
                   <div className="row-actions">
                     <button className="btn-link btn-link-ver" onClick={() => setViendo(item)}>Ver</button>
-                    {puedeEditar && (
+                    {puedeEditar && item.estado !== 'baja' && (
                       <>
                         <button className="btn-link btn-link-editar" onClick={() => setEditando(item)}>Editar</button>
                         <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)}>Eliminar</button>

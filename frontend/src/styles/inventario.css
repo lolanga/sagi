@@ -461,3 +461,27 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 }
+
+/* Fila de items dados de baja */
+.fila-baja {
+  opacity: 0.55;
+}
+
+.fila-baja:hover {
+  opacity: 0.75;
+}
+
+.badge-estado-activo {
+  background-color: rgba(76, 175, 80, 0.18);
+  color: var(--color-success);
+}
+
+.badge-estado-pendiente {
+  background-color: rgba(212, 160, 23, 0.18);
+  color: var(--color-accent);
+}
+
+.badge-estado-baja {
+  background-color: rgba(239, 83, 80, 0.18);
+  color: var(--color-danger);
+}

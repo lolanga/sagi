@@ -85,37 +85,39 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
       </div>
 
       <div className="detalle-card">
-        <h4>Historial de movimientos</h4>
+        <h4>Historial de movimientos ({item.movimientos?.length || 0})</h4>
         {item.movimientos && item.movimientos.length > 0 ? (
-          <div className="timeline">
-            {item.movimientos.map((m, idx) => (
-              <div key={m.id} className={`timeline-item ${m.estado === 'aprobado' ? 'timeline-aprobado' : m.estado === 'rechazado' ? 'timeline-rechazado' : 'timeline-pendiente'}`}>
-                <div className="timeline-dot" />
-                <div className="timeline-content">
-                  <div className="timeline-header">
-                    <span className={`badge ${badgeTipo[m.tipo] || ''}`}>{m.tipo}</span>
-                    <span className="timeline-fecha">{formatearFecha(m.created_at)}</span>
-                    <span className={`badge ${badgeEstado[m.estado] || ''}`}>{m.estado}</span>
-                  </div>
-                  <div className="timeline-body">
-                    {m.tipo === 'traslado' && (
-                      <p><strong>Origen:</strong> {m.unidad_origen?.nombre ?? '-'} → <strong>Destino:</strong> {m.unidad_destino?.nombre ?? '-'}</p>
-                    )}
-                    {m.tipo === 'baja' && (
-                      <p><strong>Origen:</strong> {m.unidad_origen?.nombre ?? '-'}</p>
-                    )}
-                    <p><strong>Motivo:</strong> {m.motivo}</p>
-                    <p className="timeline-meta">
-                      <span>Solicitó: {m.solicitante?.name ?? '-'}</span>
-                      {m.validador && <span> · Validó: {m.validador?.name}</span>}
-                    </p>
-                    {m.motivo_rechazo && (
-                      <p className="timeline-rechazo"><strong>Motivo rechazo:</strong> {m.motivo_rechazo}</p>
-                    )}
+          <div className="timeline-scroll">
+            <div className="timeline">
+              {item.movimientos.map((m, idx) => (
+                <div key={m.id} className={`timeline-item ${m.estado === 'aprobado' ? 'timeline-aprobado' : m.estado === 'rechazado' ? 'timeline-rechazado' : 'timeline-pendiente'}`}>
+                  <div className="timeline-dot" />
+                  <div className="timeline-content">
+                    <div className="timeline-header">
+                      <span className={`badge ${badgeTipo[m.tipo] || ''}`}>{m.tipo}</span>
+                      <span className="timeline-fecha">{formatearFecha(m.created_at)}</span>
+                      <span className={`badge ${badgeEstado[m.estado] || ''}`}>{m.estado}</span>
+                    </div>
+                    <div className="timeline-body">
+                      {m.tipo === 'traslado' && (
+                        <p><strong>Origen:</strong> {m.unidad_origen?.nombre ?? '-'} → <strong>Destino:</strong> {m.unidad_destino?.nombre ?? '-'}</p>
+                      )}
+                      {m.tipo === 'baja' && (
+                        <p><strong>Origen:</strong> {m.unidad_origen?.nombre ?? '-'}</p>
+                      )}
+                      <p><strong>Motivo:</strong> {m.motivo}</p>
+                      <p className="timeline-meta">
+                        <span>Solicitó: {m.solicitante?.name ?? '-'}</span>
+                        {m.validador && <span> · Validó: {m.validador?.name}</span>}
+                      </p>
+                      {m.motivo_rechazo && (
+                        <p className="timeline-rechazo"><strong>Motivo rechazo:</strong> {m.motivo_rechazo}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         ) : (
           <p className="muted">Sin movimientos registrados.</p>
