@@ -23,17 +23,21 @@ export default function Auditoria() {
   const [entidad, setEntidad] = useState('')
   const [accion, setAccion] = useState('')
   const [error, setError] = useState('')
+  const [page, setPage] = useState(1)
+  const [lastPage, setLastPage] = useState(1)
 
   const cargar = () => {
     const params = new URLSearchParams()
     if (entidad) params.set('entidad', entidad)
     if (accion) params.set('accion', accion)
+    params.set('page', page)
     setLoading(true)
     api
       .get(`/auditoria?${params.toString()}`)
       .then((res) => {
         setLogs(res.data.data || [])
         setTotal(res.data.total || 0)
+        setLastPage(res.data.last_page || 1)
       })
       .catch(() => {
         setLogs([])
@@ -42,7 +46,8 @@ export default function Auditoria() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(cargar, [entidad, accion])
+  useEffect(() => { setPage(1) }, [entidad, accion])
+  useEffect(cargar, [entidad, accion, page])
 
   const traerTodo = async () => {
     const base = new URLSearchParams()
@@ -163,6 +168,26 @@ export default function Auditoria() {
             ))}
           </tbody>
         </table>
+        </div>
+      )}
+
+      {lastPage > 1 && (
+        <div className="pagination">
+          <button
+            className={page === 1 ? 'btn btn-secondary disabled' : 'btn btn-secondary'}
+            onClick={() => setPage((p) => p - 1)}
+            disabled={page === 1}
+            aria-label="Página anterior">
+            Anterior
+          </button>
+          <span>Página {page} de {lastPage}</span>
+          <button
+            className={page === lastPage ? 'btn btn-secondary disabled' : 'btn btn-secondary'}
+            onClick={() => setPage((p) => p + 1)}
+            disabled={page === lastPage}
+            aria-label="Página siguiente">
+            Siguiente
+          </button>
         </div>
       )}
     </Layout>

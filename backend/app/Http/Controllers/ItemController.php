@@ -24,7 +24,13 @@ if ($request->filled('search')) {
             $termino = $request->string('search');
             $query->where(function ($q) use ($termino) {
                 $q->where('codigo_unico', 'like', "%{$termino}%")
-                    ->orWhereRaw("CAST(valores_dinamicos AS CHAR) LIKE ?", ["%{$termino}%"]);
+                    ->orWhereRaw("CAST(valores_dinamicos AS CHAR) LIKE ?", ["%{$termino}%"])
+                    ->orWhereHas('unidad', function ($uq) use ($termino) {
+                        $uq->where('nombre', 'like', "%{$termino}%");
+                    })
+                    ->orWhereHas('responsable', function ($rq) use ($termino) {
+                        $rq->where('name', 'like', "%{$termino}%");
+                    });
             });
         }
 
