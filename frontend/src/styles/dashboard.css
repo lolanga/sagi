@@ -63,6 +63,27 @@
   font-size: 13px;
 }
 
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.chart-card h3 {
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.chart-container {
+  height: 220px;
+  position: relative;
+}
+
+.chart-container-doughnut {
+  height: 260px;
+}
+
 @media (max-width: 480px) {
   .cards-grid {
     grid-template-columns: 1fr 1fr;
