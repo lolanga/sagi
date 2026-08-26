@@ -408,6 +408,26 @@ button {
   flex: 1;
 }
 
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 12px 0;
+}
+
+.pagination span {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.pagination .disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 .table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

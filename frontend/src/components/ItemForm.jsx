@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import api from '../services/api'
+import { extractApiError } from '../utils/helpers'
 import Aviso from '../components/Aviso'
 import '../styles/form.css'
 
@@ -19,8 +20,15 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
   const [tipos, setTipos] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({})
+  const abortRef = useRef(null)
 
   const esEdicion = Boolean(item)
+
+  const categoriasVisibles = useMemo(
+    () => categorias.filter((c) => !c.es_transitoria),
+    [categorias]
+  )
 
   useEffect(() => {
     if (item?.valores_dinamicos) {
@@ -29,6 +37,10 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
   }, [item])
 
   useEffect(() => {
+    if (abortRef.current) abortRef.current.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+
     if (!categoriaId) {
       setCampos([])
       setTipos([])
@@ -39,12 +51,17 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
 
     if (tipoItemId) {
       api
-        .get(`/categorias/${categoriaId}/campos`, { params: { tipo_item_id: tipoItemId } })
+        .get(`/categorias/${categoriaId}/campos`, {
+          params: { tipo_item_id: tipoItemId },
+          signal: controller.signal,
+        })
         .then((res) => {
           const activos = (res.data.campos || []).filter((c) => c.activo)
           setCampos(activos)
         })
-        .catch(() => setCampos([]))
+        .catch((err) => {
+          if (err.name !== 'CanceledError') setCampos([])
+        })
         .finally(() => setLoading(false))
     } else {
       setCampos([])
@@ -52,79 +69,63 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
     }
 
     api
-      .get(`/categorias/${categoriaId}/tipos`)
+      .get(`/categorias/${categoriaId}/tipos`, { signal: controller.signal })
       .then((res) => setTipos(res.data.tipos || []))
-      .catch(() => setTipos([]))
+      .catch((err) => {
+        if (err.name !== 'CanceledError') setTipos([])
+      })
+
+    return () => controller.abort()
   }, [categoriaId, tipoItemId])
 
-  const renderCampo = (campo) => {
-    const key = String(campo.id)
-    const value = valores[key] ?? ''
-    const placeholder = campo.placeholder
-    const base = {
-      id: `campo-${campo.id}`,
-      required: campo.requerido,
-      value,
-      placeholder,
-      onChange: (e) => setValores((v) => ({ ...v, [key]: e.target.value })),
-    }
+  const validateField = (name, value) => {
+    if (!value && name !== 'tipo_item_id') return `${name === 'categoria_id' ? 'Categoría' : name} es obligatorio`
+    return ''
+  }
 
-    if (campo.tipo === 'textarea') {
-      return (
-        <div className="field" key={campo.id}>
-          <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
-          <textarea {...base} rows={3} placeholder={placeholder || `Ej. descripción de ${campo.nombre.toLowerCase()}`} />
-        </div>
-      )
-    }
+  const clearFieldError = (name) => {
+    setFieldErrors((prev) => {
+      const next = { ...prev }
+      delete next[name]
+      return next
+    })
+  }
 
-    if (campo.tipo === 'select') {
-      const opcionesPlano = (campo.opciones || [])
-        .flatMap((op) => String(op).split(','))
-        .map((op) => op.trim())
-        .filter(Boolean)
-      return (
-        <div className="field" key={campo.id}>
-          <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
-          <select {...base}>
-            <option value="">Seleccionar...</option>
-            {opcionesPlano.map((op) => (
-              <option key={op} value={op}>{op}</option>
-            ))}
-          </select>
-        </div>
-      )
+  const handleTipoChange = (e) => {
+    const newTipo = e.target.value
+    if (newTipo !== tipoItemId && Object.keys(valores).some((k) => valores[k])) {
+      if (!window.confirm('Cambiar el elemento borrará los campos específicos ya completados. ¿Continuar?')) {
+        return
+      }
     }
-
-    if (campo.tipo === 'numero') {
-      return (
-        <div className="field" key={campo.id}>
-          <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
-          <input {...base} type="number" step="any" placeholder={placeholder || 'Ej. 1'} />
-        </div>
-      )
-    }
-
-    if (campo.tipo === 'fecha') {
-      return (
-        <div className="field" key={campo.id}>
-          <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
-          <input {...base} type="date" />
-        </div>
-      )
-    }
-
-    return (
-      <div className="field" key={campo.id}>
-        <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
-        <input {...base} type="text" placeholder={placeholder || `Ej. ${campo.nombre.toLowerCase()}`} />
-      </div>
-    )
+    setTipoItemId(newTipo)
+    setValores({})
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setFieldErrors({})
+
+    const errors = {}
+    if (!categoriaId) errors.categoria_id = 'Seleccioná una categoría'
+    if (!esEdicion && !unidadId) errors.unidad_id = 'Seleccioná una unidad de destino'
+    if (!esEdicion && !motivoAlta.trim()) errors.motivo_alta = 'Ingresá el motivo del alta'
+    if (!esEdicion && !fechaDesconocida && !fechaAlta) errors.fecha_alta = 'Seleccioná la fecha de alta'
+    if (tipos.length > 0 && !tipoItemId) errors.tipo_item_id = 'Seleccioná un elemento'
+
+    campos.forEach((c) => {
+      if (c.requerido && !valores[String(c.id)]) {
+        errors[`campo_${c.id}`] = `${c.nombre} es obligatorio`
+      }
+    })
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      setError('Revisá los campos marcados en rojo')
+      return
+    }
+
     setLoading(true)
     try {
       const payload = {
@@ -135,7 +136,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
         valores,
       }
       if (!esEdicion) {
-        payload.motivo_alta = motivoAlta
+        payload.motivo_alta = motivoAlta.trim()
         payload.unidad_id = Number(unidadId)
         payload.fecha_alta = fechaDesconocida ? null : fechaAlta
       }
@@ -147,21 +148,14 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
       }
       onSaved()
     } catch (err) {
-      const msg = err.response?.data?.message
-      if (msg && typeof msg === 'string') {
-        setError(msg)
-      } else {
-        const errors = err.response?.data?.errors
-        const first = errors ? Object.values(errors)[0]?.[0] : null
-        setError(first || 'Error al guardar el ítem')
-      }
+      setError(extractApiError(err, 'Error al guardar el ítem'))
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="item-form">
+    <form onSubmit={handleSubmit} className="item-form" noValidate>
       <div className="form-grid">
         <div className="field">
           <label htmlFor="categoria">Categoría *</label>
@@ -171,17 +165,18 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
             onChange={(e) => {
               setCategoriaId(e.target.value)
               if (!esEdicion) setTipoItemId('')
+              clearFieldError('categoria_id')
             }}
             required
             disabled={esEdicion}
+            aria-invalid={!!fieldErrors.categoria_id}
           >
             <option value="">Seleccionar categoría...</option>
-            {categorias
-              .filter((c) => !c.es_transitoria)
-              .map((c) => (
-                <option key={c.id} value={c.id}>{c.codigo} – {c.nombre}</option>
-              ))}
+            {categoriasVisibles.map((c) => (
+              <option key={c.id} value={c.id}>{c.codigo} – {c.nombre}</option>
+            ))}
           </select>
+          {fieldErrors.categoria_id && <span className="field-error">{fieldErrors.categoria_id}</span>}
         </div>
 
         <div className="field">
@@ -199,21 +194,20 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
         </div>
 
         <div className="field">
-          <label htmlFor="tipo-item">Elemento</label>
+          <label htmlFor="tipo-item">Elemento{tipos.length > 0 ? ' *' : ''}</label>
           <select
             id="tipo-item"
             value={tipoItemId}
-            onChange={(e) => {
-              setTipoItemId(e.target.value)
-              setValores({})
-            }}
+            onChange={handleTipoChange}
             required={tipos.length > 0}
+            aria-invalid={!!fieldErrors.tipo_item_id}
           >
             <option value="">{tipos.length > 0 ? 'Seleccionar elemento...' : 'Sin elementos definidos'}</option>
             {tipos.map((t) => (
               <option key={t.id} value={t.id}>{t.nombre}</option>
             ))}
           </select>
+          {fieldErrors.tipo_item_id && <span className="field-error">{fieldErrors.tipo_item_id}</span>}
         </div>
 
         <div className="field">
@@ -223,7 +217,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
             type="number"
             min="1"
             value={cantidad}
-            onChange={(e) => setCantidad(e.target.value)}
+            onChange={(e) => setCantidad(Number(e.target.value))}
             placeholder="Ej. 1"
             required
           />
@@ -240,6 +234,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
               max={new Date().toISOString().slice(0, 10)}
               disabled={fechaDesconocida}
               required={!fechaDesconocida}
+              aria-invalid={!!fieldErrors.fecha_alta}
             />
             <label className="checkbox-inline">
               <input
@@ -249,6 +244,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
               />
               Fecha desconocida
             </label>
+            {fieldErrors.fecha_alta && <span className="field-error">{fieldErrors.fecha_alta}</span>}
           </div>
         )}
 
@@ -258,8 +254,12 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
             <select
               id="unidad"
               value={unidadId}
-              onChange={(e) => setUnidadId(e.target.value)}
+              onChange={(e) => {
+                setUnidadId(e.target.value)
+                clearFieldError('unidad_id')
+              }}
               required
+              aria-invalid={!!fieldErrors.unidad_id}
             >
               <option value="">Seleccionar unidad...</option>
               {(unidades || []).map((u) => (
@@ -268,20 +268,26 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
                 </option>
               ))}
             </select>
+            {fieldErrors.unidad_id && <span className="field-error">{fieldErrors.unidad_id}</span>}
           </div>
         )}
 
         {!esEdicion && (
           <div className="field field-full">
             <label htmlFor="motivo">Motivo del alta *</label>
-            <input
+            <textarea
               id="motivo"
-              type="text"
               value={motivoAlta}
-              onChange={(e) => setMotivoAlta(e.target.value)}
+              onChange={(e) => {
+                setMotivoAlta(e.target.value)
+                clearFieldError('motivo_alta')
+              }}
               placeholder="Ej. Compra, donación, ingreso nuevo"
+              rows={2}
               required
+              aria-invalid={!!fieldErrors.motivo_alta}
             />
+            {fieldErrors.motivo_alta && <span className="field-error">{fieldErrors.motivo_alta}</span>}
           </div>
         )}
       </div>
@@ -296,7 +302,56 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
           ) : campos.length === 0 ? (
             <p className="muted">Este elemento no tiene campos definidos.</p>
           ) : (
-            <div className="form-grid">{campos.map(renderCampo)}</div>
+            <div className="form-grid">
+              {campos.map((campo) => {
+                const key = String(campo.id)
+                const value = valores[key] ?? ''
+                const fieldKey = `campo_${campo.id}`
+                const base = {
+                  id: `campo-${campo.id}`,
+                  required: campo.requerido,
+                  value,
+                  placeholder: campo.placeholder || '',
+                  onChange: (e) => {
+                    setValores((v) => ({ ...v, [key]: e.target.value }))
+                    clearFieldError(fieldKey)
+                  },
+                  'aria-invalid': !!fieldErrors[fieldKey],
+                }
+
+                let input
+                if (campo.tipo === 'textarea') {
+                  input = <textarea {...base} rows={3} placeholder={campo.placeholder || `Ej. descripción de ${campo.nombre.toLowerCase()}`} />
+                } else if (campo.tipo === 'select') {
+                  const opcionesPlano = (campo.opciones || [])
+                    .flatMap((op) => String(op).split(','))
+                    .map((op) => op.trim())
+                    .filter(Boolean)
+                  input = (
+                    <select {...base}>
+                      <option value="">Seleccionar...</option>
+                      {opcionesPlano.map((op) => (
+                        <option key={op} value={op}>{op}</option>
+                      ))}
+                    </select>
+                  )
+                } else if (campo.tipo === 'numero') {
+                  input = <input {...base} type="number" step="any" placeholder={campo.placeholder || 'Ej. 1'} />
+                } else if (campo.tipo === 'fecha') {
+                  input = <input {...base} type="date" />
+                } else {
+                  input = <input {...base} type="text" placeholder={campo.placeholder || `Ej. ${campo.nombre.toLowerCase()}`} />
+                }
+
+                return (
+                  <div className="field" key={campo.id}>
+                    <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
+                    {input}
+                    {fieldErrors[fieldKey] && <span className="field-error">{fieldErrors[fieldKey]}</span>}
+                  </div>
+                )
+              })}
+            </div>
           )}
         </fieldset>
       )}

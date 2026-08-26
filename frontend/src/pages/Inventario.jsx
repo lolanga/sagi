@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
@@ -59,7 +59,7 @@ export default function Inventario() {
   }, [search, categoriaId, page])
 
   useEffect(() => {
-    api.get('/categorias').then((res) => setCategorias(res.data.categorias || []))
+    api.get('/categorias').then((res) => setCategorias(res.data.categorias || [])).catch(() => {})
     api.get('/unidades').then((res) => setUnidades((res.data.unidades || []).filter((u) => u.activa))).catch(() => {})
   }, [])
 
@@ -106,25 +106,27 @@ export default function Inventario() {
     }
   }
 
-  const sortedItems = [...items].sort((a, b) => {
-    if (!sortKey) return 0
-    let aVal, bVal
-    switch (sortKey) {
-      case 'codigo_unico': aVal = a.codigo_unico; bVal = b.codigo_unico; break
-      case 'categoria': aVal = a.categoria?.codigo || ''; bVal = b.categoria?.codigo || ''; break
-      case 'estado': aVal = a.estado; bVal = b.estado; break
-      case 'estado_conservacion': aVal = a.estado_conservacion; bVal = b.estado_conservacion; break
-      case 'cantidad': aVal = a.cantidad; bVal = b.cantidad; break
-      case 'unidad': aVal = a.unidad?.nombre || ''; bVal = b.unidad?.nombre || ''; break
-      case 'responsable': aVal = a.responsable?.name || ''; bVal = b.responsable?.name || ''; break
-      default: return 0
-    }
-    if (typeof aVal === 'string') aVal = aVal.toLowerCase()
-    if (typeof bVal === 'string') bVal = bVal.toLowerCase()
-    if (aVal < bVal) return sortDir === 'asc' ? -1 : 1
-    if (aVal > bVal) return sortDir === 'asc' ? 1 : -1
-    return 0
-  })
+  const sortedItems = useMemo(() => {
+    if (!sortKey) return items
+    return [...items].sort((a, b) => {
+      let aVal, bVal
+      switch (sortKey) {
+        case 'codigo_unico': aVal = a.codigo_unico; bVal = b.codigo_unico; break
+        case 'categoria': aVal = a.categoria?.codigo || ''; bVal = b.categoria?.codigo || ''; break
+        case 'estado': aVal = a.estado; bVal = b.estado; break
+        case 'estado_conservacion': aVal = a.estado_conservacion || ''; bVal = b.estado_conservacion || ''; break
+        case 'cantidad': aVal = a.cantidad; bVal = b.cantidad; break
+        case 'unidad': aVal = a.unidad?.nombre || ''; bVal = b.unidad?.nombre || ''; break
+        case 'responsable': aVal = a.responsable?.name || ''; bVal = b.responsable?.name || ''; break
+        default: return 0
+      }
+      if (typeof aVal === 'string') aVal = aVal.toLowerCase()
+      if (typeof bVal === 'string') bVal = bVal.toLowerCase()
+      if (aVal < bVal) return sortDir === 'asc' ? -1 : 1
+      if (aVal > bVal) return sortDir === 'asc' ? 1 : -1
+      return 0
+    })
+  }, [items, sortKey, sortDir])
 
   return (
     <Layout
@@ -144,18 +146,35 @@ export default function Inventario() {
     >
       <div className="filters-bar">
         <div className="filters-search-row">
-          <input
-            className="search-input"
-            type="text"
-            placeholder="Ej. SAGI-000001 o escritorio"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <div className="search-wrapper">
+            <input
+              className="search-input"
+              type="text"
+              placeholder="Ej. SAGI-000001 o escritorio"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
+              aria-label="Buscar items"
+            />
+            {search && (
+              <button
+                className="search-clear"
+                onClick={() => { setSearch(''); setPage(1) }}
+                aria-label="Limpiar búsqueda"
+                type="button"
+              >
+                ×
+              </button>
+            )}
+          </div>
           <button
             className="btn btn-secondary filters-toggle"
             onClick={() => setFiltersOpen(!filtersOpen)}
             type="button"
             aria-label="Filtros"
+            aria-expanded={filtersOpen}
           >
             {filtersOpen ? 'Ocultar filtros' : 'Filtros'}
           </button>
@@ -164,7 +183,11 @@ export default function Inventario() {
           <select
             className="filter-select"
             value={categoriaId}
-            onChange={(e) => setCategoriaId(e.target.value)}
+            onChange={(e) => {
+              setCategoriaId(e.target.value)
+              setPage(1)
+            }}
+            aria-label="Filtrar por categoría"
           >
             <option value="">Todas las categorías</option>
             {categorias
@@ -199,13 +222,27 @@ export default function Inventario() {
       ) : (
         <>
           <div className="table-wrap desktop-only">
-            <table className="table">
+            <table className="table" aria-label="Inventario de ítems">
               <thead>
                 <tr>
-                  <th onClick={() => handleSort('codigo_unico')} className="sortable-th">
+                  <th
+                    onClick={() => handleSort('codigo_unico')}
+                    className="sortable-th"
+                    role="button"
+                    tabIndex={0}
+                    aria-sort={sortKey === 'codigo_unico' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('codigo_unico') }}
+                  >
                     Código {sortKey === 'codigo_unico' && (sortDir === 'asc' ? '▲' : '▼')}
                   </th>
-                  <th onClick={() => handleSort('categoria')} className="sortable-th">
+                  <th
+                    onClick={() => handleSort('categoria')}
+                    className="sortable-th"
+                    role="button"
+                    tabIndex={0}
+                    aria-sort={sortKey === 'categoria' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('categoria') }}
+                  >
                     Categoría {sortKey === 'categoria' && (sortDir === 'asc' ? '▲' : '▼')}
                   </th>
                   <th>Detalle</th>
@@ -231,24 +268,24 @@ export default function Inventario() {
                 {sortedItems.map((item) => (
                   <tr key={item.id} className={item.estado === 'baja' ? 'fila-baja' : ''}>
                     <td data-label="Código"><strong>{item.codigo_unico}</strong></td>
-                    <td data-label="Categoría">{item.categoria?.codigo}</td>
+                    <td data-label="Categoría">{item.categoria?.codigo ?? '-'}</td>
                     <td data-label="Detalle">{formatValores(item)}</td>
                     <td data-label="Estado">
                       <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
                     </td>
                     <td data-label="Conservación">
-                      <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
+                      <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>{item.estado_conservacion ?? '-'}</span>
                     </td>
                     <td data-label="Cant.">{item.cantidad}</td>
                     <td data-label="Unidad">{item.unidad?.nombre ?? '-'}</td>
-                    <td data-label="Responsable">{item.responsable?.name}</td>
+                    <td data-label="Responsable">{item.responsable?.name ?? '-'}</td>
                     <td data-label="Acciones">
                       <div className="row-actions">
-                        <button className="btn-link btn-link-ver" onClick={() => setViendo(item)}>Ver</button>
+                        <button className="btn-link btn-link-ver" onClick={() => setViendo(item)} aria-label={`Ver ${item.codigo_unico}`}>Ver</button>
                         {puedeEditar && item.estado !== 'baja' && (
                           <>
-                            <button className="btn-link btn-link-editar" onClick={() => setEditando(item)}>Editar</button>
-                            <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)}>Eliminar</button>
+                            <button className="btn-link btn-link-editar" onClick={() => setEditando(item)} aria-label={`Editar ${item.codigo_unico}`}>Editar</button>
+                            <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`}>Eliminar</button>
                           </>
                         )}
                       </div>
@@ -267,13 +304,13 @@ export default function Inventario() {
                   <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
                 </div>
                 <div className="item-card-body">
-                  <p className="item-card-detalle">{formatValores(item) || 'Sin detalle'}</p>
+                  <p className="item-card-detalle">{formatValores(item)}</p>
                   <div className="item-card-meta">
-                    <span>{item.categoria?.codigo}</span>
+                    <span>{item.categoria?.codigo ?? '-'}</span>
                     <span>{item.unidad?.nombre ?? '-'}</span>
                   </div>
                   <div className="item-card-meta">
-                    <span className={`badge badge-estado-${item.estado_conservacion.replace(/\s+/g, '-')}`}>{item.estado_conservacion}</span>
+                    <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>{item.estado_conservacion ?? '-'}</span>
                     <span>Cant: {item.cantidad}</span>
                   </div>
                 </div>

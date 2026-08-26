@@ -565,6 +565,36 @@
   align-items: center;
 }
 
+.search-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+.search-clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.search-clear:hover {
+  color: var(--color-text);
+}
+
 .filters-toggle {
   white-space: nowrap;
   display: none;
