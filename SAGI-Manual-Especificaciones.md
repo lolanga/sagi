@@ -2,8 +2,8 @@
 title: "SAGI - Manual de Especificaciones Técnicas"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
-date: "23 de agosto de 2026"
-version: "1.0"
+date: "26 de agosto de 2026"
+version: "1.1"
 ---
 
 # SAGI - Manual de Especificaciones Técnicas
@@ -11,7 +11,7 @@ version: "1.0"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 1.0 | Fecha: 23 de agosto de 2026 | Estado: Producción
+Versión: 1.1 | Fecha: 26 de agosto de 2026 | Estado: Producción
 
 ---
 
@@ -111,6 +111,9 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | React Router | 7.x | Enrutamiento SPA |
 | Axios | 1.x | Cliente HTTP |
 | SheetJS (xlsx) | - | Exportación Excel |
+| Chart.js | 4.x | Gráficos de barras y doughnut (Dashboard) |
+| jsPDF | 2.x | Generación de PDFs |
+| jspdf-autotable | 3.x | Tablas en PDFs |
 
 ### 3.3 Herramientas de Desarrollo
 
@@ -372,12 +375,14 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | POST | /api/login | Iniciar sesión | No | Público |
 | GET | /api/me | Obtener usuario actual | Sí | Todos |
 | POST | /api/logout | Cerrar sesión | Sí | Todos |
+| POST | /api/change-password | Cambiar contraseña | Sí | Todos |
 
 ### 6.2 Dashboard
 
 | Método | Endpoint | Descripción | Autenticación | Roles |
 |--------|----------|-------------|---------------|-------|
 | GET | /api/dashboard/stats | Estadísticas generales | Sí | Todos |
+| POST | /api/dashboard/backup | Crear backup de base de datos | Sí | admin |
 
 ### 6.3 Items (Inventario)
 
@@ -393,7 +398,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 
 | Parámetro | Tipo | Descripción |
 |-----------|------|-------------|
-| search | string | Búsqueda por código o valores dinámicos |
+| search | string | Búsqueda por código, valores dinámicos, unidad de destino o responsable |
 | categoria_id | int | Filtrar por categoría |
 | estado_conservacion | string | Filtrar por estado de conservación |
 | estado | string | Filtrar por estado (activo/pendiente/baja) |
@@ -496,7 +501,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | GET | /api/reportes/resumen | Datos agregados | Sí | admin, jefe |
 | GET | /api/reportes/items | Lista completa de ítems | Sí | admin, jefe |
 
-**Total: 39 endpoints (1 público, 38 autenticados)**
+**Total: 41 endpoints (1 público, 40 autenticados)**
 
 ---
 
@@ -539,6 +544,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Funcionalidad | admin | jefe | carga | consulta |
 |---------------|:-----:|:----:|:-----:|:--------:|
 | Dashboard | Si | Si | Si | Si |
+| Dashboard Backup | Si | No | No | No |
 | Ver Inventario | Si | Si | Si | Si |
 | Crear Ítem | Si | Si | Si | No |
 | Editar Ítem | Si | Si | Si | No |
@@ -550,6 +556,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Aprobar/Rechazar | Si | Si | No | No |
 | Ver Reportes | Si | Si | No | No |
 | Exportar Reportes | Si | Si | No | No |
+| Exportar Reportes PDF | Si | Si | No | No |
 | Ver Alertas | Si | Si | Si | No |
 | Crear Alerta | Si | Si | No | No |
 | Cerrar Alerta | Si | Si | No | No |
@@ -558,6 +565,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Gestionar Unidades | Si | No | No | No |
 | Ver Auditoría | Si | Si | No | No |
 | Exportar Auditoría | Si | Si | No | No |
+| Cambiar Contraseña | Si | Si | Si | Si |
 
 ### 7.3 Usuarios de Prueba
 
@@ -667,18 +675,18 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 
 | Componente | Función |
 |------------|---------|
-| Layout | Shell de la aplicación (sidebar + topbar + contenido) |
+| Layout | Shell de la aplicación (sidebar + topbar + contenido), incluye toggle de tema (oscuro/claro) y botón de cambio de contraseña |
 | Modal | Diálogo modal genérico |
 | Aviso | Banner de notificación auto-cerrable |
 | ItemForm | Formulario para crear/editar ítems |
-| ItemDetalle | Vista de solo lectura del ítem |
+| ItemDetalle | Vista de solo lectura del ítem con timeline de movimientos |
 
 ### 9.4 Servicios
 
 | Archivo | Función |
 |---------|---------|
 | api.js | Instancia Axios con interceptores (token, 401) |
-| AuthContext | Proveedor de autenticación (login, logout, user) |
+| AuthContext | Proveedor de autenticación (login, logout, user, changePassword) |
 
 ---
 
@@ -746,6 +754,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Excel (.xlsx) | Reportes | Una hoja por categoría con campos dinámicos |
 | CSV | Reportes | Separado por comas |
 | JSON | Auditoría | Registros completos |
+| PDF | Reportes | Generado con jsPDF + jspdf-autotable, incluye tablas de reportes |
 
 ---
 
@@ -762,6 +771,8 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | SQL Injection | Protegido por Eloquent ORM |
 | Auditoría | Registro completo de acciones |
 | Eliminación | Limpieza de dependencias antes de borrar |
+| Cambio de contraseña | Endpoint protegido, requiere contraseña actual |
+| Backup | Creación de respaldo SQL, acceso restringido a admin |
 
 ---
 
@@ -797,6 +808,15 @@ cd frontend
 npm install
 npm run dev
 ```
+
+### 13.4 Comandos Artisan Útiles
+
+| Comando | Descripción |
+|---------|-------------|
+| php artisan db:backup | Crear respaldo de la base de datos |
+| php artisan migrate | Ejecutar migraciones |
+| php artisan db:seed | Sembrar datos de prueba |
+| php artisan serve | Iniciar servidor de desarrollo |
 
 ### 13.4 Variables de Entorno
 
@@ -851,5 +871,5 @@ npm run dev
 
 ---
 
-*Documento generado el 23 de agosto de 2026*
-*SAGI v1.0 - Instituto de Seguridad Pública*
+*Documento generado el 26 de agosto de 2026*
+*SAGI v1.1 - Instituto de Seguridad Pública*

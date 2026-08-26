@@ -2,8 +2,8 @@
 title: "SAGI - Manual de Usuario"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
-date: "23 de agosto de 2026"
-version: "1.0"
+date: "26 de agosto de 2026"
+version: "1.1"
 ---
 
 # SAGI - Manual de Usuario
@@ -11,7 +11,7 @@ version: "1.0"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 1.0 | Fecha: 23 de agosto de 2026
+Versión: 1.1 | Fecha: 26 de agosto de 2026
 
 ---
 
@@ -111,7 +111,7 @@ Contacte al administrador del sistema para restablecerla.
 | Zona | Ubicación | Función |
 |------|-----------|---------|
 | Sidebar | Izquierda | Menú de navegación |
-| Topbar | Arriba | Título, usuario, cerrar sesión |
+| Topbar | Arriba | Título, botón de tema (oscuro/claro), usuario, cambio de contraseña, cerrar sesión |
 | Contenido | Centro | Página actual |
 
 ### 4.2 Menú Según Rol
@@ -119,13 +119,16 @@ Contacte al administrador del sistema para restablecerla.
 | Menú | Admin | Jefe | Carga | Consulta |
 |------|:-----:|:----:|:-----:|:--------:|
 | Dashboard | Si | Si | Si | Si |
+| Dashboard Backup | Si | No | No | No |
 | Inventario | Si | Si | Si | Si |
 | Movimientos | Si | Si | Si | No |
 | Reportes | Si | Si | No | No |
+| Reportes PDF | Si | Si | No | No |
 | Alertas | Si | Si | Si | No |
 | Categorías | Si | No | No | No |
 | Sedes y Unidades | Si | No | No | No |
 | Auditoría | Si | Si | No | No |
+| Cambiar Contraseña | Si | Si | Si | Si |
 
 ### 4.3 Dispositivos Móviles
 
@@ -148,7 +151,16 @@ El Dashboard muestra un resumen del estado del inventario.
 | Movimientos pendientes | Traslados o bajas esperando aprobación |
 | Alertas activas | Alertas abiertas que requieren atención |
 
-### 5.2 Ítems por Categoría
+### 5.2 Gráficos
+
+El Dashboard incluye dos gráficos interactivos:
+
+| Gráfico | Tipo | Descripción |
+|---------|------|-------------|
+| Ítems por Categoría | Barras (Bar Chart) | Muestra la cantidad de ítems agrupados por categoría |
+| Distribución General | Dona (Doughnut Chart) | Muestra la distribución porcentarial de ítems por estado |
+
+### 5.3 Ítems por Categoría (Tabla)
 
 Tabla con la cantidad de ítems agrupados por categoría:
 
@@ -157,6 +169,14 @@ Tabla con la cantidad de ítems agrupados por categoría:
 | Código | Identificador de la categoría (A1, A2, etc.) |
 | Categoría | Nombre completo |
 | Ítems | Cantidad de ítems en esa categoría |
+
+### 5.4 Backup de Base de Datos
+
+**Solo administradores** tienen acceso a esta función.
+
+1. Haga clic en el botón **"Backup"** en el Dashboard
+2. El sistema creará un archivo SQL de respaldo
+3. El archivo se descargará automáticamente
 
 ---
 
@@ -181,7 +201,7 @@ Haga clic en **"Inventario"** en el menú lateral.
 
 | Filtro | Uso |
 |--------|-----|
-| Campo de búsqueda | Buscar por código o detalle |
+| Campo de búsqueda | Buscar por código, detalle, unidad de destino o responsable |
 | Categoría (desplegable) | Filtrar por categoría específica |
 
 ### 6.3 Registrar Nuevo Ítem (Alta)
@@ -215,7 +235,7 @@ Haga clic en **"Inventario"** en el menú lateral.
 |---------|-----------|
 | Datos del Ítem | Código, categoría, elemento, estado, conservación, cantidad, unidad, responsable, fecha |
 | Detalles Adicionales | Campos dinámicos específicos de la categoría |
-| Historial de Movimientos | Lista de todos los movimientos del ítem |
+| Historial de Movimientos | Timeline visual de todos los movimientos del ítem |
 
 ### 6.5 Editar un Ítem
 
@@ -479,6 +499,7 @@ Las unidades son departamentos o áreas dentro de cada sede.
 |---------|-------|-----------|
 | Excel (.xlsx) | "Exportar Excel" | Hoja por categoría con campos dinámicos |
 | CSV | "Exportar CSV" | Todos los ítems, separado por comas |
+| PDF | "Exportar PDF" | Reportes generados con formato tabular usando jsPDF |
 
 ---
 
@@ -517,6 +538,8 @@ Haga clic en **"Auditoría"** en el menú lateral.
 | Entidad | Entidad afectada |
 | Detalle | Información adicional |
 
+**Paginación:** Use los botones **"Anterior"** y **"Siguiente"** para navegar entre páginas de registros.
+
 ### 12.3 Exportar Auditoría
 
 | Formato | Botón |
@@ -530,7 +553,15 @@ Haga clic en **"Auditoría"** en el menú lateral.
 
 ### ¿Cómo cambio mi contraseña?
 
-Contacte al administrador del sistema.
+1. Haga clic en su nombre de usuario en la esquina superior derecha
+2. Seleccione **"Cambiar Contraseña"**
+3. Ingrese su contraseña actual
+4. Ingrese la nueva contraseña y confírmela
+5. Haga clic en **"Guardar"**
+
+### ¿Cómo cambio el tema de la interfaz?
+
+Haga clic en el botón de tema (sol/luna) en la barra superior para alternar entre modo oscuro y claro. Su preferencia se guarda automáticamente.
 
 ### ¿Por qué no veo ciertas opciones?
 
@@ -575,6 +606,6 @@ Los ítems se muestran 20 por página. Use "Anterior" y "Siguiente" para navegar
 
 ---
 
-*Manual de Usuario - SAGI v1.0*
-*Fecha: 23 de agosto de 2026*
+*Manual de Usuario - SAGI v1.1*
+*Fecha: 26 de agosto de 2026*
 *Instituto de Seguridad Pública*
