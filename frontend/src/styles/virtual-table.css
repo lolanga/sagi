@@ -24,11 +24,18 @@
   white-space: nowrap;
 }
 
+.virtual-body {
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
 .virtual-row {
   display: flex;
   border-bottom: 1px solid var(--color-border);
   cursor: pointer;
   transition: background 0.15s;
+  background: var(--color-white);
 }
 
 .virtual-row:hover {
