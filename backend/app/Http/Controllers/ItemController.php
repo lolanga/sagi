@@ -206,7 +206,7 @@ if ($request->filled('search')) {
             foreach ($todosLosIds as $campoId) {
                 $av = $antesDinamicos[$campoId] ?? null;
                 $dv = $despuesDinamicos[$campoId] ?? null;
-                if (String($av) !== String($dv)) {
+                if ((string)$av !== (string)$dv) {
                     $nombreCampo = $todosCampos[$campoId]->nombre ?? "Campo #{$campoId}";
                     $antes[$nombreCampo] = $av ?? '(vacío)';
                     $despues[$nombreCampo] = $dv ?? '(vacío)';
