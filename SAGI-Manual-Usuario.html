@@ -518,9 +518,13 @@ Instituto de Seguridad Pública (ISeP)</p>
 <td>Categoría (desplegable)</td>
 <td>Filtrar por categoría específica</td>
 </tr>
+<tr>
+<td>Estado (desplegable)</td>
+<td>Filtrar por estado: Activo, Pendiente, Baja o Todos</td>
+</tr>
 </tbody></table>
-<p><strong>Nota:</strong> Al cambiar búsqueda o categoría, la paginación vuelve a la página 1.</p>
-<h3>6.3 Registrar Nuevo Ítem (Alta)</h3>
+<p><strong>Nota:</strong> Al cambiar búsqueda, categoría o estado, la paginación vuelve a la página 1.</p>
+<h3>6.4 Registrar Nuevo Ítem (Alta)</h3>
 <ol>
 <li>Haga clic en <strong>&quot;+ Registrar alta&quot;</strong></li>
 <li>Complete el formulario:</li>
@@ -583,7 +587,7 @@ Instituto de Seguridad Pública (ISeP)</p>
 </ul>
 </li>
 </ol>
-<h3>6.4 Ver Detalle de un Ítem</h3>
+<h3>6.5 Ver Detalle de un Ítem</h3>
 <ol>
 <li>Haga clic en <strong>&quot;Ver&quot;</strong> en la columna de Acciones</li>
 <li>Verá información completa del ítem:</li>
@@ -609,18 +613,19 @@ Instituto de Seguridad Pública (ISeP)</p>
 </tr>
 </tbody></table>
 <p><strong>Historial unificado:</strong> El timeline muestra tanto los movimientos del ítem como las ediciones realizadas, ordenados cronológicamente. Las ediciones se identifican con un badge azul y muestran qué campos cambiaron.</p>
-<h3>6.5 Editar un Ítem</h3>
+<h3>6.6 Editar un Ítem</h3>
 <ol>
 <li>Haga clic en <strong>&quot;Editar&quot;</strong> en la columna de Acciones</li>
 <li>Modifique los campos que desee</li>
 <li>Haga clic en <strong>&quot;Guardar&quot;</strong></li>
 </ol>
-<h3>6.6 Eliminar un Ítem</h3>
+<h3>6.7 Eliminar un Ítem</h3>
+<p><strong>Solo administradores</strong> pueden eliminar ítems.</p>
 <ol>
 <li>Haga clic en <strong>&quot;Eliminar&quot;</strong> en la columna de Acciones</li>
 <li>Confirme la eliminación</li>
 </ol>
-<p><strong>Nota:</strong> La eliminación es permanente y eliminará los movimientos asociados.</p>
+<p><strong>Nota:</strong> El ítem será eliminado permanentemente. Sus movimientos se conservarán como históricos.</p>
 <hr>
 <h2>7. Gestión de Movimientos</h2>
 <p>Los movimientos registran los cambios de ubicación o estado de los ítems.</p>
@@ -1263,7 +1268,7 @@ Use las flechas <strong>↑</strong> y <strong>↓</strong> para cambiar el orde
 </tr>
 </tbody></table>
 <h3>¿Puedo recuperar un ítem eliminado?</h3>
-<p>No, la eliminación es permanente. Debe crear uno nuevo.</p>
+<p>No, la eliminación es permanente. Sin embargo, los movimientos asociados se conservan como históricos. Debe crear uno nuevo si desea restaurar el registro.</p>
 <h3>¿Qué pasa si rechazo un movimiento?</h3>
 <p>El movimiento queda registrado como rechazado. El ítem mantiene su ubicación.</p>
 <h3>¿Puedo crear ítems sin fecha?</h3>
@@ -1277,6 +1282,12 @@ Use las flechas <strong>↑</strong> y <strong>↓</strong> para cambiar el orde
 <hr>
 <h2>Changelog</h2>
 <h3>v3.2 (27 agosto 2026)</h3>
+<h4>Inventario</h4>
+<ul>
+<li><strong>Filtro por estado</strong>: Nuevo desplegable para filtrar por Activo, Pendiente, Baja o Todos</li>
+<li><strong>Eliminar restringido</strong>: Solo administradores pueden eliminar ítems</li>
+<li><strong>Movimientos preservados</strong>: Al eliminar un ítem, sus movimientos se conservan como históricos</li>
+</ul>
 <h4>Auditoría</h4>
 <ul>
 <li><strong>Detalle mejorado</strong>: Solo muestra los campos que cambiaron en cada edición (diff antes/después)</li>
@@ -1331,8 +1342,8 @@ Use las flechas <strong>↑</strong> y <strong>↓</strong> para cambiar el orde
 <li><strong>Touch area mejorado</strong>: Botones mínimo 44x44px en móvil</li>
 </ul>
 <hr>
-<p><em>Manual de Usuario - SAGI v3.0</em>
-<em>Fecha: 26 de agosto de 2026</em>
+<p><em>Manual de Usuario - SAGI v3.2</em>
+<em>Fecha: 27 de agosto de 2026</em>
 <em>Instituto de Seguridad Pública</em></p>
 
 </body>

@@ -58,7 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/items/{item}', [ItemController::class, 'show']);
     Route::put('/items/{item}', [ItemController::class, 'update'])->middleware('rol:admin,jefe,carga');
     Route::post('/items/{item}/reactivar', [ItemController::class, 'reactivar'])->middleware('rol:admin,jefe');
-    Route::delete('/items/{item}', [ItemController::class, 'destroy'])->middleware('rol:admin,jefe,carga');
+    Route::delete('/items/{item}', [ItemController::class, 'destroy'])->middleware('rol:admin');
 
     // Categorías, campos dinámicos y elementos
     Route::get('/categorias', [CategoriaController::class, 'index']);

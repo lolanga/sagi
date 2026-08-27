@@ -243,10 +243,11 @@ Su configuración se guarda automáticamente y se recuerda en su próxima visita
 |--------|-----|
 | Campo de búsqueda | Buscar por código, estado conservación, estado, valores dinámicos, categoría, elemento, unidad o responsable. Use el botón "×" para limpiar. |
 | Categoría (desplegable) | Filtrar por categoría específica |
+| Estado (desplegable) | Filtrar por estado: Activo, Pendiente, Baja o Todos |
 
-**Nota:** Al cambiar búsqueda o categoría, la paginación vuelve a la página 1.
+**Nota:** Al cambiar búsqueda, categoría o estado, la paginación vuelve a la página 1.
 
-### 6.3 Registrar Nuevo Ítem (Alta)
+### 6.4 Registrar Nuevo Ítem (Alta)
 
 1. Haga clic en **"+ Registrar alta"**
 2. Complete el formulario:
@@ -268,7 +269,7 @@ Su configuración se guarda automáticamente y se recuerda en su próxima visita
    - Movimiento de alta aprobado
    - Registro de auditoría
 
-### 6.4 Ver Detalle de un Ítem
+### 6.5 Ver Detalle de un Ítem
 
 1. Haga clic en **"Ver"** en la columna de Acciones
 2. Verá información completa del ítem:
@@ -281,18 +282,20 @@ Su configuración se guarda automáticamente y se recuerda en su próxima visita
 
 **Historial unificado:** El timeline muestra tanto los movimientos del ítem como las ediciones realizadas, ordenados cronológicamente. Las ediciones se identifican con un badge azul y muestran qué campos cambiaron.
 
-### 6.5 Editar un Ítem
+### 6.6 Editar un Ítem
 
 1. Haga clic en **"Editar"** en la columna de Acciones
 2. Modifique los campos que desee
 3. Haga clic en **"Guardar"**
 
-### 6.6 Eliminar un Ítem
+### 6.7 Eliminar un Ítem
+
+**Solo administradores** pueden eliminar ítems.
 
 1. Haga clic en **"Eliminar"** en la columna de Acciones
 2. Confirme la eliminación
 
-**Nota:** La eliminación es permanente y eliminará los movimientos asociados.
+**Nota:** El ítem será eliminado permanentemente. Sus movimientos se conservarán como históricos.
 
 ---
 
@@ -626,7 +629,7 @@ Las opciones dependen de su rol. Solicite acceso al administrador.
 
 ### ¿Puedo recuperar un ítem eliminado?
 
-No, la eliminación es permanente. Debe crear uno nuevo.
+No, la eliminación es permanente. Sin embargo, los movimientos asociados se conservan como históricos. Debe crear uno nuevo si desea restaurar el registro.
 
 ### ¿Qué pasa si rechazo un movimiento?
 
@@ -653,6 +656,11 @@ Los ítems se muestran 25 por página (configurable: 10/25/50). Use "Anterior" y
 ## Changelog
 
 ### v3.2 (27 agosto 2026)
+
+#### Inventario
+- **Filtro por estado**: Nuevo desplegable para filtrar por Activo, Pendiente, Baja o Todos
+- **Eliminar restringido**: Solo administradores pueden eliminar ítems
+- **Movimientos preservados**: Al eliminar un ítem, sus movimientos se conservan como históricos
 
 #### Auditoría
 - **Detalle mejorado**: Solo muestra los campos que cambiaron en cada edición (diff antes/después)
@@ -704,6 +712,6 @@ Los ítems se muestran 25 por página (configurable: 10/25/50). Use "Anterior" y
 
 ---
 
-*Manual de Usuario - SAGI v3.0*
-*Fecha: 26 de agosto de 2026*
+*Manual de Usuario - SAGI v3.2*
+*Fecha: 27 de agosto de 2026*
 *Instituto de Seguridad Pública*

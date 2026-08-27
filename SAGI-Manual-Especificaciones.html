@@ -1415,7 +1415,7 @@ Instituto de Seguridad Pública (ISeP)</p>
 <tbody><tr>
 <td>GET</td>
 <td>/api/items</td>
-<td>Listar ítems (20/pág)</td>
+<td>Listar ítems (25/pág)</td>
 <td>Sí</td>
 <td>Todos</td>
 </tr>
@@ -1452,7 +1452,7 @@ Instituto de Seguridad Pública (ISeP)</p>
 <td>/api/items/{id}</td>
 <td>Eliminar ítem</td>
 <td>Sí</td>
-<td>admin, jefe, carga</td>
+<td>admin</td>
 </tr>
 </tbody></table>
 <p><strong>Parámetros de filtro para GET /api/items:</strong></p>
@@ -1833,7 +1833,7 @@ Instituto de Seguridad Pública (ISeP)</p>
 <tbody><tr>
 <td>GET</td>
 <td>/api/auditoria</td>
-<td>Listar registros (50/pág)</td>
+<td>Listar registros (50/pág, configurable)</td>
 <td>Sí</td>
 <td>admin, jefe</td>
 </tr>
@@ -2047,8 +2047,8 @@ Instituto de Seguridad Pública (ISeP)</p>
 <tr>
 <td>Eliminar Ítem</td>
 <td align="center">Si</td>
-<td align="center">Si</td>
-<td align="center">Si</td>
+<td align="center">No</td>
+<td align="center">No</td>
 <td align="center">No</td>
 </tr>
 <tr>
@@ -3094,6 +3094,13 @@ npm run dev
 <hr>
 <h2>14. Changelog</h2>
 <h3>v3.2 (27 agosto 2026)</h3>
+<h4>Inventario - Filtros y Permisos</h4>
+<ul>
+<li><strong>Filtro por estado</strong>: Nuevo parámetro <code>estado</code> en <code>GET /api/items</code> para filtrar por activo/pendiente/baja</li>
+<li><strong>Eliminar restringido</strong>: <code>DELETE /api/items/{id}</code> solo permite rol admin (antes admin/jefe/carga)</li>
+<li><strong>Movimientos preservados</strong>: Al eliminar ítem, movimientos se conservan con <code>item_id=null</code> (antes se eliminaban)</li>
+<li><strong>Auditoría completa</strong>: Al eliminar se guarda código, categoría, estado, unidad y responsable</li>
+</ul>
 <h4>Auditoría - Mejoras de visualización</h4>
 <ul>
 <li><strong>Detalle de auditoría</strong>: <code>formatearDetalle()</code> ahora detecta estructura <code>antes/despues</code> y solo muestra campos que cambiaron (diff)</li>

@@ -28,6 +28,7 @@ export default function Inventario() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [categoriaId, setCategoriaId] = useState('')
+  const [estadoFilter, setEstadoFilter] = useState('')
   const [page, setPage] = useState(1)
   const [lastPage, setLastPage] = useState(1)
   const [pageSize, setPageSize] = useState(() => {
@@ -54,11 +55,13 @@ export default function Inventario() {
   }
 
   const puedeEditar = ['admin', 'jefe', 'carga'].includes(user?.rol?.slug)
+  const puedeEliminar = user?.rol?.slug === 'admin'
 
   const cargarItems = useCallback(() => {
     const params = new URLSearchParams()
     if (search) params.set('search', search)
     if (categoriaId) params.set('categoria_id', categoriaId)
+    if (estadoFilter) params.set('estado', estadoFilter)
     params.set('page', page)
     params.set('per_page', pageSize)
     setLoading(true)
@@ -75,12 +78,16 @@ export default function Inventario() {
         setLastPage(1)
       })
       .finally(() => setLoading(false))
-  }, [search, categoriaId, page, pageSize])
+  }, [search, categoriaId, estadoFilter, page, pageSize])
 
   useEffect(() => {
     api.get('/categorias').then((res) => setCategorias(res.data.categorias || [])).catch(() => {})
     api.get('/unidades').then((res) => setUnidades((res.data.unidades || []).filter((u) => u.activa))).catch(() => {})
   }, [])
+
+  useEffect(() => {
+    setPage(1)
+  }, [estadoFilter])
 
   useEffect(() => {
     const timeout = setTimeout(cargarItems, 300)
@@ -193,9 +200,11 @@ export default function Inventario() {
                     <button className="btn-icon-action btn-icon-action--edit" onClick={() => setEditando(item)} aria-label={`Editar ${item.codigo_unico}`} title="Editar">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </button>
-                    <button className="btn-icon-action btn-icon-action--delete" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`} title="Eliminar">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                    </button>
+                    {puedeEliminar && (
+                      <button className="btn-icon-action btn-icon-action--delete" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`} title="Eliminar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                      </button>
+                    )}
                   </>
                 )}
               </div>
@@ -271,6 +280,20 @@ export default function Inventario() {
               .map((c) => (
                 <option key={c.id} value={c.id}>{c.codigo} – {c.nombre}</option>
               ))}
+          </select>
+          <select
+            className="filter-select"
+            value={estadoFilter}
+            onChange={(e) => {
+              setEstadoFilter(e.target.value)
+              setPage(1)
+            }}
+            aria-label="Filtrar por estado"
+          >
+            <option value="">Todos los estados</option>
+            <option value="activo">Activo</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="baja">Baja</option>
           </select>
           <span className="result-count">{total} ítems</span>
         </div>
@@ -349,7 +372,9 @@ export default function Inventario() {
                     {puedeEditar && item.estado !== 'baja' && (
                       <>
                         <button className="btn btn-sm btn-secondary" onClick={() => setEditando(item)}>Editar</button>
-                        <button className="btn btn-sm btn-danger" onClick={() => setEliminando(item)}>Eliminar</button>
+                        {puedeEliminar && (
+                          <button className="btn btn-sm btn-danger" onClick={() => setEliminando(item)}>Eliminar</button>
+                        )}
                     </>
                   )}
                 </div>
@@ -409,7 +434,7 @@ export default function Inventario() {
       <Modal open={Boolean(eliminando)} title={`Eliminar ítem ${eliminando?.codigo_unico ?? ''}`} onClose={() => setEliminando(null)}>
         <p className="muted">
           ¿Seguro que deseas eliminar el ítem <strong>{eliminando?.codigo_unico}</strong>?
-          Esta acción no se puede deshacer y eliminará sus movimientos asociados.
+          El ítem será eliminado permanentemente. Sus movimientos se conservarán como históricos.
         </p>
         <Aviso mensaje={error} onCerrar={() => setError('')} />
         <div className="form-actions">

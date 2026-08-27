@@ -408,12 +408,12 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 
 | Método | Endpoint | Descripción | Autenticación | Roles |
 |--------|----------|-------------|---------------|-------|
-| GET | /api/items | Listar ítems (20/pág) | Sí | Todos |
+| GET | /api/items | Listar ítems (25/pág) | Sí | Todos |
 | POST | /api/items | Crear ítem | Sí | admin, jefe, carga |
 | GET | /api/items/{id} | Ver detalle | Sí | Todos |
 | PUT | /api/items/{id} | Actualizar ítem | Sí | admin, jefe, carga |
 | POST | /api/items/{id}/reactivar | Reactivar ítem dado de baja | Sí | admin, jefe |
-| DELETE | /api/items/{id} | Eliminar ítem | Sí | admin, jefe, carga |
+| DELETE | /api/items/{id} | Eliminar ítem | Sí | admin |
 
 **Parámetros de filtro para GET /api/items:**
 
@@ -504,7 +504,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 
 | Método | Endpoint | Descripción | Autenticación | Roles |
 |--------|----------|-------------|---------------|-------|
-| GET | /api/auditoria | Listar registros (50/pág) | Sí | admin, jefe |
+| GET | /api/auditoria | Listar registros (50/pág, configurable) | Sí | admin, jefe |
 
 **Parámetros de filtro para GET /api/auditoria:**
 
@@ -572,7 +572,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Ver Inventario | Si | Si | Si | Si |
 | Crear Ítem | Si | Si | Si | No |
 | Editar Ítem | Si | Si | Si | No |
-| Eliminar Ítem | Si | Si | Si | No |
+| Eliminar Ítem | Si | No | No | No |
 | Ver Detalle Ítem | Si | Si | Si | Si |
 | Ver Motivo Baja | Si | Si | No | No |
 | Reactivar Ítem | Si | Si | No | No |
@@ -928,6 +928,12 @@ npm run dev
 ## 14. Changelog
 
 ### v3.2 (27 agosto 2026)
+
+#### Inventario - Filtros y Permisos
+- **Filtro por estado**: Nuevo parámetro `estado` en `GET /api/items` para filtrar por activo/pendiente/baja
+- **Eliminar restringido**: `DELETE /api/items/{id}` solo permite rol admin (antes admin/jefe/carga)
+- **Movimientos preservados**: Al eliminar ítem, movimientos se conservan con `item_id=null` (antes se eliminaban)
+- **Auditoría completa**: Al eliminar se guarda código, categoría, estado, unidad y responsable
 
 #### Auditoría - Mejoras de visualización
 - **Detalle de auditoría**: `formatearDetalle()` ahora detecta estructura `antes/despues` y solo muestra campos que cambiaron (diff)

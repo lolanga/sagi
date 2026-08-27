@@ -256,16 +256,19 @@ if ($request->filled('search')) {
                 'accion' => 'eliminar',
                 'entidad' => 'item',
                 'entidad_id' => $item->id,
-                'detalle' => ['codigo' => $item->codigo_unico],
+                'detalle' => [
+                    'codigo' => $item->codigo_unico,
+                    'categoria' => $item->categoria?->codigo,
+                    'estado' => $item->estado,
+                    'unidad' => $item->unidad?->nombre,
+                    'responsable' => $item->responsable?->name,
+                ],
             ]);
 
-            $movimientoIds = $item->movimientos()->pluck('id');
-
             Alerta::where('item_id', $item->id)
-                ->orWhereIn('movimiento_id', $movimientoIds)
-                ->update(['item_id' => null, 'movimiento_id' => null]);
+                ->update(['item_id' => null]);
 
-            $item->movimientos()->delete();
+            $item->movimientos()->update(['item_id' => null]);
             $item->delete();
         });
 
