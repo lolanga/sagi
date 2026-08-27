@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js'
 import { Bar, Doughnut } from 'react-chartjs-2'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 import api from '../services/api'
 import Layout from '../components/Layout'
 import '../styles/dashboard.css'
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement)
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, ChartDataLabels)
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ total: 0, activos: 0, movimientos_pendientes: 0, alertas_activas: 0 })
@@ -116,6 +117,18 @@ export default function Dashboard() {
                       maintainAspectRatio: false,
                       plugins: {
                         legend: { position: 'bottom', labels: { color: '#a0aec0', padding: 12, font: { size: 11 } } },
+                        datalabels: {
+                          color: '#fff',
+                          font: { weight: 'bold', size: 12 },
+                          formatter: (value, ctx) => {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0)
+                            if (total === 0) return ''
+                            const pct = Math.round((value / total) * 100)
+                            return value > 0 ? `${value}\n(${pct}%)` : ''
+                          },
+                          display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0,
+                          textAlign: 'center',
+                        },
                       },
                     }}
                   />

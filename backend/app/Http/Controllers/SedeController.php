@@ -59,8 +59,15 @@ class SedeController extends Controller
             $validated['nombre'] = $nombre;
         }
 
-        $antes = $sede->activa;
+        $antes = [
+            'nombre' => $sede->nombre,
+            'activa' => $sede->activa,
+        ];
         $sede->update($validated);
+        $despues = [
+            'nombre' => $sede->nombre,
+            'activa' => $sede->activa,
+        ];
 
         if (array_key_exists('activa', $validated)) {
             $accion = $sede->activa ? 'activar' : 'desactivar';
@@ -73,7 +80,7 @@ class SedeController extends Controller
             'accion' => $accion,
             'entidad' => 'sede',
             'entidad_id' => $sede->id,
-            'detalle' => ['nombre' => $sede->nombre, 'activa_anterior' => $antes, 'activa_nueva' => $sede->activa],
+            'detalle' => ['antes' => $antes, 'despues' => $despues],
         ]);
 
         return response()->json(['sede' => $sede]);

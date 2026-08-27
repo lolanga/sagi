@@ -78,8 +78,17 @@ class UnidadController extends Controller
             $validated['nombre'] = trim((string) $request->input('nombre'));
         }
 
-        $antes = $unidad->activa;
+        $antes = [
+            'nombre' => $unidad->nombre,
+            'activa' => $unidad->activa,
+            'sede' => $unidad->sede?->nombre,
+        ];
         $unidad->update($validated);
+        $despues = [
+            'nombre' => $unidad->nombre,
+            'activa' => $unidad->activa,
+            'sede' => $unidad->sede?->nombre,
+        ];
 
         if (array_key_exists('activa', $validated)) {
             $accion = $unidad->activa ? 'activar' : 'desactivar';
@@ -92,7 +101,7 @@ class UnidadController extends Controller
             'accion' => $accion,
             'entidad' => 'unidad',
             'entidad_id' => $unidad->id,
-            'detalle' => ['nombre' => $unidad->nombre, 'activa_anterior' => $antes, 'activa_nueva' => $unidad->activa],
+            'detalle' => ['antes' => $antes, 'despues' => $despues],
         ]);
 
         return response()->json(['unidad' => $unidad->load('sede')]);
