@@ -175,8 +175,13 @@ if ($request->filled('search')) {
 
         $user = $request->user();
         $item->load(['categoria', 'tipoItem', 'unidad']);
-        $antesNumericos = $item->only(['estado_conservacion', 'cantidad']);
         $antesDinamicos = $item->valores_dinamicos ?? [];
+        $antesRef = [
+            'categoria' => $item->categoria->codigo ?? '-',
+            'tipo_item' => $item->tipoItem->nombre ?? '-',
+            'unidad' => $item->unidad->nombre ?? '-',
+        ];
+        $antesNumRef = $item->only(['estado_conservacion', 'cantidad']);
 
         $datos = $validated;
         if (array_key_exists('valores', $datos)) {
@@ -188,12 +193,7 @@ if ($request->filled('search')) {
         $item->load(['categoria', 'tipoItem', 'unidad']);
         $despuesDinamicos = $item->valores_dinamicos ?? [];
 
-        $antes = array_merge([
-            'categoria' => $item->categoria->codigo ?? '-',
-            'tipo_item' => $item->tipoItem->nombre ?? '-',
-            'unidad' => $item->unidad->nombre ?? '-',
-        ], $antesNumericos);
-
+        $antes = array_merge($antesRef, $antesNumRef);
         $despues = array_merge([
             'categoria' => $item->categoria->codigo ?? '-',
             'tipo_item' => $item->tipoItem->nombre ?? '-',
