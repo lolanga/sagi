@@ -16,6 +16,10 @@ class AuditoriaController extends Controller
             $query->where('entidad', $request->string('entidad'));
         }
 
+        if ($request->filled('entidad_id')) {
+            $query->where('entidad_id', $request->integer('entidad_id'));
+        }
+
         if ($request->filled('accion')) {
             $query->where('accion', $request->string('accion'));
         }
@@ -32,6 +36,6 @@ class AuditoriaController extends Controller
             $query->whereDate('created_at', '<=', $request->string('hasta'));
         }
 
-        return response()->json($query->paginate(50)->withQueryString());
+        return response()->json($query->paginate($request->integer('per_page', 50))->withQueryString());
     }
 }

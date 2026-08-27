@@ -21,6 +21,7 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
   const { user } = useAuth()
   const toast = useToast()
   const [item, setItem] = useState(null)
+  const [auditLogs, setAuditLogs] = useState([])
   const [error, setError] = useState('')
   const [reactivando, setReactivando] = useState(false)
   const [motivoReactivar, setMotivoReactivar] = useState('')
@@ -33,6 +34,11 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
       .get(`/items/${itemId}`)
       .then((res) => setItem(res.data.item))
       .catch(() => setError('No se pudo cargar el detalle del ítem.'))
+
+    api
+      .get(`/auditoria?entidad=item&entidad_id=${itemId}`)
+      .then((res) => setAuditLogs(res.data.data || []))
+      .catch(() => {})
   }, [itemId])
 
   if (error) {
@@ -74,6 +80,40 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
     const d = new Date(f)
     return isNaN(d) ? '-' : d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
   }
+
+  const formatearCambios = (detalle) => {
+    if (!detalle) return ''
+    if (detalle.antes && detalle.despues) {
+      const campos = new Set([...Object.keys(detalle.antes), ...Object.keys(detalle.despues)])
+      const cambios = []
+      for (const k of campos) {
+        const a = detalle.antes[k]
+        const d = detalle.despues[k]
+        const av = typeof a === 'object' ? JSON.stringify(a) : a
+        const dv = typeof d === 'object' ? JSON.stringify(d) : d
+        if (av !== dv) {
+          cambios.push({ campo: k, antes: av ?? '(vacío)', despues: dv ?? '(vacío)' })
+        }
+      }
+      return cambios
+    }
+    return Object.entries(detalle)
+      .filter(([, v]) => v !== null && v !== undefined && v !== '')
+      .map(([k, v]) => ({ campo: k, antes: null, despues: typeof v === 'object' ? JSON.stringify(v) : v }))
+  }
+
+  const timelineItems = [
+    ...(item?.movimientos || []).map((m) => ({
+      tipo: 'movimiento',
+      fecha: m.created_at,
+      data: m,
+    })),
+    ...auditLogs.map((a) => ({
+      tipo: 'auditoria',
+      fecha: a.created_at,
+      data: a,
+    })),
+  ].sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
 
   return (
     <div className="detalle">
@@ -117,37 +157,68 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
       </div>
 
       <div className="detalle-card">
-        <h4>Historial de movimientos ({item.movimientos?.length || 0})</h4>
-        {item.movimientos && item.movimientos.length > 0 ? (
+        <h4>Historial ({timelineItems.length})</h4>
+        {timelineItems.length > 0 ? (
           <div className="timeline-scroll">
             <div className="timeline">
-              {item.movimientos.map((m, idx) => (
-                <div key={m.id} className={`timeline-item ${m.estado === 'aprobado' ? 'timeline-aprobado' : m.estado === 'rechazado' ? 'timeline-rechazado' : 'timeline-pendiente'}`}>
-                  <div className="timeline-dot" />
-                  <div className="timeline-content">
-                    <div className="timeline-header">
-                      <span className={`badge ${badgeTipo[m.tipo] || ''}`}>{m.tipo}</span>
-                      <span className="timeline-fecha">{formatearFecha(m.created_at)}</span>
-                      <span className={`badge ${badgeEstado[m.estado] || ''}`}>{m.estado}</span>
-                    </div>
-                    <div className="timeline-body">
-                      {m.tipo === 'traslado' && (
-                        <p><strong>Origen:</strong> {m.unidad_origen?.nombre ?? '-'} → <strong>Destino:</strong> {m.unidad_destino?.nombre ?? '-'}</p>
-                      )}
-                      {m.tipo === 'baja' && (
-                        <p><strong>Origen:</strong> {m.unidad_origen?.nombre ?? '-'}</p>
-                      )}
-                      <p><strong>Motivo:</strong> {m.motivo}</p>
-                      <p className="timeline-meta">
-                        <span>Solicitó: {m.solicitante?.name ?? '-'}</span>
-                        {m.validador && <span> · Validó: {m.validador?.name}</span>}
-                      </p>
-                      {m.motivo_rechazo && (
-                        <p className="timeline-rechazo"><strong>Motivo rechazo:</strong> {m.motivo_rechazo}</p>
-                      )}
+              {timelineItems.map((entry, idx) => (
+                entry.tipo === 'movimiento' ? (
+                  <div key={`m-${entry.data.id}`} className={`timeline-item ${entry.data.estado === 'aprobado' ? 'timeline-aprobado' : entry.data.estado === 'rechazado' ? 'timeline-rechazado' : 'timeline-pendiente'}`}>
+                    <div className="timeline-dot" />
+                    <div className="timeline-content">
+                      <div className="timeline-header">
+                        <span className={`badge ${badgeTipo[entry.data.tipo] || ''}`}>{entry.data.tipo}</span>
+                        <span className="timeline-fecha">{formatearFecha(entry.fecha)}</span>
+                        <span className={`badge ${badgeEstado[entry.data.estado] || ''}`}>{entry.data.estado}</span>
+                      </div>
+                      <div className="timeline-body">
+                        {entry.data.tipo === 'traslado' && (
+                          <p><strong>Origen:</strong> {entry.data.unidad_origen?.nombre ?? '-'} → <strong>Destino:</strong> {entry.data.unidad_destino?.nombre ?? '-'}</p>
+                        )}
+                        {entry.data.tipo === 'baja' && (
+                          <p><strong>Origen:</strong> {entry.data.unidad_origen?.nombre ?? '-'}</p>
+                        )}
+                        <p><strong>Motivo:</strong> {entry.data.motivo}</p>
+                        <p className="timeline-meta">
+                          <span>Solicitó: {entry.data.solicitante?.name ?? '-'}</span>
+                          {entry.data.validador && <span> · Validó: {entry.data.validador?.name}</span>}
+                        </p>
+                        {entry.data.motivo_rechazo && (
+                          <p className="timeline-rechazo"><strong>Motivo rechazo:</strong> {entry.data.motivo_rechazo}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div key={`a-${entry.data.id}`} className="timeline-item timeline-audit">
+                    <div className="timeline-dot timeline-dot-audit" />
+                    <div className="timeline-content">
+                      <div className="timeline-header">
+                        <span className="badge badge-audit">{entry.data.accion}</span>
+                        <span className="timeline-fecha">{formatearFecha(entry.fecha)}</span>
+                      </div>
+                      <div className="timeline-body">
+                        <p className="timeline-meta"><span>Por: {entry.data.user?.name ?? '-'}</span></p>
+                        {entry.data.accion === 'editar' && entry.data.detalle ? (
+                          <div className="timeline-cambios">
+                            {formatearCambios(entry.data.detalle).map((c, i) => (
+                              <div key={i} className="timeline-cambio">
+                                <span className="timeline-campo">{c.campo}</span>
+                                {c.antes !== null ? (
+                                  <span className="timeline-valores"><span className="val-antes">{c.antes}</span> → <span className="val-despues">{c.despues}</span></span>
+                                ) : (
+                                  <span className="timeline-valores">{c.despues}</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p>{entry.data.detalle ? JSON.stringify(entry.data.detalle) : '-'}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
               ))}
             </div>
           </div>

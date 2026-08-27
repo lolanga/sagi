@@ -30,6 +30,9 @@ export default function Inventario() {
   const [categoriaId, setCategoriaId] = useState('')
   const [page, setPage] = useState(1)
   const [lastPage, setLastPage] = useState(1)
+  const [pageSize, setPageSize] = useState(() => {
+    try { return Number(localStorage.getItem('sagi_page_size')) || 25 } catch { return 25 }
+  })
   const [showAlta, setShowAlta] = useState(false)
   const [editando, setEditando] = useState(null)
   const [viendo, setViendo] = useState(null)
@@ -57,6 +60,7 @@ export default function Inventario() {
     if (search) params.set('search', search)
     if (categoriaId) params.set('categoria_id', categoriaId)
     params.set('page', page)
+    params.set('per_page', pageSize)
     setLoading(true)
     api
       .get(`/items?${params.toString()}`)
@@ -71,7 +75,7 @@ export default function Inventario() {
         setLastPage(1)
       })
       .finally(() => setLoading(false))
-  }, [search, categoriaId, page])
+  }, [search, categoriaId, page, pageSize])
 
   useEffect(() => {
     api.get('/categorias').then((res) => setCategorias(res.data.categorias || [])).catch(() => {})
@@ -144,16 +148,16 @@ export default function Inventario() {
   }, [items, sortKey, sortDir])
 
   const allColumns = useMemo(() => [
-    { key: 'codigo_unico', label: 'Código', mandatory: true, flex: '1.4' },
-    { key: 'categoria', label: 'Categoría', flex: '0.7' },
-    { key: 'detalle', label: 'Detalle', flex: '2' },
-    { key: 'estado', label: 'Estado', mandatory: true, flex: '0.6' },
-    { key: 'estado_conservacion', label: 'Conservación', flex: '0.8' },
+    { key: 'codigo_unico', label: 'Código', mandatory: true, flex: '1.5' },
+    { key: 'categoria', label: 'Cat.', flex: '0.5' },
+    { key: 'detalle', label: 'Detalle', flex: '2.5' },
+    { key: 'estado', label: 'Estado', mandatory: true, flex: '0.5' },
+    { key: 'estado_conservacion', label: 'Conserv.', flex: '0.7' },
     { key: 'cantidad', label: 'Cant.', flex: '0.4' },
-    { key: 'unidad', label: 'Unidad', flex: '0.7' },
-    { key: 'responsable', label: 'Responsable', flex: '0.9' },
-    { key: 'motivo_baja', label: 'Motivo Baja', flex: '1', showFor: ['admin', 'jefe'] },
-    { key: 'acciones', label: '', mandatory: true, flex: '1.2' },
+    { key: 'unidad', label: 'Unidad', flex: '0.5' },
+    { key: 'responsable', label: 'Responsable', flex: '0.7' },
+    { key: 'motivo_baja', label: 'Motivo Baja', flex: '0.8', showFor: ['admin', 'jefe'] },
+    { key: 'acciones', label: 'Acciones', mandatory: true, flex: '0.8' },
   ], [])
 
   const columns = useMemo(() =>
@@ -180,12 +184,18 @@ export default function Inventario() {
               </span>
             ) : '-'
           : col.key === 'acciones' ? (item) => (
-              <div className="row-actions" onClick={(e) => e.stopPropagation()}>
-                <button className="btn-link btn-link-ver" onClick={() => setViendo(item)} aria-label={`Ver ${item.codigo_unico}`}>Ver</button>
+              <div className="row-actions-icons" onClick={(e) => e.stopPropagation()}>
+                <button className="btn-icon-action" onClick={() => setViendo(item)} aria-label={`Ver ${item.codigo_unico}`} title="Ver detalle">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
                 {puedeEditar && item.estado !== 'baja' && (
                   <>
-                    <button className="btn-link btn-link-editar" onClick={() => setEditando(item)} aria-label={`Editar ${item.codigo_unico}`}>Editar</button>
-                    <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`}>Eliminar</button>
+                    <button className="btn-icon-action btn-icon-action--edit" onClick={() => setEditando(item)} aria-label={`Editar ${item.codigo_unico}`} title="Editar">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button className="btn-icon-action btn-icon-action--delete" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`} title="Eliminar">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </button>
                   </>
                 )}
               </div>
@@ -301,12 +311,14 @@ export default function Inventario() {
                   </button>
                 ))}
               </div>
-              <VirtualTable
-                items={sortedItems}
-                columns={columns}
-                onRowClick={(item) => setViendo(item)}
-                aria-label="Inventario de ítems"
-              />
+              <div className="virtual-table-wrapper">
+                <VirtualTable
+                  items={sortedItems}
+                  columns={columns}
+                  onRowClick={(item) => setViendo(item)}
+                  aria-label="Inventario de ítems"
+                />
+              </div>
             </>
           ) : (
             <div className="cards-grid">
@@ -348,7 +360,13 @@ export default function Inventario() {
         </>
       )}
 
-      <Pagination page={page} lastPage={lastPage} onPageChange={setPage} />
+      <Pagination
+        page={page}
+        lastPage={lastPage}
+        total={total}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => { setPageSize(size); setPage(1) }}
+      />
 
       <Modal open={showAlta} title="Registrar alta de ítem" onClose={() => setShowAlta(false)} wide>
         <ItemForm

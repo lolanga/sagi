@@ -2,8 +2,8 @@
 title: "SAGI - Manual de Usuario"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
-date: "26 de agosto de 2026"
-version: "3.0"
+date: "27 de agosto de 2026"
+version: "3.2"
 ---
 
 # SAGI - Manual de Usuario
@@ -11,7 +11,7 @@ version: "3.0"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 3.0 | Fecha: 26 de agosto de 2026
+Versión: 3.2 | Fecha: 27 de agosto de 2026
 
 ---
 
@@ -209,15 +209,16 @@ Haga clic en **"Inventario"** en el menú lateral.
 
 | Columna | Descripción | Ancho |
 |---------|-------------|-------|
-| Código | Código único del ítem (ej: A1-03-47-000001) | 1.4 |
-| Categoría | Código de categoría | 0.7 |
-| Detalle | Campos dinámicos del ítem | 2.0 |
-| Estado | Estado del ítem (activo/pendiente/baja) | 0.6 |
-| Conservación | Estado de conservación | 0.8 |
+| Código | Código único del ítem (ej: A1-03-47-000001) | 1.5 |
+| Categoría | Código de categoría | 0.5 |
+| Detalle | Campos dinámicos del ítem | 2.5 |
+| Estado | Estado del ítem (activo/pendiente/baja) | 0.5 |
+| Conservación | Estado de conservación | 0.7 |
 | Cant. | Cantidad | 0.4 |
-| Unidad | Unidad de destino | 0.7 |
-| Responsable | Persona responsable | 0.9 |
-| Acciones | Botones de acción | 1.2 |
+| Unidad | Unidad de destino | 0.5 |
+| Responsable | Persona responsable | 0.7 |
+| Motivo Baja | Razón de la baja (solo admin/jefe) | 0.8 |
+| Acciones | Iconos de ver, editar, eliminar | 0.8 |
 
 ### 6.2 Configurar Columnas (Escritorio)
 
@@ -240,7 +241,7 @@ Su configuración se guarda automáticamente y se recuerda en su próxima visita
 
 | Filtro | Uso |
 |--------|-----|
-| Campo de búsqueda | Buscar por código, detalle, unidad de destino o responsable. Use el botón "×" para limpiar. |
+| Campo de búsqueda | Buscar por código, estado conservación, estado, valores dinámicos, categoría, elemento, unidad o responsable. Use el botón "×" para limpiar. |
 | Categoría (desplegable) | Filtrar por categoría específica |
 
 **Nota:** Al cambiar búsqueda o categoría, la paginación vuelve a la página 1.
@@ -276,7 +277,9 @@ Su configuración se guarda automáticamente y se recuerda en su próxima visita
 |---------|-----------|
 | Datos del Ítem | Código, categoría, elemento, estado, conservación, cantidad, unidad, responsable, fecha |
 | Detalles Adicionales | Campos dinámicos específicos de la categoría |
-| Historial de Movimientos | Timeline visual de todos los movimientos del ítem |
+| Historial | Timeline unificado de movimientos (altas, traslados, bajas) y ediciones del ítem |
+
+**Historial unificado:** El timeline muestra tanto los movimientos del ítem como las ediciones realizadas, ordenados cronológicamente. Las ediciones se identifican con un badge azul y muestran qué campos cambiaron.
 
 ### 6.5 Editar un Ítem
 
@@ -577,9 +580,9 @@ Haga clic en **"Auditoría"** en el menú lateral.
 | Usuario | Quién realizó la acción |
 | Acción | Tipo de acción realizada |
 | Entidad | Entidad afectada |
-| Detalle | Información adicional |
+| Detalle | Solo muestra los campos que cambiaron (ej: `estado: Malo → Bueno`) |
 
-**Paginación:** Use los botones **"Anterior"** y **"Siguiente"** para navegar entre páginas de registros.
+**Paginación:** Use el selector de cantidad (10/25/50) y los botones de navegación para recorrer los registros.
 
 ### 12.3 Exportar Auditoría
 
@@ -643,11 +646,27 @@ No, solo desaparecen de los formularios de selección.
 
 ### ¿Cómo funciona la paginación?
 
-Los ítems se muestran 20 por página. Use "Anterior" y "Siguiente" para navegar.
+Los ítems se muestran 25 por página (configurable: 10/25/50). Use "Anterior" y "Siguiente" para navegar. Su preferencia se guarda automáticamente.
 
 ---
 
 ## Changelog
+
+### v3.2 (27 agosto 2026)
+
+#### Auditoría
+- **Detalle mejorado**: Solo muestra los campos que cambiaron en cada edición (diff antes/después)
+- **Paginación mejorada**: Selector de cantidad de registros (10/25/50) reemplaza paginación simple
+
+#### Historial del Ítem
+- **Timeline unificado**: Combina movimientos (altas, traslados, bajas) y ediciones en un solo historial
+- **Ediciones visibles**: Las ediciones del ítem aparecen con badge azul mostrando qué campos cambiaron
+- **Orden cronológico**: Todos los eventos se muestran de más reciente a más antiguo
+
+#### Responsive
+- **Modal mejorado**: Se ajusta al alto de la pantalla en desktop, tablet y móvil
+- **Navegación visible**: Botón "Cerrar" siempre visible en todos los tamaños de pantalla
+- **Tabla optimizada**: Iconos de acciones más compactos, mejor uso del espacio
 
 ### v3.0 (26 agosto 2026)
 

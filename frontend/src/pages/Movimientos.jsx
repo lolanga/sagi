@@ -183,47 +183,85 @@ export default function Movimientos() {
 
       <Modal open={showNuevo} title="Nueva solicitud de movimiento" onClose={() => setShowNuevo(false)} wide>
         <form onSubmit={guardar} className="item-form">
-          <div className="form-grid">
-            <div className="field">
-              <label htmlFor="m-tipo">Tipo *</label>
-              <select id="m-tipo" value={tipo} onChange={(e) => setTipo(e.target.value)} required>
-                {tiposMovimiento.map((t) => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
-                ))}
-              </select>
-            </div>
-            <div className="field">
-              <label htmlFor="m-item">Ítem *</label>
-              <select id="m-item" value={itemId} onChange={(e) => setItemId(e.target.value)} required>
-                <option value="">Seleccionar ítem...</option>
-                {items.map((i) => (
-                  <option key={i.id} value={i.id}>{i.codigo_unico} · {i.tipo_item?.nombre ?? i.categoria?.codigo}</option>
-                ))}
-              </select>
-            </div>
-            {tipo === 'traslado' && (
+          <fieldset className="form-fieldset">
+            <legend>Datos del movimiento</legend>
+            <div className="form-grid">
               <div className="field">
-                <label htmlFor="m-unidad">Unidad de destino *</label>
-                <select id="m-unidad" value={unidadDestino} onChange={(e) => setUnidadDestino(e.target.value)} required>
-                  <option value="">Seleccionar unidad...</option>
-                  {unidades.map((u) => (
-                    <option key={u.id} value={u.id}>{u.nombre} ({u.sede?.nombre ?? ''})</option>
+                <label htmlFor="m-tipo">
+                  <span className="field-icon">🔄</span>
+                  Tipo de movimiento *
+                </label>
+                <select id="m-tipo" value={tipo} onChange={(e) => setTipo(e.target.value)} required>
+                  {tiposMovimiento.map((t) => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
                   ))}
                 </select>
               </div>
-            )}
-            <div className="field field-full">
-              <label htmlFor="m-motivo">Motivo *</label>
-              <input
-                id="m-motivo"
-                type="text"
-                value={motivo}
-                onChange={(e) => setMotivo(e.target.value)}
-                placeholder={tipo === 'traslado' ? 'Ej. Reasignación de equipo' : 'Ej. Obsolescencia, rotura total'}
-                required
-              />
+              <div className="field">
+                <label htmlFor="m-item">
+                  <span className="field-icon">📦</span>
+                  Ítem *
+                </label>
+                <select id="m-item" value={itemId} onChange={(e) => setItemId(e.target.value)} required>
+                  <option value="">Seleccionar ítem...</option>
+                  {items.map((i) => (
+                    <option key={i.id} value={i.id}>{i.codigo_unico} · {i.tipo_item?.nombre ?? i.categoria?.codigo}</option>
+                  ))}
+                </select>
+              </div>
+              {tipo === 'traslado' && (
+                <div className="field">
+                  <label htmlFor="m-unidad">
+                    <span className="field-icon">🏢</span>
+                    Unidad de destino *
+                  </label>
+                  <select id="m-unidad" value={unidadDestino} onChange={(e) => setUnidadDestino(e.target.value)} required>
+                    <option value="">Seleccionar unidad...</option>
+                    {unidades.map((u) => (
+                      <option key={u.id} value={u.id}>{u.nombre} ({u.sede?.nombre ?? ''})</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className="field field-full">
+                <label htmlFor="m-motivo">
+                  <span className="field-icon">💬</span>
+                  Motivo *
+                </label>
+                <input
+                  id="m-motivo"
+                  type="text"
+                  value={motivo}
+                  onChange={(e) => setMotivo(e.target.value)}
+                  placeholder={tipo === 'traslado' ? 'Ej. Reasignación de equipo' : 'Ej. Obsolescencia, rotura total'}
+                  required
+                />
+              </div>
             </div>
-          </div>
+          </fieldset>
+
+          {itemId && tipo === 'traslado' && (() => {
+            const itemSeleccionado = items.find((i) => String(i.id) === String(itemId))
+            const unidadOrigen = itemSeleccionado?.unidad?.nombre ?? 'Sin unidad actual'
+            const unidadDestinoSeleccionada = unidades.find((u) => String(u.id) === String(unidadDestino))
+            const destino = unidadDestinoSeleccionada
+              ? `${unidadDestinoSeleccionada.nombre} (${unidadDestinoSeleccionada.sede?.nombre ?? ''})`
+              : 'Sin seleccionar'
+            return (
+              <div className="movimiento-flujo">
+                <div className="movimiento-flujo-item">
+                  <span className="movimiento-flujo-label">Origen</span>
+                  <span className="movimiento-flujo-valor">{unidadOrigen}</span>
+                </div>
+                <span className="movimiento-flujo-arrow">→</span>
+                <div className="movimiento-flujo-item">
+                  <span className="movimiento-flujo-label">Destino</span>
+                  <span className="movimiento-flujo-valor">{destino}</span>
+                </div>
+              </div>
+            )
+          })()}
+
           <Aviso mensaje={error} onCerrar={() => setError('')} />
           <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={() => setShowNuevo(false)}>Cancelar</button>

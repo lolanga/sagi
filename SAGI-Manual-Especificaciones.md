@@ -3,7 +3,7 @@ title: "SAGI - Manual de Especificaciones Técnicas"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
 date: "27 de agosto de 2026"
-version: "3.1"
+version: "3.2"
 ---
 
 # SAGI - Manual de Especificaciones Técnicas
@@ -11,7 +11,7 @@ version: "3.1"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 3.1 | Fecha: 27 de agosto de 2026 | Estado: Producción
+Versión: 3.2 | Fecha: 27 de agosto de 2026 | Estado: Producción
 
 ---
 
@@ -420,6 +420,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Parámetro | Tipo | Descripción |
 |-----------|------|-------------|
 | search | string | Búsqueda por código, valores dinámicos, unidad de destino o responsable |
+| per_page | int | Registros por página (default: 25, max: 100) |
 | categoria_id | int | Filtrar por categoría |
 | estado_conservacion | string | Filtrar por estado de conservación |
 | estado | string | Filtrar por estado (activo/pendiente/baja) |
@@ -510,8 +511,10 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Parámetro | Tipo | Descripción |
 |-----------|------|-------------|
 | entidad | string | Filtrar por entidad |
+| entidad_id | int | Filtrar por ID de entidad específica |
 | accion | string | Filtrar por acción |
 | user_id | int | Filtrar por usuario |
+| per_page | int | Registros por página (default: 50, max: 100) |
 | desde | date | Fecha inicio (YYYY-MM-DD) |
 | hasta | date | Fecha fin (YYYY-MM-DD) |
 
@@ -722,7 +725,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Modal | Diálogo modal genérico (close on Escape, overlay click, body scroll lock) |
 | Aviso | Banner de notificación auto-cerrable (5s) |
 | ItemForm | Formulario para crear/editar ítems con validación inline, AbortController, confirmación al cambiar tipo |
-| ItemDetalle | Vista de solo lectura del ítem con timeline de movimientos (scroll 400px) |
+| ItemDetalle | Vista de solo lectura del ítem con timeline unificado de movimientos y auditoría (scroll 300px) |
 | VirtualTable | Tabla CSS con flex columns, scroll virtual (max-height: 70vh), columnas configurables |
 | Pagination | Paginador con aria-live="polite", nav semántico |
 | EmptyState | Estado vacío con iconos SVG (search, inventory, alert, box) |
@@ -923,6 +926,31 @@ npm run dev
 ---
 
 ## 14. Changelog
+
+### v3.2 (27 agosto 2026)
+
+#### Auditoría - Mejoras de visualización
+- **Detalle de auditoría**: `formatearDetalle()` ahora detecta estructura `antes/despues` y solo muestra campos que cambiaron (diff)
+- **Filtro entidad_id**: Endpoint `GET /api/auditoria` acepta parámetro `entidad_id` para filtrar por registro específico
+- **Per_page configurable**: Endpoint acepta `per_page` (1-100, default 50)
+- **Paginación unificada**: Auditoría usa componente `Pagination` con selector de cantidad de registros
+
+#### Timeline del ítem unificado
+- **Historial combinado**: `ItemDetalle` carga movimientos + registros de auditoría del ítem
+- **Fusión cronológica**: Ambos tipos de eventos se ordenan por fecha descendente
+- **Ediciones en timeline**: Las ediciones del ítem se muestran con badge azul y diff de cambios (campo: antes → después)
+- **Estilos timeline**: Cards compactas (padding reducido, dots más pequeños, scroll 300px)
+
+#### Responsive - Fixes
+- **Zona muerta 769-900px**: `padding-bottom: 80px` aplicado correctamente para bottom-nav
+- **Overflow imágenes**: Regla global `img, video, embed, iframe { max-width: 100% }`
+- **Modal viewport**: `.modal-wide` usa `max-height: calc(100dvh - 32px)` con flex y body scrollable
+- **Modal responsive**: Breakpoints unificados (768px, 480px) con `dvh` consistente
+- **VirtualTable overflow**: `.virtual-cell:last-child { overflow: visible }` para iconos de acciones
+- **Form selects**: `min-width: 0` previene overflow de selects en grids
+- **Inventario iconos**: Botones de acción compactos (26x26, gap 2px)
+- **Categorías wrap**: `campo-row` con flex-wrap en tablets, touch targets 32x32
+- **Dashboard cards**: Grid `1fr` en 480px (antes forzaba 2 columnas)
 
 ### v3.1 (27 agosto 2026)
 

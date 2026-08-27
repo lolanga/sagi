@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx'
 import api from '../services/api'
 import Aviso from '../components/Aviso'
 import Layout from '../components/Layout'
+import Pagination from '../components/Pagination'
 import '../styles/inventario.css'
 
 const entidades = ['auth', 'item', 'categoria', 'tipo_item', 'campo_dinamico', 'movimiento']
@@ -10,6 +11,20 @@ const acciones = ['login', 'crear', 'editar', 'eliminar', 'mover', 'solicitar', 
 
 function formatearDetalle(detalle) {
   if (!detalle) return '-'
+  if (detalle.antes && detalle.despues) {
+    const campos = new Set([...Object.keys(detalle.antes), ...Object.keys(detalle.despues)])
+    const cambios = []
+    for (const k of campos) {
+      const a = detalle.antes[k]
+      const d = detalle.despues[k]
+      const av = typeof a === 'object' ? JSON.stringify(a) : a
+      const dv = typeof d === 'object' ? JSON.stringify(d) : d
+      if (av !== dv) {
+        cambios.push(`${k}: ${av ?? '(vacío)'} → ${dv ?? '(vacío)'}`)
+      }
+    }
+    return cambios.length > 0 ? cambios.join(' · ') : 'Sin cambios detectados'
+  }
   const partes = Object.entries(detalle)
     .filter(([k, v]) => v !== null && v !== undefined && v !== '')
     .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
@@ -25,12 +40,16 @@ export default function Auditoria() {
   const [error, setError] = useState('')
   const [page, setPage] = useState(1)
   const [lastPage, setLastPage] = useState(1)
+  const [pageSize, setPageSize] = useState(() => {
+    try { return Number(localStorage.getItem('sagi_audit_page_size')) || 50 } catch { return 50 }
+  })
 
   const cargar = () => {
     const params = new URLSearchParams()
     if (entidad) params.set('entidad', entidad)
     if (accion) params.set('accion', accion)
     params.set('page', page)
+    params.set('per_page', pageSize)
     setLoading(true)
     api
       .get(`/auditoria?${params.toString()}`)
@@ -46,8 +65,8 @@ export default function Auditoria() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { setPage(1) }, [entidad, accion])
-  useEffect(cargar, [entidad, accion, page])
+  useEffect(() => { setPage(1) }, [entidad, accion, pageSize])
+  useEffect(cargar, [entidad, accion, page, pageSize])
 
   const traerTodo = async () => {
     const base = new URLSearchParams()
@@ -145,50 +164,42 @@ export default function Auditoria() {
           <p>No hay movimientos de auditoría que coincidan con los filtros.</p>
         </div>
       ) : (
-        <div className="table-wrap">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Usuario</th>
-              <th>Acción</th>
-              <th>Entidad</th>
-              <th>Detalle</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((log) => (
-              <tr key={log.id}>
-                <td data-label="Fecha">{new Date(log.created_at).toLocaleString()}</td>
-                <td data-label="Usuario">{log.user?.name}</td>
-                <td data-label="Acción"><span className={`badge badge-accion badge-${log.accion}`}>{log.accion}</span></td>
-                <td data-label="Entidad">{log.entidad}</td>
-                <td data-label="Detalle" className="audit-detalle">{formatearDetalle(log.detalle)}</td>
+        <>
+          <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Entidad</th>
+                <th>Detalle</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        </div>
-      )}
-
-      {lastPage > 1 && (
-        <div className="pagination">
-          <button
-            className={page === 1 ? 'btn btn-secondary disabled' : 'btn btn-secondary'}
-            onClick={() => setPage((p) => p - 1)}
-            disabled={page === 1}
-            aria-label="Página anterior">
-            Anterior
-          </button>
-          <span>Página {page} de {lastPage}</span>
-          <button
-            className={page === lastPage ? 'btn btn-secondary disabled' : 'btn btn-secondary'}
-            onClick={() => setPage((p) => p + 1)}
-            disabled={page === lastPage}
-            aria-label="Página siguiente">
-            Siguiente
-          </button>
-        </div>
+            </thead>
+            <tbody>
+              {logs.map((log) => (
+                <tr key={log.id}>
+                  <td data-label="Fecha">{new Date(log.created_at).toLocaleString()}</td>
+                  <td data-label="Usuario">{log.user?.name}</td>
+                  <td data-label="Acción"><span className={`badge badge-accion badge-${log.accion}`}>{log.accion}</span></td>
+                  <td data-label="Entidad">{log.entidad}</td>
+                  <td data-label="Detalle" className="audit-detalle">{formatearDetalle(log.detalle)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          </div>
+          <Pagination
+            page={page}
+            lastPage={lastPage}
+            total={total}
+            onPageChange={setPage}
+            onPageSizeChange={(size) => {
+              localStorage.setItem('sagi_audit_page_size', size)
+              setPageSize(size)
+            }}
+          />
+        </>
       )}
     </Layout>
   )

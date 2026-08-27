@@ -250,8 +250,8 @@
 }
 
 .campo-row-orden .btn-icon {
-  width: 20px;
-  height: 18px;
+  width: 28px;
+  height: 26px;
   font-size: 11px;
 }
 
@@ -374,7 +374,8 @@
 
 .wizard-steps {
   display: flex;
-  gap: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .wizard-step {
@@ -410,8 +411,8 @@
    ============================================ */
 
 .btn-icon {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -420,6 +421,9 @@
   font-size: 13px;
   line-height: 1;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-icon:hover:not(:disabled) {
@@ -447,7 +451,7 @@
 @media (min-width: 768px) {
   .categorias-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 260px 1fr;
     gap: 20px;
     align-items: start;
   }
@@ -466,14 +470,39 @@
 
   .campo-row-nombre {
     flex: 2;
+    min-width: 120px;
   }
 
   .campo-row-tipo {
     flex: 1;
+    min-width: 90px;
   }
 
   .campo-row-opciones {
     flex: 1.5;
+    min-width: 100px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Tablets (769px - 1024px)
+   ============================================ */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .categorias-layout {
+    grid-template-columns: 240px 1fr;
+  }
+
+  .campo-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .campo-row-nombre,
+  .campo-row-tipo,
+  .campo-row-opciones {
+    flex-basis: calc(50% - 4px);
+    min-width: 0;
   }
 }
 

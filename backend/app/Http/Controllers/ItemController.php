@@ -24,7 +24,16 @@ if ($request->filled('search')) {
             $termino = $request->string('search');
             $query->where(function ($q) use ($termino) {
                 $q->where('codigo_unico', 'like', "%{$termino}%")
+                    ->orWhere('estado_conservacion', 'like', "%{$termino}%")
+                    ->orWhere('estado', 'like', "%{$termino}%")
                     ->orWhereRaw("CAST(valores_dinamicos AS CHAR) LIKE ?", ["%{$termino}%"])
+                    ->orWhereHas('categoria', function ($cq) use ($termino) {
+                        $cq->where('codigo', 'like', "%{$termino}%")
+                            ->orWhere('nombre', 'like', "%{$termino}%");
+                    })
+                    ->orWhereHas('tipoItem', function ($tq) use ($termino) {
+                        $tq->where('nombre', 'like', "%{$termino}%");
+                    })
                     ->orWhereHas('unidad', function ($uq) use ($termino) {
                         $uq->where('nombre', 'like', "%{$termino}%");
                     })
@@ -50,7 +59,8 @@ if ($request->filled('search')) {
             $query->where('unidad_id', $request->integer('unidad_id'));
         }
 
-        $items = $query->paginate(20)->withQueryString();
+        $perPage = min(max($request->integer('per_page', 25), 1), 100);
+        $items = $query->paginate($perPage)->withQueryString();
 
         return response()->json($items);
     }

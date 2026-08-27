@@ -23,7 +23,8 @@
   background-color: var(--color-bg);
   color: var(--color-text);
   flex: 1;
-  min-width: 200px;
+  min-width: 0;
+  width: 100%;
 }
 
 .result-count {
@@ -123,6 +124,65 @@
 
 .row-actions .btn-link.btn-link-danger:hover {
   background-color: rgba(239, 83, 80, 0.25);
+}
+
+/* Acciones por icono SVG */
+.row-actions-icons {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.btn-icon-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-icon-action:hover {
+  background: rgba(74, 143, 212, 0.12);
+  color: var(--color-primary);
+}
+
+.btn-icon-action--edit {
+  color: var(--color-accent);
+}
+
+.btn-icon-action--edit:hover {
+  background: rgba(245, 124, 0, 0.12);
+  color: var(--color-accent);
+}
+
+.btn-icon-action--delete {
+  color: var(--color-danger);
+}
+
+.btn-icon-action--delete:hover {
+  background: rgba(239, 83, 80, 0.12);
+  color: var(--color-danger);
+}
+
+@media (max-width: 1024px) {
+  .btn-icon-action {
+    width: 24px;
+    height: 24px;
+  }
+
+  .btn-icon-action svg {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 .panel-admin {
@@ -514,7 +574,7 @@
 .item-card {
   background: var(--color-white);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 14px;
   display: flex;
   flex-direction: column;
@@ -663,5 +723,60 @@
   .filters-extra--open .result-count {
     text-align: center;
     padding-top: 4px;
+  }
+}
+
+/* ============================================
+   FLUJO DE MOVIMIENTO (Origen → Destino)
+   ============================================ */
+
+.movimiento-flujo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  margin: 16px 0;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.movimiento-flujo-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.movimiento-flujo-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.movimiento-flujo-valor {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.movimiento-flujo-arrow {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .movimiento-flujo {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .movimiento-flujo-arrow {
+    transform: rotate(90deg);
   }
 }
