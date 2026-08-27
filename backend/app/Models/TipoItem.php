@@ -19,4 +19,9 @@ class TipoItem extends Model
     {
         return $this->hasMany(CampoDinamico::class)->orderBy('orden');
     }
+
+    public function items()
+    {
+        return $this->hasMany(Item::class);
+    }
 }
