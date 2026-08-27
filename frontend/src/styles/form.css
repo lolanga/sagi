@@ -1,9 +1,32 @@
+/* ============================================
+   FORMULARIO DE ÍTEM - ESTILOS
+   Mobile-first: estilos base para móvil
+   ============================================ */
+
+/* Grid de campos - Mobile-first: 1 columna */
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: 14px;
 }
 
+/* Fieldset - Agrupación visual */
+.form-fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin: 0 0 16px;
+  background-color: transparent;
+}
+
+.form-fieldset legend {
+  font-weight: 700;
+  font-size: 14px;
+  padding: 0 8px;
+  color: var(--color-text);
+}
+
+/* Campo individual */
 .field {
   display: flex;
   flex-direction: column;
@@ -17,6 +40,14 @@
 .field label {
   font-size: 13px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field-icon {
+  font-size: 14px;
+  opacity: 0.7;
 }
 
 .field input,
@@ -50,7 +81,7 @@
   font-weight: 500;
 }
 
-/* Checkbox dentro de un campo: alineado con el borde del input */
+/* Checkbox dentro de un campo */
 .field > .checkbox-inline {
   align-self: flex-start;
   margin-top: 2px;
@@ -62,6 +93,181 @@
   height: 16px;
   accent-color: var(--color-primary);
 }
+
+/* ============================================
+   BARRA DE PROGRESO
+   ============================================ */
+
+.progress-section {
+  margin-bottom: 20px;
+}
+
+.progress-bar {
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--color-primary);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+.progress-bar-fill--complete {
+  background: var(--color-success);
+}
+
+.progress-text {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: 6px;
+  text-align: right;
+}
+
+/* ============================================
+   CAMPOS ADICIONALES - COLAPSABLE
+   ============================================ */
+
+.campos-adicionales-section {
+  margin-top: 16px;
+}
+
+.campos-adicionales-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  cursor: pointer;
+  padding: 12px 16px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text);
+  transition: background 0.15s;
+}
+
+.campos-adicionales-toggle:hover:not(:disabled) {
+  background: rgba(74, 143, 212, 0.08);
+}
+
+.campos-adicionales-toggle--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.campos-adicionales-toggle-icon {
+  font-size: 10px;
+  transition: transform 0.2s;
+  color: var(--color-muted);
+}
+
+.campos-adicionales-toggle-icon--open {
+  transform: rotate(90deg);
+}
+
+.campos-adicionales-hint {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-left: auto;
+}
+
+.campos-adicionales-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.campos-adicionales-content--open {
+  max-height: 2000px;
+  margin-top: 12px;
+}
+
+/* ============================================
+   TOOLTIP
+   ============================================ */
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tooltip-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-border);
+  color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  transition: background 0.15s;
+}
+
+.tooltip-icon:hover {
+  background: var(--color-primary);
+  color: white;
+}
+
+.tooltip-content {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-text);
+  color: var(--color-bg);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+
+.tooltip-content::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--color-text);
+}
+
+.tooltip-wrapper:hover .tooltip-content {
+  opacity: 1;
+}
+
+/* ============================================
+   CONTADOR DE CARACTERES
+   ============================================ */
+
+.char-counter {
+  font-size: 11px;
+  color: var(--color-muted);
+  text-align: right;
+  margin-top: 2px;
+}
+
+.char-counter--limit {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+/* ============================================
+   CAMPOS DINÁMICOS (LEGACY - mantener compatibilidad)
+   ============================================ */
 
 .campos-dinamicos {
   border: 1px solid var(--color-border);
@@ -77,6 +283,10 @@
   font-size: 14px;
 }
 
+/* ============================================
+   ACCIONES DEL FORMULARIO
+   ============================================ */
+
 .form-error {
   background-color: rgba(239, 83, 80, 0.15);
   color: var(--color-danger);
@@ -91,6 +301,8 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
 }
 
 .muted {
@@ -101,7 +313,31 @@
   font-size: 12px;
 }
 
-@media (max-width: 768px) {
+/* ============================================
+   RESPONSIVE - Desktop (>= 768px)
+   2 columnas
+   ============================================ */
+
+@media (min-width: 768px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-fieldset {
+    padding: 20px;
+  }
+
+  .form-actions {
+    padding-top: 20px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Mobile (< 768px)
+   1 columna + ajustes
+   ============================================ */
+
+@media (max-width: 767px) {
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -112,5 +348,40 @@
 
   .form-actions .btn {
     width: 100%;
+  }
+
+  .form-fieldset {
+    padding: 12px;
+    margin: 0 0 12px;
+  }
+
+  .campos-adicionales-toggle {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .tooltip-content {
+    left: 0;
+    transform: none;
+  }
+
+  .tooltip-content::after {
+    left: 16px;
+    transform: none;
+  }
+}
+
+/* ============================================
+   LARGE DESKTOP (>= 1200px)
+   ============================================ */
+
+@media (min-width: 1200px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .form-fieldset {
+    padding: 24px;
   }
 }
