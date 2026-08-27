@@ -175,14 +175,8 @@ if ($request->filled('search')) {
 
         $user = $request->user();
         $item->load(['categoria', 'tipoItem', 'unidad']);
-        $antes = [
-            'categoria' => $item->categoria->codigo ?? '-',
-            'tipo_item' => $item->tipoItem->nombre ?? '-',
-            'estado_conservacion' => $item->estado_conservacion,
-            'cantidad' => $item->cantidad,
-            'unidad' => $item->unidad->nombre ?? '-',
-            'valores_dinamicos' => $item->valores_dinamicos,
-        ];
+        $antesNumericos = $item->only(['estado_conservacion', 'cantidad']);
+        $antesDinamicos = $item->valores_dinamicos ?? [];
 
         $datos = $validated;
         if (array_key_exists('valores', $datos)) {
@@ -192,14 +186,31 @@ if ($request->filled('search')) {
 
         $item->update($datos);
         $item->load(['categoria', 'tipoItem', 'unidad']);
-        $despues = [
+        $despuesDinamicos = $item->valores_dinamicos ?? [];
+
+        $antes = array_merge([
             'categoria' => $item->categoria->codigo ?? '-',
             'tipo_item' => $item->tipoItem->nombre ?? '-',
-            'estado_conservacion' => $item->estado_conservacion,
-            'cantidad' => $item->cantidad,
             'unidad' => $item->unidad->nombre ?? '-',
-            'valores_dinamicos' => $item->valores_dinamicos,
-        ];
+        ], $antesNumericos);
+
+        $despues = array_merge([
+            'categoria' => $item->categoria->codigo ?? '-',
+            'tipo_item' => $item->tipoItem->nombre ?? '-',
+            'unidad' => $item->unidad->nombre ?? '-',
+        ], $item->only(['estado_conservacion', 'cantidad']));
+
+        $camposDinamicos = $item->categoria->camposDinamicos()->get()->keyBy('id');
+        $todosLosIds = array_unique(array_merge(array_keys($antesDinamicos), array_keys($despuesDinamicos)));
+        foreach ($todosLosIds as $campoId) {
+            $av = $antesDinamicos[$campoId] ?? null;
+            $dv = $despuesDinamicos[$campoId] ?? null;
+            if (String($av) !== String($dv)) {
+                $nombreCampo = $camposDinamicos[$campoId]->nombre ?? "Campo #{$campoId}";
+                $antes[$nombreCampo] = $av ?? '(vacío)';
+                $despues[$nombreCampo] = $dv ?? '(vacío)';
+            }
+        }
 
         Auditoria::create([
             'user_id' => $user->id,
