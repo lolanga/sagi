@@ -3,7 +3,7 @@ title: "SAGI - Manual de Especificaciones Técnicas"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
 date: "27 de agosto de 2026"
-version: "3.2"
+version: "3.3"
 ---
 
 # SAGI - Manual de Especificaciones Técnicas
@@ -11,7 +11,7 @@ version: "3.2"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 3.2 | Fecha: 27 de agosto de 2026 | Estado: Producción
+Versión: 3.3 | Fecha: 27 de agosto de 2026 | Estado: Producción
 
 ---
 
@@ -131,7 +131,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Lazy loading imágenes | Componente Image con loading="lazy" |
 | CSS code splitting | Vite genera CSS separado por página |
 
-### 3.3 Herramientas de Desarrollo
+### 3.4 Herramientas de Desarrollo
 
 | Herramienta | Propósito |
 |-------------|-----------|
@@ -655,7 +655,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | 7 | Se crea movimiento "alta" con estado "aprobado" |
 | 8 | Se registra en auditoría con acción "reactivar" |
 
-### 8.4 Generación de Código Único
+### 8.5 Generación de Código Único
 
 **Formato:** `{Categoría}-{IdSede}-{IdUnidad}-{Secuencial}`
 
@@ -675,7 +675,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 4. Buscar el último secuencial para esa combinación
 5. Incrementar en 1 y formatear a 6 dígitos
 
-### 8.5 Sistema de Campos Dinámicos
+### 8.6 Sistema de Campos Dinámicos
 
 | Característica | Descripción |
 |----------------|-------------|
@@ -782,7 +782,62 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | accion | VARCHAR | Tipo de acción |
 | entidad | VARCHAR | Nombre de la entidad |
 | entidad_id | INT | ID de la entidad (nullable) |
-| detalle | JSON | Información adicional |
+| detalle | JSON | Información adicional con nombres resueltos |
+
+### 10.4 Formato del Detalle
+
+El campo `detalle` usa el patrón `antes/despues` para ediciones, con **nombres resueltos** (no IDs):
+
+**Item (editar):**
+```json
+{
+  "codigo": "A1-08-15-000001",
+  "antes": { "categoria": "A1", "tipo_item": "Computadora", "unidad": "Recreo", "estado_conservacion": "Bueno", "cantidad": 1, "N° Serie": "ABC123" },
+  "despues": { "categoria": "A1", "tipo_item": "Computadora", "unidad": "Rosario", "estado_conservacion": "Muy bueno", "cantidad": 2, "N° Serie": "XYZ789" }
+}
+```
+
+**Sede (editar/activar/desactivar):**
+```json
+{
+  "nombre": "Sede Central",
+  "antes": { "nombre": "Sede Central", "activa": true },
+  "despues": { "nombre": "Sede Central", "activa": false }
+}
+```
+
+**Unidad (editar/activar/desactivar):**
+```json
+{
+  "nombre": "Recreo",
+  "sede": "Sede Central",
+  "antes": { "nombre": "Recreo", "activa": true, "sede": "Sede Central" },
+  "despues": { "nombre": "Recreo", "activa": false, "sede": "Sede Central" }
+}
+```
+
+**Movimientos (solicitar):**
+```json
+{
+  "tipo": "traslado",
+  "item": "A1-08-15-000001",
+  "unidad_origen": "Recreo",
+  "unidad_destino": "Rosario",
+  "motivo": "Reubicación"
+}
+```
+
+**Categorías/Campos dinámicos:**
+```json
+{
+  "categoria": "A1",
+  "tipo_item": "Computadora",
+  "antes": { "nombre": "Marca", "tipo": "texto" },
+  "despues": { "nombre": "Marca", "tipo": "select" }
+}
+```
+
+Los IDs de categorías, unidades, sedes y campos dinámicos se resuelven a sus **nombres reales** antes de almacenarse. El frontend formatea estos datos en mensajes legibles como: `A1-08-15-000001 — N° Serie: ABC123 → XYZ789`.
 
 ---
 
@@ -869,7 +924,7 @@ npm run dev
 | php artisan db:seed | Sembrar datos de prueba |
 | php artisan serve | Iniciar servidor de desarrollo |
 
-### 13.4 Variables de Entorno
+### 13.5 Variables de Entorno
 
 | Variable | Valor |
 |----------|-------|
@@ -923,6 +978,34 @@ npm run dev
 ---
 
 ## 14. Changelog
+
+### v3.3 (27 agosto 2026)
+
+#### Auditoría - Nombres resueltos
+- **IDs a nombres legibles**: Todos los IDs crudos (categoria_id, unidad_id, sede_id, campo dinámico) se resuelven a sus nombres reales antes de almacenarse
+- **Campos dinámicos individuales**: `valores_dinamicos` se descompone campo por campo, mostrando solo los que cambiaron
+- **Prefijo de entidad**: Items muestran código (`A1-08-15-000001 — ...`), Sedes/Unidades muestran nombre
+- **Backend**: `ItemController`, `MovimientoController`, `UnidadController`, `SedeController`, `CategoriaController` actualizados
+- **Frontend**: `formatearDetalle()` genera mensajes legibles por tipo de evento (29 eventos cubiertos)
+- **Timeline**: `ItemDetalle.jsx` nunca muestra JSON crudo, usa `formatDetalleTexto()` con mensajes claros
+
+#### Sedes y Unidades - Renovación UI
+- **Tabs**: Separador visual "Sedes" / "Unidades de destino" con tabs activos
+- **Cards de Sedes**: Header con badge ID + badge estado (Activa/Inactiva), contador de unidades, acciones con iconos
+- **Accordion de Unidades**: Unidades agrupadas por sede en secciones colapsables, reduciendo scroll
+- **Modales**: Crear, editar y eliminar todo en Modal (consistente con ItemForm)
+- **Toast notifications**: Feedback de éxito en todas las mutaciones
+- **Skeleton loading**: Cards animadas mientras se cargan datos
+- **Empty state**: Estados vacíos con icono, mensaje y botón de acción
+- **Ver desactivadas**: Checkbox disponible en ambos tabs
+
+#### Dashboard
+- **Doughnut con cifras**: Plugin `chartjs-plugin-datalabels` muestra valor + porcentaje directamente en cada segmento
+
+#### Favicon y branding
+- **Favicon**: SVG personalizado con "S" sobre fondo azul
+- **Título**: Pestaña muestra "Inventario ISeP"
+- **Sidebar**: Logo "SAGI ISeP" en el encabezado
 
 ### v3.2 (27 agosto 2026)
 
@@ -1053,5 +1136,5 @@ npm run dev
 
 ---
 
-*Documento generado el 26 de agosto de 2026*
-*SAGI v3.0 - Instituto de Seguridad Pública*
+*Documento generado el 27 de agosto de 2026*
+*SAGI v3.3 - Instituto de Seguridad Pública*

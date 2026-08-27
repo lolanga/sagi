@@ -3,7 +3,7 @@ title: "SAGI - Manual de Usuario"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
 date: "27 de agosto de 2026"
-version: "3.2"
+version: "3.3"
 ---
 
 # SAGI - Manual de Usuario
@@ -11,7 +11,7 @@ version: "3.2"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 3.2 | Fecha: 27 de agosto de 2026
+Versión: 3.3 | Fecha: 27 de agosto de 2026
 
 ---
 
@@ -484,44 +484,51 @@ Use las flechas **↑** y **↓** para cambiar el orden.
 
 **Solo administradores pueden acceder.**
 
-### 10.1 Sedes
+La página se organiza en dos pestañas: **Sedes** y **Unidades de destino**.
 
-Las sedes representan las ubicaciones físicas del instituto.
+### 10.1 Sedes (Pestaña "Sedes")
+
+Las sedes representan las ubicaciones físicas del instituto. Se muestran como tarjetas con badge de ID, estado y contador de unidades.
 
 | Acción | Descripción |
 |--------|-------------|
-| Crear sede | Ingrese nombre en "Nueva Sede" y haga clic en "Crear" |
-| Editar sede | Modifique el nombre directamente en el campo de texto |
-| Desactivar | Haga clic en "Desactivar" (no aparece en formularios) |
-| Activar | Haga clic en "Activar" para habilitar nuevamente |
+| Crear sede | Haga clic en "+ Nueva sede", ingrese nombre en el modal y confirme |
+| Editar sede | Haga clic en el icono ✎ en la tarjeta, modifique nombre en el modal |
+| Desactivar | Haga clic en 👁 para desactivar (la sede aparece con borde punteado) |
+| Activar | Haga clic en 🚫 para reactivar |
+| Eliminar | Haga clic en 🗑, confirme en el modal (no se puede eliminar si tiene unidades) |
 
-### 10.2 Unidades
+**Filtros:**
+- **Buscar**: Filtra sedes por nombre
+- **Ver desactivadas**: Incluye sedes inactivas en la lista
 
-Las unidades son departamentos o áreas dentro de cada sede.
+### 10.2 Unidades (Pestaña "Unidades de destino")
 
-| Columna | Descripción |
-|---------|-------------|
-| IdUnidad | Identificador de la unidad |
-| Sede | Sede a la que pertenece |
-| Nombre | Nombre de la unidad |
-| Activo | Estado de la unidad |
-| Acciones | Desactivar, Eliminar |
+Las unidades son departamentos o áreas dentro de cada sede. Se muestran **agrupadas por sede** en secciones colapsables (accordion), reduciendo el scroll.
+
+| Elemento | Descripción |
+|----------|-------------|
+| Encabezado de grupo | Nombre de la sede + contador de unidades, clic para expandir/colapsar |
+| Fila de unidad | ID, nombre, badge de estado, acciones |
 
 **Crear unidad:**
 1. Haga clic en **"+ Nueva unidad"**
-2. Seleccione la **sede**
-3. Ingrese el **nombre**
-4. Haga clic en **"Crear"**
+2. Ingrese el **nombre** en el modal
+3. Seleccione la **sede** del desplegable
+4. Haga clic en **"Crear unidad"**
 
 **Editar unidad:**
-- Modifique el nombre directamente en el campo de texto
+1. Haga clic en el icono **✎** en la fila de la unidad
+2. Modifique nombre y/o sede en el modal
+3. Haga clic en **"Guardar"**
+
+**Otras acciones:**
+- **Desactivar/Activar**: Icono 👁 / 🚫 en la fila
+- **Eliminar**: Icono 🗑, confirma en modal
 
 **Filtros:**
-
-| Filtro | Descripción |
-|--------|-------------|
-| Buscar | Filtrar por nombre |
-| Ver inactivas | Incluir unidades desactivadas |
+- **Buscar**: Filtra por nombre de unidad o nombre de sede
+- **Ver desactivadas**: Incluye unidades inactivas
 
 ---
 
@@ -583,7 +590,13 @@ Haga clic en **"Auditoría"** en el menú lateral.
 | Usuario | Quién realizó la acción |
 | Acción | Tipo de acción realizada |
 | Entidad | Entidad afectada |
-| Detalle | Solo muestra los campos que cambiaron (ej: `estado: Malo → Bueno`) |
+| Detalle | Muestra solo los campos que cambiaron, con nombres legibles |
+
+**Ejemplos de detalle:**
+- Ítem editado: `A1-08-15-000001 — N° Serie: no visible → SA1243FDSA`
+- Traslado: `Traslado de A1-08-15-000001: Recreo → Rosario`
+- Sede activada: `Sede Central — Activa: false → true`
+- Unidad creada: `Unidad "Recreo" creada en Sede Central`
 
 **Paginación:** Use el selector de cantidad (10/25/50) y los botones de navegación para recorrer los registros.
 
@@ -647,6 +660,26 @@ Los ítems se muestran 25 por página (configurable: 10/25/50). Use "Anterior" y
 
 ## Changelog
 
+### v3.3 (27 agosto 2026)
+
+#### Sedes y Unidades
+- **Tabs**: Separador visual "Sedes" / "Unidades de destino"
+- **Cards de Sedes**: Tarjetas con badge ID, estado (Activa/Inactiva) y contador de unidades
+- **Accordion de Unidades**: Unidades agrupadas por sede en secciones colapsables
+- **Modales**: Crear, editar y eliminar en ventana modal (consistente con el resto de la app)
+- **Toast notifications**: Confirmación visual en cada acción
+- **Skeleton loading**: Animación de carga mientras se obtienen datos
+- **Empty state**: Mensaje ilustrado cuando no hay datos
+
+#### Auditoría
+- **Nombres legibles**: Todos los IDs se muestran como nombres reales (ej: "Recreo" en vez de "5")
+- **Detalle del ítem**: Al editar, se muestra el código del ítem (ej: "A1-08-15-000001 — ...")
+- **Campos dinámicos**: Solo se muestran los campos que cambiaron, con sus nombres reales
+- **Sedes/Unidades**: El detalle incluye el nombre de la entidad modificada
+
+#### Dashboard
+- **Doughnut con cifras**: Los valores y porcentajes se muestran directamente en el gráfico
+
 ### v3.2 (27 agosto 2026)
 
 #### Inventario
@@ -704,6 +737,6 @@ Los ítems se muestran 25 por página (configurable: 10/25/50). Use "Anterior" y
 
 ---
 
-*Manual de Usuario - SAGI v3.2*
+*Manual de Usuario - SAGI v3.3*
 *Fecha: 27 de agosto de 2026*
 *Instituto de Seguridad Pública*
