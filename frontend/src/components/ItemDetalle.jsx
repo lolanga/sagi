@@ -81,25 +81,71 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
     return isNaN(d) ? '-' : d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
   }
 
-  const formatearCambios = (detalle) => {
-    if (!detalle) return ''
-    if (detalle.antes && detalle.despues) {
+  const Etiquetas = {
+    categoria: 'Categoría', categoria_id: 'Categoría',
+    tipo_item: 'Elemento', tipo_item_id: 'Elemento',
+    estado_conservacion: 'Estado conservación', cantidad: 'Cantidad',
+    unidad: 'Unidad', unidad_id: 'Unidad', unidad_origen: 'Origen', unidad_destino: 'Destino',
+    sede: 'Sede', codigo: 'Código', nombre: 'Nombre', tipo: 'Tipo',
+    activa: 'Activa', motivo: 'Motivo', motivo_rechazo: 'Motivo rechazo',
+    estado: 'Estado', estado_item: 'Estado ítem',
+    valores_dinamicos: 'Campos dinámicos', item: 'Ítem',
+  }
+
+  const formatearDetalle = (detalle, accion, entidad) => {
+    if (!detalle) return '-'
+    if (detalle.antes && detalle.despues && typeof detalle.antes === 'object' && typeof detalle.despues === 'object') {
       const campos = new Set([...Object.keys(detalle.antes), ...Object.keys(detalle.despues)])
       const cambios = []
       for (const k of campos) {
         const a = detalle.antes[k]
         const d = detalle.despues[k]
-        const av = typeof a === 'object' ? JSON.stringify(a) : a
-        const dv = typeof d === 'object' ? JSON.stringify(d) : d
-        if (av !== dv) {
-          cambios.push({ campo: k, antes: av ?? '(vacío)', despues: dv ?? '(vacío)' })
+        const av = typeof a === 'object' ? JSON.stringify(a) : (a ?? '(vacío)')
+        const dv = typeof d === 'object' ? JSON.stringify(d) : (d ?? '(vacío)')
+        if (String(av) !== String(dv)) {
+          cambios.push({ campo: Etiquetas[k] || k, antes: av, despues: dv })
         }
       }
       return cambios
     }
-    return Object.entries(detalle)
+    const label = (k) => Etiquetas[k] || k
+    const partes = Object.entries(detalle)
       .filter(([, v]) => v !== null && v !== undefined && v !== '')
-      .map(([k, v]) => ({ campo: k, antes: null, despues: typeof v === 'object' ? JSON.stringify(v) : v }))
+      .map(([k, v]) => ({ campo: label(k), antes: null, despues: typeof v === 'object' ? JSON.stringify(v) : v }))
+    return partes
+  }
+
+  const formatDetalleTexto = (detalle, accion, entidad) => {
+    if (!detalle) return '-'
+    const e = entidad, a = accion
+    if (e === 'item' && a === 'crear') return `Ítem ${detalle.codigo} creado en categoría ${detalle.categoria}`
+    if (e === 'item' && a === 'reactivar') return `Ítem ${detalle.codigo} reactivado a categoría ${detalle.categoria}`
+    if (e === 'item' && a === 'eliminar') return `Ítem ${detalle.codigo} eliminado (${detalle.categoria}, ${detalle.unidad})`
+    if (e === 'movimiento' && a === 'solicitar') {
+      if (detalle.tipo === 'traslado') return `Traslado de ${detalle.item}: ${detalle.unidad_origen} → ${detalle.unidad_destino}`
+      if (detalle.tipo === 'baja') return `Baja de ${detalle.item} desde ${detalle.unidad_origen}`
+    }
+    if (e === 'movimiento' && a === 'aprobar') return `${detalle.tipo?.charAt(0).toUpperCase() + detalle.tipo?.slice(1)} de ${detalle.item} aprobado`
+    if (e === 'movimiento' && a === 'rechazar') return `${detalle.tipo?.charAt(0).toUpperCase() + detalle.tipo?.slice(1)} de ${detalle.item} rechazado`
+    if (e === 'unidad' && a === 'crear') return `Unidad "${detalle.nombre}" creada en ${detalle.sede}`
+    if (e === 'unidad' && a === 'eliminar') return `Unidad "${detalle.nombre}" eliminada`
+    if (e === 'sede' && a === 'crear') return `Sede "${detalle.nombre}" creada`
+    if (e === 'sede' && a === 'eliminar') return `Sede "${detalle.nombre}" eliminada`
+    if (e === 'auth' && a === 'login') return `Sesión iniciada (DNI ${detalle.dni})`
+    if (e === 'user' && a === 'editar') return 'Contraseña actualizada'
+    if (e === 'categoria' && a === 'crear') return `Categoría ${detalle.codigo} (${detalle.nombre}) creada`
+    if (e === 'categoria' && a === 'editar') return `Categoría ${detalle.codigo} editada`
+    if (e === 'categoria' && a === 'eliminar') return `Categoría ${detalle.codigo} (${detalle.nombre}) eliminada`
+    if (e === 'tipo_item' && a === 'crear') return `Elemento "${detalle.nombre}" creado en ${detalle.categoria}`
+    if (e === 'tipo_item' && a === 'eliminar') return `Elemento "${detalle.nombre}" eliminado de ${detalle.categoria}`
+    if (e === 'tipo_item' && a === 'mover') return `Elemento "${detalle.nombre}" movido ${detalle.direccion === 'up' ? '↑' : '↓'}`
+    if (e === 'campo_dinamico' && a === 'crear') return `Campo "${detalle.nombre}" (${detalle.tipo}) creado en ${detalle.categoria}`
+    if (e === 'campo_dinamico' && a === 'eliminar') return `Campo "${detalle.nombre}" eliminado de ${detalle.categoria}`
+    if (e === 'campo_dinamico' && a === 'mover') return `Campo "${detalle.nombre}" movido ${detalle.direccion === 'up' ? '↑' : '↓'}`
+    if (e === 'alerta' && a === 'crear') return `Alerta creada — ${detalle.prioridad}`
+    if (e === 'alerta' && a === 'cerrar') return 'Alerta cerrada'
+    const items = Object.entries(detalle).filter(([, v]) => v != null && v !== '').map(([k, v]) => `${Etiquetas[k] || k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+    return items.join(' · ') || '-'
   }
 
   const timelineItems = [
@@ -199,22 +245,22 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
                       </div>
                       <div className="timeline-body">
                         <p className="timeline-meta"><span>Por: {entry.data.user?.name ?? '-'}</span></p>
-                        {entry.data.accion === 'editar' && entry.data.detalle ? (
-                          <div className="timeline-cambios">
-                            {formatearCambios(entry.data.detalle).map((c, i) => (
-                              <div key={i} className="timeline-cambio">
-                                <span className="timeline-campo">{c.campo}</span>
-                                {c.antes !== null ? (
-                                  <span className="timeline-valores"><span className="val-antes">{c.antes}</span> → <span className="val-despues">{c.despues}</span></span>
-                                ) : (
-                                  <span className="timeline-valores">{c.despues}</span>
-                                )}
+                        {(() => {
+                          const cambios = formatearDetalle(entry.data.detalle, entry.data.accion, entry.data.entidad)
+                          if (Array.isArray(cambios) && cambios.length > 0 && cambios[0]?.antes !== null) {
+                            return (
+                              <div className="timeline-cambios">
+                                {cambios.map((c, i) => (
+                                  <div key={i} className="timeline-cambio">
+                                    <span className="timeline-campo">{c.campo}</span>
+                                    <span className="timeline-valores"><span className="val-antes">{c.antes}</span> → <span className="val-despues">{c.despues}</span></span>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p>{entry.data.detalle ? JSON.stringify(entry.data.detalle) : '-'}</p>
-                        )}
+                            )
+                          }
+                          return <p>{formatDetalleTexto(entry.data.detalle, entry.data.accion, entry.data.entidad)}</p>
+                        })()}
                       </div>
                     </div>
                   </div>

@@ -98,8 +98,8 @@ class MovimientoController extends Controller
                 'detalle' => [
                     'tipo' => 'traslado',
                     'item' => $item->codigo_unico,
-                    'unidad_origen' => $item->unidad_id,
-                    'unidad_destino' => $validated['unidad_destino_id'],
+                    'unidad_origen' => $item->unidad->nombre ?? '-',
+                    'unidad_destino' => \App\Models\Unidad::find($validated['unidad_destino_id'])->nombre ?? '-',
                     'motivo' => $validated['motivo'],
                 ],
             ]);
@@ -143,7 +143,7 @@ class MovimientoController extends Controller
                 'detalle' => [
                     'tipo' => 'baja',
                     'item' => $item->codigo_unico,
-                    'unidad_origen' => $item->unidad_id,
+                    'unidad_origen' => $item->unidad->nombre ?? '-',
                     'motivo' => $validated['motivo'],
                 ],
             ]);

@@ -99,7 +99,7 @@ class CategoriaController extends Controller
         $tipo->update($validated);
 
         $this->log($request, 'editar', 'tipo_item', $tipo->id, [
-            'categoria' => $tipo->categoria_id,
+            'categoria' => $tipo->categoria->codigo ?? '-',
             'antes' => $antes,
             'despues' => $tipo->nombre,
         ]);
@@ -116,7 +116,7 @@ class CategoriaController extends Controller
             ], 422);
         }
 
-        $detalle = ['categoria' => $tipo->categoria_id, 'nombre' => $tipo->nombre];
+        $detalle = ['categoria' => $tipo->categoria->codigo ?? '-', 'nombre' => $tipo->nombre];
         $tipo->delete();
 
         $this->log($request, 'eliminar', 'tipo_item', $tipo->id, $detalle);
@@ -130,7 +130,7 @@ class CategoriaController extends Controller
         $this->moverEnLista(TipoItem::where('categoria_id', $tipo->categoria_id), $tipo, $direccion);
 
         $this->log($request, 'mover', 'tipo_item', $tipo->id, [
-            'categoria' => $tipo->categoria_id,
+            'categoria' => $tipo->categoria->codigo ?? '-',
             'nombre' => $tipo->nombre,
             'direccion' => $direccion,
         ]);
@@ -147,8 +147,8 @@ class CategoriaController extends Controller
             ->where('tipo_item_id', $campo->tipo_item_id), $campo, $direccion);
 
         $this->log($request, 'mover', 'campo_dinamico', $campo->id, [
-            'categoria' => $campo->categoria_id,
-            'tipo_item' => $campo->tipo_item_id,
+            'categoria' => $campo->categoria->codigo ?? '-',
+            'tipo_item' => $campo->tipoItem->nombre ?? 'General',
             'nombre' => $campo->nombre,
             'direccion' => $direccion,
         ]);
@@ -219,7 +219,7 @@ class CategoriaController extends Controller
 
         $this->log($request, 'crear', 'campo_dinamico', $campo->id, [
             'categoria' => $categoria->codigo,
-            'tipo_item' => $validated['tipo_item_id'] ?? null,
+            'tipo_item' => $campo->tipoItem->nombre ?? 'General',
             'nombre' => $campo->nombre,
             'tipo' => $campo->tipo,
         ]);
@@ -259,8 +259,8 @@ class CategoriaController extends Controller
         $campo->update($validated);
 
         $this->log($request, 'editar', 'campo_dinamico', $campo->id, [
-            'categoria' => $campo->categoria_id,
-            'tipo_item' => $campo->tipo_item_id,
+            'categoria' => $campo->categoria->codigo ?? '-',
+            'tipo_item' => $campo->tipoItem->nombre ?? 'General',
             'antes' => $antes,
             'despues' => $campo->only(['nombre', 'tipo', 'opciones', 'placeholder', 'requerido', 'activo']),
         ]);
@@ -271,8 +271,8 @@ class CategoriaController extends Controller
     public function destroyCampo(Request $request, CampoDinamico $campo): JsonResponse
     {
         $detalle = [
-            'categoria' => $campo->categoria_id,
-            'tipo_item' => $campo->tipo_item_id,
+            'categoria' => $campo->categoria->codigo ?? '-',
+            'tipo_item' => $campo->tipoItem->nombre ?? 'General',
             'nombre' => $campo->nombre,
         ];
         $campo->delete();

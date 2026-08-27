@@ -42,7 +42,7 @@ class UnidadController extends Controller
             'accion' => 'crear',
             'entidad' => 'unidad',
             'entidad_id' => $unidad->id,
-            'detalle' => ['nombre' => $unidad->nombre, 'sede_id' => $unidad->sede_id],
+            'detalle' => ['nombre' => $unidad->nombre, 'sede' => $unidad->sede->nombre ?? '-'],
         ]);
 
         return response()->json(['unidad' => $unidad->load('sede')], 201);

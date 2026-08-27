@@ -9,26 +9,86 @@ import '../styles/inventario.css'
 const entidades = ['auth', 'item', 'categoria', 'tipo_item', 'campo_dinamico', 'movimiento']
 const acciones = ['login', 'crear', 'editar', 'eliminar', 'mover', 'solicitar', 'aprobar', 'rechazar']
 
-function formatearDetalle(detalle) {
+const Etiquetas = {
+  categoria: 'Categoría', categoria_id: 'Categoría', categoria_original: 'Categoría',
+  tipo_item: 'Elemento', tipo_item_id: 'Elemento',
+  estado_conservacion: 'Estado conservación', cantidad: 'Cantidad',
+  unidad: 'Unidad', unidad_id: 'Unidad', unidad_origen: 'Origen', unidad_destino: 'Destino',
+  sede: 'Sede', sede_id: 'Sede',
+  codigo: 'Código', nombre: 'Nombre', tipo: 'Tipo', opciones: 'Opciones',
+  placeholder: 'Placeholder', requerido: 'Requerido', activo: 'Activo',
+  activa: 'Activa', activa_anterior: 'Activa', activa_nueva: 'Activa',
+  motivo: 'Motivo', motivo_rechazo: 'Motivo rechazo', motivo_baja: 'Motivo baja',
+  prioridad: 'Prioridad', mensaje: 'Mensaje', campo: 'Campo',
+  responsable: 'Responsable', estado: 'Estado', estado_item: 'Estado ítem',
+  valores_dinamicos: 'Campos dinámicos', direccion: 'Dirección', item: 'Ítem',
+  es_transitoria: 'Transitoria', dni: 'DNI',
+}
+
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s }
+
+function formatearDetalle(detalle, accion, entidad) {
   if (!detalle) return '-'
-  if (detalle.antes && detalle.despues) {
+
+  if (detalle.antes && detalle.despues && typeof detalle.antes === 'object' && typeof detalle.despues === 'object') {
     const campos = new Set([...Object.keys(detalle.antes), ...Object.keys(detalle.despues)])
     const cambios = []
     for (const k of campos) {
       const a = detalle.antes[k]
       const d = detalle.despues[k]
-      const av = typeof a === 'object' ? JSON.stringify(a) : a
-      const dv = typeof d === 'object' ? JSON.stringify(d) : d
-      if (av !== dv) {
-        cambios.push(`${k}: ${av ?? '(vacío)'} → ${dv ?? '(vacío)'}`)
+      const av = typeof a === 'object' ? JSON.stringify(a) : (a ?? '(vacío)')
+      const dv = typeof d === 'object' ? JSON.stringify(d) : (d ?? '(vacío)')
+      if (String(av) !== String(dv)) {
+        const label =Etiquetas[k] || k
+        cambios.push(`${label}: ${av} → ${dv}`)
       }
     }
     return cambios.length > 0 ? cambios.join(' · ') : 'Sin cambios detectados'
   }
+
+  const e = entidad
+  const a = accion
+
+  if (e === 'item' && a === 'crear') return `Ítem ${detalle.codigo} creado en categoría ${detalle.categoria}`
+  if (e === 'item' && a === 'reactivar') return `Ítem ${detalle.codigo} reactivado a categoría ${detalle.categoria}`
+  if (e === 'item' && a === 'eliminar') return `Ítem ${detalle.codigo} eliminado (${detalle.categoria}, ${detalle.unidad})`
+
+  if (e === 'movimiento' && a === 'solicitar') {
+    if (detalle.tipo === 'traslado') return `Traslado de ${detalle.item}: ${detalle.unidad_origen} → ${detalle.unidad_destino}`
+    if (detalle.tipo === 'baja') return `Baja de ${detalle.item} desde ${detalle.unidad_origen}`
+  }
+  if (e === 'movimiento' && a === 'aprobar') return `${capitalize(detalle.tipo)} de ${detalle.item} aprobado`
+  if (e === 'movimiento' && a === 'rechazar') return `${capitalize(detalle.tipo)} de ${detalle.item} rechazado`
+
+  if (e === 'unidad' && a === 'crear') return `Unidad "${detalle.nombre}" creada en ${detalle.sede}`
+  if (e === 'unidad' && a === 'eliminar') return `Unidad "${detalle.nombre}" eliminada`
+  if (e === 'unidad' && (a === 'editar' || a === 'activar' || a === 'desactivar')) return `Unidad "${detalle.nombre || '?'}"` 
+
+  if (e === 'sede' && a === 'crear') return `Sede "${detalle.nombre}" creada`
+  if (e === 'sede' && a === 'eliminar') return `Sede "${detalle.nombre}" eliminada`
+
+  if (e === 'auth' && a === 'login') return `Sesión iniciada (DNI ${detalle.dni})`
+  if (e === 'user' && a === 'editar') return 'Contraseña actualizada'
+
+  if (e === 'categoria' && a === 'crear') return `Categoría ${detalle.codigo} (${detalle.nombre}) creada`
+  if (e === 'categoria' && a === 'editar') return `Categoría ${detalle.codigo} editada`
+  if (e === 'categoria' && a === 'eliminar') return `Categoría ${detalle.codigo} (${detalle.nombre}) eliminada`
+
+  if (e === 'tipo_item' && a === 'crear') return `Elemento "${detalle.nombre}" creado en ${detalle.categoria}`
+  if (e === 'tipo_item' && a === 'eliminar') return `Elemento "${detalle.nombre}" eliminado de ${detalle.categoria}`
+  if (e === 'tipo_item' && a === 'mover') return `Elemento "${detalle.nombre}" movido ${detalle.direccion === 'up' ? '↑' : '↓'}`
+
+  if (e === 'campo_dinamico' && a === 'crear') return `Campo "${detalle.nombre}" (${detalle.tipo}) creado en ${detalle.categoria}`
+  if (e === 'campo_dinamico' && a === 'eliminar') return `Campo "${detalle.nombre}" eliminado de ${detalle.categoria}`
+  if (e === 'campo_dinamico' && a === 'mover') return `Campo "${detalle.nombre}" movido ${detalle.direccion === 'up' ? '↑' : '↓'}`
+
+  if (e === 'alerta' && a === 'crear') return `Alerta creada — ${detalle.prioridad}`
+  if (e === 'alerta' && a === 'cerrar') return 'Alerta cerrada'
+
   const partes = Object.entries(detalle)
-    .filter(([k, v]) => v !== null && v !== undefined && v !== '')
-    .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
-  return partes.join(' · ')
+    .filter(([, v]) => v !== null && v !== undefined && v !== '')
+    .map(([k, v]) => `${Etiquetas[k] || k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+  return partes.join(' · ') || '-'
 }
 
 export default function Auditoria() {
@@ -112,7 +172,7 @@ export default function Auditoria() {
         r.user?.name ?? '',
         r.accion,
         r.entidad,
-        formatearDetalle(r.detalle),
+        formatearDetalle(r.detalle, r.accion, r.entidad),
       ])
       const hoja = XLSX.utils.aoa_to_sheet([
         ['Fecha', 'Usuario', 'Acción', 'Entidad', 'Detalle'],
@@ -183,7 +243,7 @@ export default function Auditoria() {
                   <td data-label="Usuario">{log.user?.name}</td>
                   <td data-label="Acción"><span className={`badge badge-accion badge-${log.accion}`}>{log.accion}</span></td>
                   <td data-label="Entidad">{log.entidad}</td>
-                  <td data-label="Detalle" className="audit-detalle">{formatearDetalle(log.detalle)}</td>
+                  <td data-label="Detalle" className="audit-detalle">{formatearDetalle(log.detalle, log.accion, log.entidad)}</td>
                 </tr>
               ))}
             </tbody>

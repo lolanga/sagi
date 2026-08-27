@@ -143,7 +143,11 @@ if ($request->filled('search')) {
                 'accion' => 'crear',
                 'entidad' => 'item',
                 'entidad_id' => $item->id,
-                'detalle' => ['codigo' => $codigo, 'categoria' => $categoria->codigo, 'movimiento_id' => $alta->id],
+                'detalle' => [
+                    'codigo' => $codigo,
+                    'categoria' => $categoria->codigo,
+                    'unidad' => $item->unidad->nombre ?? '-',
+                ],
             ]);
         });
 
@@ -170,7 +174,15 @@ if ($request->filled('search')) {
         ]);
 
         $user = $request->user();
-        $antes = $item->only(['categoria_id', 'estado_conservacion', 'cantidad', 'valores_dinamicos']);
+        $item->load(['categoria', 'tipoItem', 'unidad']);
+        $antes = [
+            'categoria' => $item->categoria->codigo ?? '-',
+            'tipo_item' => $item->tipoItem->nombre ?? '-',
+            'estado_conservacion' => $item->estado_conservacion,
+            'cantidad' => $item->cantidad,
+            'unidad' => $item->unidad->nombre ?? '-',
+            'valores_dinamicos' => $item->valores_dinamicos,
+        ];
 
         $datos = $validated;
         if (array_key_exists('valores', $datos)) {
@@ -179,13 +191,22 @@ if ($request->filled('search')) {
         }
 
         $item->update($datos);
+        $item->load(['categoria', 'tipoItem', 'unidad']);
+        $despues = [
+            'categoria' => $item->categoria->codigo ?? '-',
+            'tipo_item' => $item->tipoItem->nombre ?? '-',
+            'estado_conservacion' => $item->estado_conservacion,
+            'cantidad' => $item->cantidad,
+            'unidad' => $item->unidad->nombre ?? '-',
+            'valores_dinamicos' => $item->valores_dinamicos,
+        ];
 
         Auditoria::create([
             'user_id' => $user->id,
             'accion' => 'editar',
             'entidad' => 'item',
             'entidad_id' => $item->id,
-            'detalle' => ['antes' => $antes, 'despues' => $item->only(['categoria_id', 'estado_conservacion', 'cantidad', 'valores_dinamicos'])],
+            'detalle' => ['antes' => $antes, 'despues' => $despues],
         ]);
 
         $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);
@@ -235,7 +256,7 @@ if ($request->filled('search')) {
                 'entidad_id' => $item->id,
                 'detalle' => [
                     'codigo' => $item->codigo_unico,
-                    'categoria_original' => $categoriaOriginalId,
+                    'categoria' => $item->categoria->codigo ?? '-',
                     'motivo' => $validated['motivo_reactivacion'],
                 ],
             ]);
