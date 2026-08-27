@@ -101,7 +101,7 @@ class UnidadController extends Controller
             'accion' => $accion,
             'entidad' => 'unidad',
             'entidad_id' => $unidad->id,
-            'detalle' => ['antes' => $antes, 'despues' => $despues],
+            'detalle' => ['nombre' => $unidad->nombre, 'sede' => $unidad->sede?->nombre, 'antes' => $antes, 'despues' => $despues],
         ]);
 
         return response()->json(['unidad' => $unidad->load('sede')]);

@@ -231,6 +231,10 @@ export default function Unidades() {
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />
+              <label className="checkbox-inline">
+                <input type="checkbox" checked={verInactivas} onChange={(e) => setVerInactivas(e.target.checked)} />
+                Ver desactivadas
+              </label>
               {puedeGestionar && (
                 <button className="btn btn-primary" onClick={abrirCrearSede}>+ Nueva sede</button>
               )}
@@ -259,13 +263,13 @@ export default function Unidades() {
                       <h4 className="sede-nombre">{sede.nombre}</h4>
                       <span className="sede-count">{sede.unidades?.length ?? 0} unidad{(sede.unidades?.length ?? 0) !== 1 ? 'es' : ''}</span>
                     </div>
-                    {puedeGestionar && (
+                      {puedeGestionar && (
                       <div className="sede-card-actions">
-                        <button className="btn-icon" title="Editar" onClick={() => abrirEditarSede(sede)}>&#9998;</button>
+                        <button className="btn-icon" title="Editar" onClick={() => abrirEditarSede(sede)}>✎</button>
                         <button className="btn-icon" title={sede.activa ? 'Desactivar' : 'Activar'} onClick={() => toggleSede(sede)}>
-                          {sede.activa ? '&#128068;' : '&#128065;'}
+                          {sede.activa ? '👁' : '🚫'}
                         </button>
-                        <button className="btn-icon btn-icon-danger" title="Eliminar" onClick={() => abrirEliminarSede(sede)}>&#128465;</button>
+                        <button className="btn-icon btn-icon-danger" title="Eliminar" onClick={() => abrirEliminarSede(sede)}>🗑</button>
                       </div>
                     )}
                   </div>
@@ -318,13 +322,13 @@ export default function Unidades() {
                     <div className="unidad-card-body">
                       <h4 className="unidad-nombre">{u.nombre}</h4>
                     </div>
-                    {puedeGestionar && (
+                      {puedeGestionar && (
                       <div className="unidad-card-actions">
-                        <button className="btn-icon" title="Editar" onClick={() => abrirEditarUnidad(u)}>&#9998;</button>
+                        <button className="btn-icon" title="Editar" onClick={() => abrirEditarUnidad(u)}>✎</button>
                         <button className="btn-icon" title={u.activa ? 'Desactivar' : 'Activar'} onClick={() => toggleUnidad(u)}>
-                          {u.activa ? '&#128068;' : '&#128065;'}
+                          {u.activa ? '👁' : '🚫'}
                         </button>
-                        <button className="btn-icon btn-icon-danger" title="Eliminar" onClick={() => abrirEliminarUnidad(u)}>&#128465;</button>
+                        <button className="btn-icon btn-icon-danger" title="Eliminar" onClick={() => abrirEliminarUnidad(u)}>🗑</button>
                       </div>
                     )}
                   </div>

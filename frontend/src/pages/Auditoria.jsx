@@ -59,7 +59,7 @@ function formatearDetalle(detalle, accion, entidad) {
         cambios.push(`${label}: ${av} → ${dv}`)
       }
     }
-    const prefijo = detalle.codigo ? `${detalle.codigo} — ` : ''
+    const prefijo = detalle.codigo ? `${detalle.codigo} — ` : (detalle.nombre ? `${detalle.nombre} — ` : '')
     return cambios.length > 0 ? prefijo + cambios.join(' · ') : 'Sin cambios detectados'
   }
 
@@ -79,7 +79,6 @@ function formatearDetalle(detalle, accion, entidad) {
 
   if (e === 'unidad' && a === 'crear') return `Unidad "${detalle.nombre}" creada en ${detalle.sede}`
   if (e === 'unidad' && a === 'eliminar') return `Unidad "${detalle.nombre}" eliminada`
-  if (e === 'unidad' && (a === 'editar' || a === 'activar' || a === 'desactivar')) return `Unidad "${detalle.nombre || '?'}"` 
 
   if (e === 'sede' && a === 'crear') return `Sede "${detalle.nombre}" creada`
   if (e === 'sede' && a === 'eliminar') return `Sede "${detalle.nombre}" eliminada`

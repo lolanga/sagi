@@ -80,7 +80,7 @@ class SedeController extends Controller
             'accion' => $accion,
             'entidad' => 'sede',
             'entidad_id' => $sede->id,
-            'detalle' => ['antes' => $antes, 'despues' => $despues],
+            'detalle' => ['nombre' => $sede->nombre, 'antes' => $antes, 'despues' => $despues],
         ]);
 
         return response()->json(['sede' => $sede]);
