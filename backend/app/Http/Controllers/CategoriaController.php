@@ -24,7 +24,9 @@ class CategoriaController extends Controller
     }
     public function index(): JsonResponse
     {
-        $categorias = Categoria::with(['camposDinamicos', 'tiposItems'])->orderBy('codigo')->get();
+        $categorias = Categoria::with(['camposDinamicos', 'tiposItems' => function ($q) {
+            $q->withCount('items');
+        }])->orderBy('codigo')->get();
 
         return response()->json(['categorias' => $categorias]);
     }
@@ -107,6 +109,13 @@ class CategoriaController extends Controller
 
     public function destroyTipo(Request $request, TipoItem $tipo): JsonResponse
     {
+        $itemsAsociados = \App\Models\Item::where('tipo_item_id', $tipo->id)->count();
+        if ($itemsAsociados > 0) {
+            return response()->json([
+                'message' => "No se puede eliminar: el elemento \"{$tipo->nombre}\" tiene {$itemsAsociados} ítem(s) asociado(s)."
+            ], 422);
+        }
+
         $detalle = ['categoria' => $tipo->categoria_id, 'nombre' => $tipo->nombre];
         $tipo->delete();
 
