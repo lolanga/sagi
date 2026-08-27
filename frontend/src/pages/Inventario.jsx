@@ -38,6 +38,17 @@ export default function Inventario() {
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [sortKey, setSortKey] = useState('')
   const [sortDir, setSortDir] = useState('asc')
+  const [hiddenCols, setHiddenCols] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('sagi_hidden_cols')) || [] } catch { return [] }
+  })
+
+  useEffect(() => {
+    localStorage.setItem('sagi_hidden_cols', JSON.stringify(hiddenCols))
+  }, [hiddenCols])
+
+  const toggleCol = (key) => {
+    setHiddenCols((prev) => prev.includes(key) ? prev.filter((c) => c !== key) : [...prev, key])
+  }
 
   const puedeEditar = ['admin', 'jefe', 'carga'].includes(user?.rol?.slug)
 
@@ -132,69 +143,49 @@ export default function Inventario() {
     })
   }, [items, sortKey, sortDir])
 
-  const columns = useMemo(() => [
-    {
-      key: 'codigo_unico',
-      label: 'Código',
-      render: (item) => <strong>{item.codigo_unico}</strong>
-    },
-    {
-      key: 'categoria',
-      label: 'Categoría',
-      render: (item) => item.categoria?.codigo ?? '-'
-    },
-    {
-      key: 'detalle',
-      label: 'Detalle',
-      render: (item) => formatValores(item)
-    },
-    {
-      key: 'estado',
-      label: 'Estado',
-      render: (item) => (
-        <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
-      )
-    },
-    {
-      key: 'estado_conservacion',
-      label: 'Conservación',
-      render: (item) => (
-        <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>
-          {item.estado_conservacion ?? '-'}
-        </span>
-      )
-    },
-    {
-      key: 'cantidad',
-      label: 'Cant.',
-      render: (item) => item.cantidad
-    },
-    {
-      key: 'unidad',
-      label: 'Unidad',
-      render: (item) => item.unidad?.nombre ?? '-'
-    },
-    {
-      key: 'responsable',
-      label: 'Responsable',
-      render: (item) => item.responsable?.name ?? '-'
-    },
-    {
-      key: 'acciones',
-      label: '',
-      render: (item) => (
-        <div className="row-actions" onClick={(e) => e.stopPropagation()}>
-          <button className="btn-link btn-link-ver" onClick={() => setViendo(item)} aria-label={`Ver ${item.codigo_unico}`}>Ver</button>
-          {puedeEditar && item.estado !== 'baja' && (
-            <>
-              <button className="btn-link btn-link-editar" onClick={() => setEditando(item)} aria-label={`Editar ${item.codigo_unico}`}>Editar</button>
-              <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`}>Eliminar</button>
-            </>
-          )}
-        </div>
-      )
-    }
-  ], [puedeEditar])
+  const allColumns = useMemo(() => [
+    { key: 'codigo_unico', label: 'Código', mandatory: true },
+    { key: 'categoria', label: 'Categoría' },
+    { key: 'detalle', label: 'Detalle' },
+    { key: 'estado', label: 'Estado', mandatory: true },
+    { key: 'estado_conservacion', label: 'Conservación' },
+    { key: 'cantidad', label: 'Cant.' },
+    { key: 'unidad', label: 'Unidad' },
+    { key: 'responsable', label: 'Responsable' },
+    { key: 'acciones', label: '', mandatory: true },
+  ], [])
+
+  const columns = useMemo(() =>
+    allColumns
+      .filter((col) => !hiddenCols.includes(col.key))
+      .map((col) => ({
+        ...col,
+        render: col.key === 'codigo_unico' ? (item) => <strong>{item.codigo_unico}</strong>
+          : col.key === 'categoria' ? (item) => item.categoria?.codigo ?? '-'
+          : col.key === 'detalle' ? (item) => formatValores(item)
+          : col.key === 'estado' ? (item) => <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
+          : col.key === 'estado_conservacion' ? (item) => (
+              <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>
+                {item.estado_conservacion ?? '-'}
+              </span>
+            )
+          : col.key === 'cantidad' ? (item) => item.cantidad
+          : col.key === 'unidad' ? (item) => item.unidad?.nombre ?? '-'
+          : col.key === 'responsable' ? (item) => item.responsable?.name ?? '-'
+          : col.key === 'acciones' ? (item) => (
+              <div className="row-actions" onClick={(e) => e.stopPropagation()}>
+                <button className="btn-link btn-link-ver" onClick={() => setViendo(item)} aria-label={`Ver ${item.codigo_unico}`}>Ver</button>
+                {puedeEditar && item.estado !== 'baja' && (
+                  <>
+                    <button className="btn-link btn-link-editar" onClick={() => setEditando(item)} aria-label={`Editar ${item.codigo_unico}`}>Editar</button>
+                    <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`}>Eliminar</button>
+                  </>
+                )}
+              </div>
+            )
+          : undefined
+      }))
+  , [hiddenCols, allColumns, puedeEditar])
 
   return (
     <Layout
@@ -290,12 +281,26 @@ export default function Inventario() {
       ) : (
         <>
           {!isMobile ? (
-            <VirtualTable
-              items={sortedItems}
-              columns={columns}
-              onRowClick={(item) => setViendo(item)}
-              aria-label="Inventario de ítems"
-            />
+            <>
+              <div className="col-toggle-bar">
+                <span className="col-toggle-label">Columnas:</span>
+                {allColumns.filter((c) => !c.mandatory).map((col) => (
+                  <button
+                    key={col.key}
+                    className={`col-toggle-btn ${hiddenCols.includes(col.key) ? 'col-toggle-btn--off' : ''}`}
+                    onClick={() => toggleCol(col.key)}
+                  >
+                    {col.label}
+                  </button>
+                ))}
+              </div>
+              <VirtualTable
+                items={sortedItems}
+                columns={columns}
+                onRowClick={(item) => setViendo(item)}
+                aria-label="Inventario de ítems"
+              />
+            </>
           ) : (
             <div className="cards-grid">
               {sortedItems.map((item) => (
