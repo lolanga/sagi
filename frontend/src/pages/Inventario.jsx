@@ -144,15 +144,15 @@ export default function Inventario() {
   }, [items, sortKey, sortDir])
 
   const allColumns = useMemo(() => [
-    { key: 'codigo_unico', label: 'Código', mandatory: true },
-    { key: 'categoria', label: 'Categoría' },
-    { key: 'detalle', label: 'Detalle' },
-    { key: 'estado', label: 'Estado', mandatory: true },
-    { key: 'estado_conservacion', label: 'Conservación' },
-    { key: 'cantidad', label: 'Cant.' },
-    { key: 'unidad', label: 'Unidad' },
-    { key: 'responsable', label: 'Responsable' },
-    { key: 'acciones', label: '', mandatory: true },
+    { key: 'codigo_unico', label: 'Código', mandatory: true, flex: '1.4' },
+    { key: 'categoria', label: 'Categoría', flex: '0.7' },
+    { key: 'detalle', label: 'Detalle', flex: '2' },
+    { key: 'estado', label: 'Estado', mandatory: true, flex: '0.6' },
+    { key: 'estado_conservacion', label: 'Conservación', flex: '0.8' },
+    { key: 'cantidad', label: 'Cant.', flex: '0.4' },
+    { key: 'unidad', label: 'Unidad', flex: '0.7' },
+    { key: 'responsable', label: 'Responsable', flex: '0.9' },
+    { key: 'acciones', label: '', mandatory: true, flex: '1.2' },
   ], [])
 
   const columns = useMemo(() =>
