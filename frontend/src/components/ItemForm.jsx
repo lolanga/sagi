@@ -7,6 +7,7 @@ import '../styles/form.css'
 const estadosConservacion = ['Muy bueno', 'Bueno', 'Regular', 'Malo']
 
 const CAMPOS_FIJOS_NUEVOS = ['Marca', 'Modelo', 'Procedencia']
+const CAMPOS_OCULTOS = ['Numero de serie']
 
 const MAX_MOTIVO = 500
 
@@ -61,7 +62,9 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
           signal: controller.signal,
         })
         .then((res) => {
-          const activos = (res.data.campos || []).filter((c) => c.activo)
+          const activos = (res.data.campos || []).filter(
+            (c) => c.activo && !CAMPOS_OCULTOS.includes(c.nombre)
+          )
           setCampos(activos)
         })
         .catch((err) => {

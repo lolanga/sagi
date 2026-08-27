@@ -14,9 +14,11 @@
 .form-fieldset {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  padding: 16px;
-  margin: 0 0 16px;
+  padding: 14px;
+  margin: 0;
   background-color: transparent;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .form-fieldset legend {
@@ -352,7 +354,6 @@
 
   .form-fieldset {
     padding: 12px;
-    margin: 0 0 12px;
   }
 
   .campos-adicionales-toggle {
@@ -372,13 +373,75 @@
 }
 
 /* ============================================
-   LARGE DESKTOP (>= 1200px)
+   RESPONSIVE - Small phones (< 380px)
+   Ajustes extra para pantallas muy pequeñas
    ============================================ */
 
-@media (min-width: 1200px) {
+@media (max-width: 379px) {
+  .form-fieldset {
+    padding: 10px;
+  }
+
+  .field label {
+    font-size: 12px;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .campos-adicionales-toggle {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+
+  .progress-text {
+    font-size: 11px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Medium phones (< 430px)
+   ============================================ */
+
+@media (max-width: 429px) {
+  .form-fieldset {
+    padding: 10px;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    padding: 8px 10px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Tablets (< 1024px)
+   ============================================ */
+
+@media (max-width: 1023px) {
   .form-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: 12px;
+  }
+
+  .form-fieldset {
+    padding: 16px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - Large desktop (>= 1440px)
+   ============================================ */
+
+@media (min-width: 1440px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
   }
 
   .form-fieldset {

@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
-import Modal from './Modal'
-import Aviso from './Aviso'
 
 const navGroups = [
   {
@@ -68,9 +66,6 @@ export default function Layout({ title, actions, children, back }) {
     try { return JSON.parse(localStorage.getItem('sagi_open_groups')) || navGroups.map((g) => g.id) } catch { return navGroups.map((g) => g.id) }
   })
   const [theme, setTheme] = useState(() => localStorage.getItem('sagi_theme') || 'dark')
-  const [showPasswordModal, setShowPasswordModal] = useState(false)
-  const [passwordError, setPasswordError] = useState('')
-  const [passwordSuccess, setPasswordSuccess] = useState('')
   const [alertCount, setAlertCount] = useState(0)
 
   useEffect(() => {
@@ -101,30 +96,6 @@ export default function Layout({ title, actions, children, back }) {
     setOpenGroups((prev) =>
       prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId]
     )
-  }
-
-  const handleChangePassword = async (e) => {
-    e.preventDefault()
-    setPasswordError('')
-    setPasswordSuccess('')
-    const form = e.target
-    const current_password = form.current_password.value
-    const password = form.password.value
-    const password_confirmation = form.password_confirmation.value
-
-    if (password !== password_confirmation) {
-      setPasswordError('Las contraseñas no coinciden')
-      return
-    }
-
-    try {
-      await api.post('/change-password', { current_password, password, password_confirmation })
-      setPasswordSuccess('Contraseña actualizada correctamente')
-      form.reset()
-      setTimeout(() => { setShowPasswordModal(false); setPasswordSuccess('') }, 2000)
-    } catch (err) {
-      setPasswordError(err.response?.data?.message || 'Error al cambiar la contraseña')
-    }
   }
 
   const visibleGroups = navGroups
@@ -246,9 +217,6 @@ export default function Layout({ title, actions, children, back }) {
             <button className="btn btn-secondary" onClick={toggleTheme} title="Cambiar tema">
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
-            <button className="btn btn-secondary" onClick={() => setShowPasswordModal(true)} title="Cambiar contraseña">
-              🔑
-            </button>
             <button className="btn btn-secondary" onClick={logout}>
               Cerrar sesión
             </button>
@@ -277,29 +245,6 @@ export default function Layout({ title, actions, children, back }) {
             </NavLink>
           ))}
       </nav>
-
-      <Modal open={showPasswordModal} title="Cambiar contraseña" onClose={() => setShowPasswordModal(false)}>
-        <form onSubmit={handleChangePassword}>
-          <Aviso mensaje={passwordError} onCerrar={() => setPasswordError('')} />
-          {passwordSuccess && <div className="aviso aviso-success">{passwordSuccess}</div>}
-          <div className="field">
-            <label htmlFor="current_password">Contraseña actual</label>
-            <input type="password" id="current_password" name="current_password" required />
-          </div>
-          <div className="field">
-            <label htmlFor="password">Nueva contraseña</label>
-            <input type="password" id="password" name="password" required minLength={6} />
-          </div>
-          <div className="field">
-            <label htmlFor="password_confirmation">Confirmar contraseña</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required minLength={6} />
-          </div>
-          <div className="form-actions">
-            <button type="button" className="btn btn-secondary" onClick={() => setShowPasswordModal(false)}>Cancelar</button>
-            <button type="submit" className="btn btn-primary">Guardar</button>
-          </div>
-        </form>
-      </Modal>
     </div>
   )
 }
