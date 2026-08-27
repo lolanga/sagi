@@ -1,16 +1,29 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
-import Inventario from './pages/Inventario'
-import Categorias from './pages/Categorias'
-import Movimientos from './pages/Movimientos'
-import Reportes from './pages/Reportes'
-import Alertas from './pages/Alertas'
-import Auditoria from './pages/Auditoria'
-import Unidades from './pages/Unidades'
+import Layout from './components/Layout'
 import './index.css'
+
+const Login = lazy(() => import('./pages/Login'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Inventario = lazy(() => import('./pages/Inventario'))
+const Categorias = lazy(() => import('./pages/Categorias'))
+const Movimientos = lazy(() => import('./pages/Movimientos'))
+const Reportes = lazy(() => import('./pages/Reportes'))
+const Alertas = lazy(() => import('./pages/Alertas'))
+const Auditoria = lazy(() => import('./pages/Auditoria'))
+const Unidades = lazy(() => import('./pages/Unidades'))
+
+function PageLoader() {
+  return (
+    <Layout title="Cargando...">
+      <div style={{ padding: 40, textAlign: 'center', color: 'var(--color-muted)' }}>
+        Cargando...
+      </div>
+    </Layout>
+  )
+}
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth()
@@ -30,74 +43,76 @@ export default function App() {
     <AuthProvider>
       <ToastProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/inventario"
-              element={
-                <ProtectedRoute>
-                  <Inventario />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/categorias"
-              element={
-                <RoleRoute roles={['admin']}>
-                  <Categorias />
-                </RoleRoute>
-              }
-            />
-            <Route
-              path="/unidades"
-              element={
-                <RoleRoute roles={['admin']}>
-                  <Unidades />
-                </RoleRoute>
-              }
-            />
-            <Route
-              path="/movimientos"
-              element={
-                <ProtectedRoute>
-                  <Movimientos />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reportes"
-              element={
-                <ProtectedRoute>
-                  <Reportes />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/alertas"
-              element={
-                <ProtectedRoute>
-                  <Alertas />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/auditoria"
-              element={
-                <ProtectedRoute>
-                  <Auditoria />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/inventario"
+                element={
+                  <ProtectedRoute>
+                    <Inventario />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/categorias"
+                element={
+                  <RoleRoute roles={['admin']}>
+                    <Categorias />
+                  </RoleRoute>
+                }
+              />
+              <Route
+                path="/unidades"
+                element={
+                  <RoleRoute roles={['admin']}>
+                    <Unidades />
+                  </RoleRoute>
+                }
+              />
+              <Route
+                path="/movimientos"
+                element={
+                  <ProtectedRoute>
+                    <Movimientos />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reportes"
+                element={
+                  <ProtectedRoute>
+                    <Reportes />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/alertas"
+                element={
+                  <ProtectedRoute>
+                    <Alertas />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/auditoria"
+                element={
+                  <ProtectedRoute>
+                    <Auditoria />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </ToastProvider>
     </AuthProvider>

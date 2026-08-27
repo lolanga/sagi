@@ -13,6 +13,8 @@ import Layout from '../components/Layout'
 import Skeleton from '../components/Skeleton'
 import EmptyState from '../components/EmptyState'
 import Pagination from '../components/Pagination'
+import VirtualTable from '../components/VirtualTable'
+import '../styles/virtual-table.css'
 import '../styles/inventario.css'
 
 export default function Inventario() {
@@ -130,6 +132,70 @@ export default function Inventario() {
     })
   }, [items, sortKey, sortDir])
 
+  const columns = useMemo(() => [
+    {
+      key: 'codigo_unico',
+      label: 'Código',
+      render: (item) => <strong>{item.codigo_unico}</strong>
+    },
+    {
+      key: 'categoria',
+      label: 'Categoría',
+      render: (item) => item.categoria?.codigo ?? '-'
+    },
+    {
+      key: 'detalle',
+      label: 'Detalle',
+      render: (item) => formatValores(item)
+    },
+    {
+      key: 'estado',
+      label: 'Estado',
+      render: (item) => (
+        <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
+      )
+    },
+    {
+      key: 'estado_conservacion',
+      label: 'Conservación',
+      render: (item) => (
+        <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>
+          {item.estado_conservacion ?? '-'}
+        </span>
+      )
+    },
+    {
+      key: 'cantidad',
+      label: 'Cant.',
+      render: (item) => item.cantidad
+    },
+    {
+      key: 'unidad',
+      label: 'Unidad',
+      render: (item) => item.unidad?.nombre ?? '-'
+    },
+    {
+      key: 'responsable',
+      label: 'Responsable',
+      render: (item) => item.responsable?.name ?? '-'
+    },
+    {
+      key: 'acciones',
+      label: '',
+      render: (item) => (
+        <div className="row-actions" onClick={(e) => e.stopPropagation()}>
+          <button className="btn-link btn-link-ver" onClick={() => setViendo(item)} aria-label={`Ver ${item.codigo_unico}`}>Ver</button>
+          {puedeEditar && item.estado !== 'baja' && (
+            <>
+              <button className="btn-link btn-link-editar" onClick={() => setEditando(item)} aria-label={`Editar ${item.codigo_unico}`}>Editar</button>
+              <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`}>Eliminar</button>
+            </>
+          )}
+        </div>
+      )
+    }
+  ], [puedeEditar])
+
   return (
     <Layout
       title="Inventario"
@@ -224,80 +290,12 @@ export default function Inventario() {
       ) : (
         <>
           {!isMobile ? (
-            <div className="table-wrap">
-              <table className="table" aria-label="Inventario de ítems">
-                <thead>
-                  <tr>
-                    <th
-                      onClick={() => handleSort('codigo_unico')}
-                      className="sortable-th"
-                      role="button"
-                      tabIndex={0}
-                      aria-sort={sortKey === 'codigo_unico' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('codigo_unico') }}
-                    >
-                      Código {sortKey === 'codigo_unico' && (sortDir === 'asc' ? '▲' : '▼')}
-                    </th>
-                    <th
-                      onClick={() => handleSort('categoria')}
-                      className="sortable-th"
-                      role="button"
-                      tabIndex={0}
-                      aria-sort={sortKey === 'categoria' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('categoria') }}
-                    >
-                      Categoría {sortKey === 'categoria' && (sortDir === 'asc' ? '▲' : '▼')}
-                    </th>
-                    <th>Detalle</th>
-                    <th onClick={() => handleSort('estado')} className="sortable-th">
-                      Estado {sortKey === 'estado' && (sortDir === 'asc' ? '▲' : '▼')}
-                    </th>
-                    <th onClick={() => handleSort('estado_conservacion')} className="sortable-th">
-                      Conservación {sortKey === 'estado_conservacion' && (sortDir === 'asc' ? '▲' : '▼')}
-                    </th>
-                    <th onClick={() => handleSort('cantidad')} className="sortable-th">
-                      Cant. {sortKey === 'cantidad' && (sortDir === 'asc' ? '▲' : '▼')}
-                    </th>
-                    <th onClick={() => handleSort('unidad')} className="sortable-th">
-                      Unidad {sortKey === 'unidad' && (sortDir === 'asc' ? '▲' : '▼')}
-                    </th>
-                    <th onClick={() => handleSort('responsable')} className="sortable-th">
-                      Responsable {sortKey === 'responsable' && (sortDir === 'asc' ? '▲' : '▼')}
-                    </th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedItems.map((item) => (
-                    <tr key={item.id} className={item.estado === 'baja' ? 'fila-baja' : ''}>
-                      <td data-label="Código"><strong>{item.codigo_unico}</strong></td>
-                      <td data-label="Categoría">{item.categoria?.codigo ?? '-'}</td>
-                      <td data-label="Detalle">{formatValores(item)}</td>
-                      <td data-label="Estado">
-                        <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
-                      </td>
-                      <td data-label="Conservación">
-                        <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>{item.estado_conservacion ?? '-'}</span>
-                      </td>
-                      <td data-label="Cant.">{item.cantidad}</td>
-                      <td data-label="Unidad">{item.unidad?.nombre ?? '-'}</td>
-                      <td data-label="Responsable">{item.responsable?.name ?? '-'}</td>
-                      <td data-label="Acciones">
-                        <div className="row-actions">
-                          <button className="btn-link btn-link-ver" onClick={() => setViendo(item)} aria-label={`Ver ${item.codigo_unico}`}>Ver</button>
-                          {puedeEditar && item.estado !== 'baja' && (
-                            <>
-                              <button className="btn-link btn-link-editar" onClick={() => setEditando(item)} aria-label={`Editar ${item.codigo_unico}`}>Editar</button>
-                              <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`}>Eliminar</button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <VirtualTable
+              items={sortedItems}
+              columns={columns}
+              onRowClick={(item) => setViendo(item)}
+              aria-label="Inventario de ítems"
+            />
           ) : (
             <div className="cards-grid">
               {sortedItems.map((item) => (
