@@ -111,7 +111,7 @@ Contacte al administrador del sistema para restablecerla.
 | Zona | Ubicación | Función |
 |------|-----------|---------|
 | Sidebar | Izquierda | Menú de navegación jerárquico con iconos |
-| Topbar | Arriba | Título, botón de tema (oscuro/claro), usuario, cambio de contraseña, cerrar sesión |
+| Topbar | Arriba | Título, botón de tema (oscuro/claro), usuario, cerrar sesión |
 | Contenido | Centro | Página actual |
 | Bottom Nav | Abajo (móvil) | Accesos rápidos a Operaciones e Inventario |
 
@@ -597,14 +597,6 @@ Haga clic en **"Auditoría"** en el menú lateral.
 ---
 
 ## 13. Preguntas Frecuentes
-
-### ¿Cómo cambio mi contraseña?
-
-1. Haga clic en su nombre de usuario en la esquina superior derecha
-2. Seleccione **"Cambiar Contraseña"**
-3. Ingrese su contraseña actual
-4. Ingrese la nueva contraseña y confírmela
-5. Haga clic en **"Guardar"**
 
 ### ¿Cómo cambio el tema de la interfaz?
 

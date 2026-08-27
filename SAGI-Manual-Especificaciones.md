@@ -395,7 +395,6 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | POST | /api/login | Iniciar sesión | No | Público |
 | GET | /api/me | Obtener usuario actual | Sí | Todos |
 | POST | /api/logout | Cerrar sesión | Sí | Todos |
-| POST | /api/change-password | Cambiar contraseña | Sí | Todos |
 
 ### 6.2 Dashboard
 
@@ -591,7 +590,6 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Gestionar Unidades | Si | No | No | No |
 | Ver Auditoría | Si | Si | No | No |
 | Exportar Auditoría | Si | Si | No | No |
-| Cambiar Contraseña | Si | Si | Si | Si |
 
 ### 7.3 Usuarios de Prueba
 
@@ -721,7 +719,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 
 | Componente | Función |
 |------------|---------|
-| Layout | Shell de la aplicación (sidebar + topbar + contenido), incluye toggle de tema (oscuro/claro) y botón de cambio de contraseña |
+| Layout | Shell de la aplicación (sidebar + topbar + contenido), incluye toggle de tema (oscuro/claro) |
 | Modal | Diálogo modal genérico (close on Escape, overlay click, body scroll lock) |
 | Aviso | Banner de notificación auto-cerrable (5s) |
 | ItemForm | Formulario para crear/editar ítems con validación inline, AbortController, confirmación al cambiar tipo |
@@ -824,8 +822,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Unicidad | Case-insensitive (sedes, unidades, categorías) |
 | SQL Injection | Protegido por Eloquent ORM |
 | Auditoría | Registro completo de acciones |
-| Eliminación | Limpieza de dependencias antes de borrar |
-| Cambio de contraseña | Endpoint protegido, requiere contraseña actual |
+| Eliminación | Movimientos preservados como históricos (item_id=null) |
 | Backup | Creación de respaldo SQL, acceso restringido a admin |
 
 ---
