@@ -16,6 +16,7 @@ export default function Unidades() {
   const [tab, setTab] = useState('sedes')
   const [busqueda, setBusqueda] = useState('')
   const [verInactivas, setVerInactivas] = useState(false)
+  const [sedesAbiertas, setSedesAbiertas] = useState({})
 
   const [showCrearSede, setShowCrearSede] = useState(false)
   const [sedeEdit, setSedeEdit] = useState(null)
@@ -195,6 +196,15 @@ export default function Unidades() {
 
   const sedesVisibles = sedes.filter((s) => verInactivas || s.activa)
 
+  const toggleSedeAbierta = (sedeId) => {
+    setSedesAbiertas((prev) => ({ ...prev, [sedeId]: !prev[sedeId] }))
+  }
+
+  const unidadesPorSede = sedesVisibles.map((sede) => ({
+    sede,
+    unidades: unidadesVisibles.filter((u) => u.sede_id === sede.id),
+  })).filter((g) => g.unidades.length > 0 || !termino)
+
   const SkeletonCards = ({ count = 4 }) => (
     <div className="sedes-grid">
       {Array.from({ length: count }).map((_, i) => (
@@ -309,30 +319,48 @@ export default function Unidades() {
                 {!termino && puedeGestionar && <button className="btn btn-primary" onClick={abrirCrearUnidad}>+ Crear primera unidad</button>}
               </div>
             ) : (
-              <div className="unidades-grid">
-                {unidadesVisibles.map((u) => (
-                  <div key={u.id} className={`unidad-card ${u.activa ? '' : 'unidad-inactiva'}`}>
-                    <div className="unidad-card-header">
-                      <span className="unidad-id">#{String(u.id).padStart(2, '0')}</span>
-                      <span className="unidad-sede">{sedeDe(u.sede_id)}</span>
-                      <span className={`unidad-badge-estado ${u.activa ? 'badge-activa' : 'badge-inactiva'}`}>
-                        {u.activa ? 'Activa' : 'Inactiva'}
-                      </span>
+              <div className="unidades-grupo-list">
+                {unidadesPorSede.map(({ sede, unidades }) => {
+                  const abierta = sedesAbiertas[sede.id] !== false
+                  return (
+                    <div key={sede.id} className={`unidades-grupo ${abierta ? 'abierto' : ''}`}>
+                      <button className="unidades-grupo-header" onClick={() => toggleSedeAbierta(sede.id)}>
+                        <span className={`grupo-flecha ${abierta ? 'flecha-abierta' : ''}`}>&#9654;</span>
+                        <span className="grupo-nombre">{sede.nombre}</span>
+                        <span className="grupo-count">{unidades.length}</span>
+                        {!sede.activa && <span className="badge-inactiva" style={{ marginLeft: 8 }}>Inactiva</span>}
+                      </button>
+                      {abierta && (
+                        <div className="unidades-grupo-body">
+                          {unidades.length === 0 ? (
+                            <p className="muted" style={{ padding: '12px 16px' }}>Sin unidades en esta sede.</p>
+                          ) : (
+                            <div className="unidades-lista">
+                              {unidades.map((u) => (
+                                <div key={u.id} className={`unidad-row ${u.activa ? '' : 'unidad-inactiva'}`}>
+                                  <div className="unidad-row-info">
+                                    <span className="unidad-row-id">#{String(u.id).padStart(2, '0')}</span>
+                                    <span className="unidad-row-nombre">{u.nombre}</span>
+                                    {!u.activa && <span className="badge-inactiva">Inactiva</span>}
+                                  </div>
+                                  {puedeGestionar && (
+                                    <div className="unidad-row-actions">
+                                      <button className="btn-icon-sm" title="Editar" onClick={() => abrirEditarUnidad(u)}>✎</button>
+                                      <button className="btn-icon-sm" title={u.activa ? 'Desactivar' : 'Activar'} onClick={() => toggleUnidad(u)}>
+                                        {u.activa ? '👁' : '🚫'}
+                                      </button>
+                                      <button className="btn-icon-sm btn-icon-danger" title="Eliminar" onClick={() => abrirEliminarUnidad(u)}>🗑</button>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <div className="unidad-card-body">
-                      <h4 className="unidad-nombre">{u.nombre}</h4>
-                    </div>
-                      {puedeGestionar && (
-                      <div className="unidad-card-actions">
-                        <button className="btn-icon" title="Editar" onClick={() => abrirEditarUnidad(u)}>✎</button>
-                        <button className="btn-icon" title={u.activa ? 'Desactivar' : 'Activar'} onClick={() => toggleUnidad(u)}>
-                          {u.activa ? '👁' : '🚫'}
-                        </button>
-                        <button className="btn-icon btn-icon-danger" title="Eliminar" onClick={() => abrirEliminarUnidad(u)}>🗑</button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
