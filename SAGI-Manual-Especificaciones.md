@@ -3,7 +3,7 @@ title: "SAGI - Manual de Especificaciones Técnicas"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
 date: "26 de agosto de 2026"
-version: "2.0"
+version: "3.0"
 ---
 
 # SAGI - Manual de Especificaciones Técnicas
@@ -11,7 +11,7 @@ version: "2.0"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 2.0 | Fecha: 26 de agosto de 2026 | Estado: Producción
+Versión: 3.0 | Fecha: 26 de agosto de 2026 | Estado: Producción
 
 ---
 
@@ -41,12 +41,15 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 
 | Funcionalidad | Descripción |
 |---------------|-------------|
-| Registro de ítems | Alta con campos dinámicos por categoría |
+| Registro de ítems | Alta con campos dinámicos por categoría, AbortController, validación inline |
 | Control de movimientos | Altas, traslados, bajas con flujo de aprobación |
 | Gestión organizacional | Sedes y unidades del instituto |
 | Sistema de alertas | Notificaciones para pendientes |
 | Auditoría | Registro completo de acciones |
-| Reportes | Exportación a Excel, CSV, JSON |
+| Reportes | Exportación a Excel, CSV, PDF |
+| Tabla virtual | VirtualTable con columnas configurables y scroll optimizado |
+| Lazy loading | Carga bajo demanda de módulos con React.lazy |
+| Compresión | Brotli/Gzip en responses del backend |
 
 ### 1.1 Alcance
 
@@ -107,13 +110,24 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Componente | Versión | Propósito |
 |------------|---------|-----------|
 | React | 19.x | Biblioteca de UI |
-| Vite | 6.x | Bundler y dev server |
-| React Router | 7.x | Enrutamiento SPA |
-| Axios | 1.x | Cliente HTTP |
+| Vite | 8.x | Bundler y dev server |
+| React Router | 7.x | Enrutamiento SPA con React.lazy |
+| Axios | 1.x | Cliente HTTP con AbortController |
 | SheetJS (xlsx) | - | Exportación Excel |
 | Chart.js | 4.x | Gráficos de barras y doughnut (Dashboard) |
 | jsPDF | 2.x | Generación de PDFs |
 | jspdf-autotable | 3.x | Tablas en PDFs |
+
+### 3.3 Performance y Optimización
+
+| Feature | Descripción |
+|---------|-------------|
+| React.lazy | Carga bajo demanda de cada página (code splitting) |
+| VirtualTable | Tabla CSS con scroll virtual (max-height: 70vh) |
+| Column toggle | Ocultar/mostrar columnas configurables |
+| Compresión | Middleware PrecompressResponse (Brotli/Gzip) |
+| Lazy loading imágenes | Componente Image con loading="lazy" |
+| CSS code splitting | Vite genera CSS separado por página |
 
 ### 3.3 Herramientas de Desarrollo
 
@@ -651,10 +665,13 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 
 | Directorio | Contenido |
 |------------|-----------|
-| src/components/ | AuthContext, Layout, Modal, Aviso, ItemForm, ItemDetalle |
+| src/components/ | Layout, Modal, Aviso, ItemForm, ItemDetalle, VirtualTable, Pagination, EmptyState, Skeleton, Image |
 | src/pages/ | Login, Dashboard, Inventario, Movimientos, Categorias, Unidades, Alertas, Auditoria, Reportes |
-| src/services/ | api.js (instancia Axios) |
-| src/styles/ | auth, dashboard, inventario, categorias, form, modal, aviso, detalle |
+| src/services/ | api.js (instancia Axios con AbortController) |
+| src/context/ | AuthContext, ToastContext |
+| src/hooks/ | useMediaQuery (responsive table/cards) |
+| src/utils/ | helpers.js (extractApiError) |
+| src/styles/ | auth, dashboard, inventario, categorias, form, modal, aviso, detalle, virtual-table, skeleton, empty-state, toast, image |
 | src/index.css | Estilos globales |
 
 ### 9.2 Rutas
@@ -676,17 +693,25 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Componente | Función |
 |------------|---------|
 | Layout | Shell de la aplicación (sidebar + topbar + contenido), incluye toggle de tema (oscuro/claro) y botón de cambio de contraseña |
-| Modal | Diálogo modal genérico |
-| Aviso | Banner de notificación auto-cerrable |
-| ItemForm | Formulario para crear/editar ítems |
-| ItemDetalle | Vista de solo lectura del ítem con timeline de movimientos |
+| Modal | Diálogo modal genérico (close on Escape, overlay click, body scroll lock) |
+| Aviso | Banner de notificación auto-cerrable (5s) |
+| ItemForm | Formulario para crear/editar ítems con validación inline, AbortController, confirmación al cambiar tipo |
+| ItemDetalle | Vista de solo lectura del ítem con timeline de movimientos (scroll 400px) |
+| VirtualTable | Tabla CSS con flex columns, scroll virtual (max-height: 70vh), columnas configurables |
+| Pagination | Paginador con aria-live="polite", nav semántico |
+| EmptyState | Estado vacío con iconos SVG (search, inventory, alert, box) |
+| Skeleton | Placeholder de carga animado (pulse 1.4s) para tabla y cards |
+| Image | Imagen con lazy loading, fallback, transición opacidad |
 
-### 9.4 Servicios
+### 9.4 Servicios y Utilidades
 
 | Archivo | Función |
 |---------|---------|
-| api.js | Instancia Axios con interceptores (token, 401) |
-| AuthContext | Proveedor de autenticación (login, logout, user, changePassword) |
+| api.js | Instancia Axios con interceptores (token, 401), soporte AbortController |
+| AuthContext | Proveedor de autenticación (login, logout, user) |
+| ToastContext | Notificaciones toast (success, error, info) con auto-dismiss |
+| helpers.js | extractApiError() - extrae mensajes de error de API |
+| useMediaQuery.js | Hook para detectar breakpoint responsive (table vs cards) |
 
 ---
 
@@ -871,9 +896,46 @@ npm run dev
 
 ---
 
-## 14. Changelog v2.0
+## 14. Changelog
 
-### Mejoras de UI/UX
+### v3.0 (26 agosto 2026)
+
+#### Performance y Optimización
+- **React.lazy** para carga bajo demanda de todas las páginas (code splitting)
+- **VirtualTable** con scroll CSS virtual (max-height: 70vh) reemplazando tabla tradicional
+- **Column toggle** para mostrar/ocultar columnas configurables en inventario
+- **Anchos proporcionales** por columna (flex values: 0.4 a 2.0)
+- **Compresión Brotli/Gzip** via middleware PrecompressResponse en Laravel
+- **Image component** con lazy loading="lazy" y fallback
+- **CSS code splitting** por página (Vite genera bundles separados)
+- **useMediaQuery hook** para toggle table/cards sin doble DOM
+
+#### ItemForm - Correcciones Críticas
+- **AbortController** para cancelar requests obsoletos al cambiar categoría/tipo
+- **Confirmación** antes de borrar campos dinámicos al cambiar tipo de elemento
+- **Validación inline** con fieldErrors por campo, aria-invalid, mensajes en español
+- **Motivo** cambiado de input a textarea
+- **useMemo** para categorías filtradas
+
+#### Inventario - Correcciones
+- **Null safety** en estado_conservacion.replace() con optional chaining
+- **.catch()** agregado a fetch de /categorias
+- **useMemo** para sortedItems (evita re-orden en cada render)
+- **Page reset** al cambiar búsqueda o filtro de categoría
+- **Clear search** botón "×" para limpiar búsqueda
+- **aria-labels** en inputs, botones y headers ordenables
+- **Pagination** mejorado con nav semántico y aria-live
+
+#### Sidebar
+- **Fix hover** color cambiado de var(--color-white) (#232937) a #ffffff
+
+#### Build
+- **Vite 8.x** con target es2020
+- **Build size** reducido a ~330KB gzipped total
+
+### v2.0 (26 agosto 2026)
+
+#### Mejoras de UI/UX
 - Sidebar jerárquico con 4 bloques temáticos (Operaciones, Inventario, Configuración, Control)
 - Iconos SVG en cada item del menú
 - Sidebar colapsable en desktop (botón ‹)
@@ -889,7 +951,7 @@ npm run dev
 - Toast notifications para acciones
 - Ordenar columnas por click
 
-### Depuración de Código
+#### Depuración de Código
 - Eliminado `hasRole` muerto de AuthContext
 - Eliminado import duplicado de `index.css` en Layout.jsx
 - Extraído `extractApiError()` como utilidad compartida
@@ -900,7 +962,7 @@ npm run dev
 - Renombrado `.cards-grid` → `.stats-grid` en dashboard.css (evita colisión)
 - Agregadas CSS variables faltantes (`--color-info`, `--color-text-secondary`, `--color-card`)
 
-### Backend
+#### Backend
 - Eliminados métodos muertos `esAdmin()` y `esJefe()` de User model
 - Eliminado import `UserFactory` no utilizado de User model
 - Eliminado trait `Notifiable` no utilizado de User model
@@ -910,4 +972,4 @@ npm run dev
 ---
 
 *Documento generado el 26 de agosto de 2026*
-*SAGI v2.0 - Instituto de Seguridad Pública*
+*SAGI v3.0 - Instituto de Seguridad Pública*

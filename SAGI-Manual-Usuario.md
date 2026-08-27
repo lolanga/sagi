@@ -3,7 +3,7 @@ title: "SAGI - Manual de Usuario"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
 date: "26 de agosto de 2026"
-version: "2.0"
+version: "3.0"
 ---
 
 # SAGI - Manual de Usuario
@@ -11,7 +11,7 @@ version: "2.0"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 2.0 | Fecha: 26 de agosto de 2026
+Versión: 3.0 | Fecha: 26 de agosto de 2026
 
 ---
 
@@ -204,23 +204,46 @@ Tabla con la cantidad de ítems agrupados por categoría:
 
 Haga clic en **"Inventario"** en el menú lateral.
 
-| Columna | Descripción |
-|---------|-------------|
-| Código | Código único del ítem (ej: A1-03-47-000001) |
-| Categoría | Código de categoría |
-| Detalle | Campos dinámicos del ítem |
-| Estado | Estado de conservación |
-| Cant. | Cantidad |
-| Unidad | Unidad de destino |
-| Responsable | Persona responsable |
-| Acciones | Botones de acción |
+**En escritorio:** Se muestra una tabla con columnas configurables.
+**En móvil:** Se muestran tarjetas con la información del ítem.
 
-### 6.2 Buscar Ítems
+| Columna | Descripción | Ancho |
+|---------|-------------|-------|
+| Código | Código único del ítem (ej: A1-03-47-000001) | 1.4 |
+| Categoría | Código de categoría | 0.7 |
+| Detalle | Campos dinámicos del ítem | 2.0 |
+| Estado | Estado del ítem (activo/pendiente/baja) | 0.6 |
+| Conservación | Estado de conservación | 0.8 |
+| Cant. | Cantidad | 0.4 |
+| Unidad | Unidad de destino | 0.7 |
+| Responsable | Persona responsable | 0.9 |
+| Acciones | Botones de acción | 1.2 |
+
+### 6.2 Configurar Columnas (Escritorio)
+
+Debajo de los filtros verá una barra de pills con las columnas disponibles:
+
+| Pill | Columna que controla |
+|------|---------------------|
+| Categoría | Oculta/muestra columna de categoría |
+| Detalle | Oculta/muestra columna de detalle |
+| Conservación | Oculta/muestra columna de conservación |
+| Cant. | Oculta/muestra columna de cantidad |
+| Unidad | Oculta/muestra columna de unidad |
+| Responsable | Oculta/muestra columna de responsable |
+
+**Las columnas Código, Estado y Acciones siempre están visibles.**
+
+Su configuración se guarda automáticamente y se recuerda en su próxima visita.
+
+### 6.3 Buscar Ítems
 
 | Filtro | Uso |
 |--------|-----|
-| Campo de búsqueda | Buscar por código, detalle, unidad de destino o responsable |
+| Campo de búsqueda | Buscar por código, detalle, unidad de destino o responsable. Use el botón "×" para limpiar. |
 | Categoría (desplegable) | Filtrar por categoría específica |
+
+**Nota:** Al cambiar búsqueda o categoría, la paginación vuelve a la página 1.
 
 ### 6.3 Registrar Nuevo Ítem (Alta)
 
@@ -624,9 +647,25 @@ Los ítems se muestran 20 por página. Use "Anterior" y "Siguiente" para navegar
 
 ---
 
-## Changelog v2.0
+## Changelog
 
-### Nuevas Funcionalidades
+### v3.0 (26 agosto 2026)
+
+#### Nuevas Funcionalidades
+- **Columnas configurables**: Muestre/oculte columnas en la tabla de inventario con pills clickeables
+- **Búsqueda mejorada**: Botón "×" para limpiar búsqueda rápidamente
+- **Anchos proporcionales**: Columnas con anchos adaptables (Detalle más ancho, Cantidad más estrecho)
+- **Carga rápida**: Las páginas se cargan bajo demanda (más ágil)
+- **Imágenes optimizadas**: Las imágenes cargan solo cuando son visibles
+
+#### Mejoras de UX
+- **Filtros resetean paginación**: Al buscar o filtrar, vuelve a página 1 automáticamente
+- **Tabla responsive**: Se adapta al tamaño de pantalla automáticamente
+- **Mejor accesibilidad**: Descripciones para lectores de pantalla en toda la app
+
+### v2.0 (26 agosto 2026)
+
+#### Nuevas Funcionalidades
 - **Sidebar jerárquico**: Menú organizado en 4 bloques temáticos
 - **Iconos SVG**: Cada módulo tiene un icono visual
 - **Sidebar colapsable**: Maximice el área de trabajo con el botón `‹`
@@ -638,7 +677,7 @@ Los ítems se muestran 20 por página. Use "Anterior" y "Siguiente" para navegar
 - **Toast notifications**: Confirmaciones emergentes para acciones
 - **Ordenar columnas**: Click en encabezados de tabla para ordenar
 
-### Mejoras de UX
+#### Mejoras de UX
 - **Cards en móvil**: Ítems como tarjetas en lugar de tabla
 - **Filtros colapsables**: Ocultar/mostrar filtros en móvil
 - **Sticky header**: Encabezado de tabla fijo al hacer scroll
@@ -646,6 +685,6 @@ Los ítems se muestran 20 por página. Use "Anterior" y "Siguiente" para navegar
 
 ---
 
-*Manual de Usuario - SAGI v2.0*
+*Manual de Usuario - SAGI v3.0*
 *Fecha: 26 de agosto de 2026*
 *Instituto de Seguridad Pública*
