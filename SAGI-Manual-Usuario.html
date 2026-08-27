@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAGI - Manual de Usuario v3.0</title>
+  <title>SAGI - Manual de Usuario v3.1</title>
   <style>
     :root {
       --primary: #4a8fd4;
@@ -467,7 +467,7 @@
 <div class="hero">
   <h1>SAGI</h1>
   <p class="subtitle">Sistema de Administración y Gestión de Inventarios</p>
-  <span class="version-badge">Manual de Usuario v3.0 — Instituto de Seguridad Pública</span>
+  <span class="version-badge">Manual de Usuario v3.1 — Instituto de Seguridad Pública</span>
 </div>
 
 <div class="container">
@@ -782,11 +782,11 @@
     <ol class="steps">
       <li>Haga clic en <strong>"+ Nueva solicitud"</strong></li>
       <li>Seleccione <strong>"Baja"</strong> y el ítem</li>
-      <li>Ingrese el <strong>motivo</strong></li>
+      <li>Ingrese el <strong>motivo</strong> (requerido)</li>
       <li>Haga clic en <strong>"Registrar"</strong></li>
     </ol>
 
-    <div class="warning"><strong>Nota:</strong> La baja tiene prioridad crítica y genera una alerta inmediata.</div>
+    <div class="warning"><strong>Nota:</strong> La baja tiene prioridad crítica y genera una alerta inmediata. Al aprobarla, el ítem conserva todos sus registros y se asigna un motivo de baja visible solo para Admin/Jefe.</div>
 
     <h3>Aprobar o Rechazar Movimiento</h3>
     <p><span class="badge badge-warning">Solo admin/jefe</span></p>
@@ -794,9 +794,23 @@
       <thead><tr><th>Acción</th><th>Resultado</th></tr></thead>
       <tbody>
         <tr><td>Aprobar traslado</td><td>Cambia la unidad del ítem</td></tr>
-        <tr><td>Aprobar baja</td><td>Estado del ítem = "baja", categoría = A8</td></tr>
+        <tr><td>Aprobar baja</td><td>Estado del ítem = "baja", se guarda motivo y fecha de baja, categoría original preservada</td></tr>
         <tr><td>Rechazar</td><td>Se registra motivo, movimiento queda como rechazado</td></tr>
       </tbody>
+    </table>
+
+    <h3>Reactivar Ítem</h3>
+    <p><span class="badge badge-warning">Solo admin/jefe</span> — Si un ítem fue dado de baja, puede reactivarlo para volverlo a estado activo.</p>
+    <ol class="steps">
+      <li>Busque el ítem dado de baja en el inventario</li>
+      <li>Haga clic en <strong>"Ver"</strong> para abrir el detalle</li>
+      <li>Haga clic en <strong>"Reactivar ítem"</strong></li>
+      <li>Ingrese el <strong>motivo de reactivación</strong> (requerido)</li>
+      <li>Haga clic en <strong>"Reactivar"</strong></li>
+      <li>El ítem vuelve a su categoría original con estado "activo"</li>
+    </ol>
+
+    <div class="tip"><strong>Historial:</strong> Al reactivar se crea un nuevo movimiento "alta" para mantener la trazabilidad completa del ítem.</div>
     </table>
   </section>
 
@@ -987,13 +1001,33 @@
       <h4>¿Cómo funciona la paginación?</h4>
       <p>Los ítems se muestran 20 por página. Use "Anterior" y "Siguiente" para navegar.</p>
     </div>
+
+    <div class="faq-item">
+      <h4>¿Qué pasa cuando doy de baja un ítem?</h4>
+      <p>El ítem <strong>no se elimina</strong>. Se marca como "baja" y se mueve a la categoría A8. Se guarda el motivo de baja y la fecha. Solo Admin y Jefe pueden ver esta información. El historial de movimientos se mantiene intacto.</p>
+    </div>
+
+    <div class="faq-item">
+      <h4>¿Puedo reactivar un ítem dado de baja?</h4>
+      <p>Sí. Admin y Jefe pueden reactivar ítems desde el detalle del ítem. Deben ingresar un motivo de reactivación. El ítem vuelve a su categoría original con estado "activo" y se crea un nuevo movimiento "alta" para mantener la trazabilidad.</p>
+    </div>
+
+    <div class="faq-item">
+      <h4>¿Quién puede ver el motivo de baja?</h4>
+      <p>Solo los usuarios con rol de <strong>Administrador</strong> y <strong>Jefe de Área</strong>. El motivo se muestra en el detalle del ítem y como columna adicional en la tabla de inventario.</p>
+    </div>
+
+    <div class="faq-item">
+      <h4>¿Se guarda historial de bajas y reactivaciones?</h4>
+      <p>Sí. Cada baja y reactivación se registra como un movimiento en el historial del ítem. Además, se guarda en la auditoría del sistema con todos los detalles.</p>
+    </div>
   </section>
 
 </div>
 
 <footer>
-  Manual de Usuario — SAGI v3.0<br>
-  Instituto de Seguridad Pública — 26 de agosto de 2026
+  Manual de Usuario — SAGI v3.1<br>
+  Instituto de Seguridad Pública — 27 de agosto de 2026
 </footer>
 
 </body>

@@ -2,8 +2,8 @@
 title: "SAGI - Manual de Especificaciones Técnicas"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
-date: "26 de agosto de 2026"
-version: "3.0"
+date: "27 de agosto de 2026"
+version: "3.1"
 ---
 
 # SAGI - Manual de Especificaciones Técnicas
@@ -11,7 +11,7 @@ version: "3.0"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 3.0 | Fecha: 26 de agosto de 2026 | Estado: Producción
+Versión: 3.1 | Fecha: 27 de agosto de 2026 | Estado: Producción
 
 ---
 
@@ -42,7 +42,9 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Funcionalidad | Descripción |
 |---------------|-------------|
 | Registro de ítems | Alta con campos dinámicos por categoría, AbortController, validación inline |
-| Control de movimientos | Altas, traslados, bajas con flujo de aprobación |
+| Control de movimientos | Altas, traslados, bajas con flujo de aprobación y motivos |
+| Baja con trazabilidad | Ítems dados de baja conservan registros, motivo y fecha de baja |
+| Reactivación | Re-activación de ítems dados de baja con motivo y auditoría |
 | Gestión organizacional | Sedes y unidades del instituto |
 | Sistema de alertas | Notificaciones para pendientes |
 | Auditoría | Registro completo de acciones |
@@ -269,7 +271,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 |-------|------|-------------|-------------|
 | id | INT | PK, auto_increment | Identificador único |
 | codigo_unico | VARCHAR(20) | UNIQUE, NOT NULL | Código del ítem |
-| categoria_id | INT | FK → categorias | Categoría |
+| categoria_id | INT | FK → categorias | Categoría actual (A8 si está en baja) |
 | tipo_item_id | INT | FK → tipos_items (NULLABLE) | Tipo específico |
 | responsable_id | INT | FK → users | Persona responsable |
 | unidad_id | INT | FK → unidades | Unidad de destino |
@@ -278,6 +280,9 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | fecha_alta | DATE | NULLABLE | Fecha de incorporación |
 | valores_dinamicos | JSON | NULLABLE | Valores de campos dinámicos |
 | estado | ENUM | DEFAULT 'activo' | activo, pendiente, baja |
+| motivo_baja | TEXT | NULLABLE | Razón de la baja (solo visible admin/jefe) |
+| fecha_baja | TIMESTAMP | NULLABLE | Fecha y hora de la baja |
+| categoria_original_id | INT | FK → categorias (NULLABLE) | Categoría antes de la baja (para reactivación) |
 
 **Formato del código único:**
 
@@ -377,6 +382,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | 17 | 20260818 | sedes, unidades | Agregar campo activa |
 | 18 | 20260823 | items | Hacer fecha_alta nullable |
 | 19 | 20260823 | items | Recodificar códigos existentes |
+| 20 | 20260827 | items | Agregar motivo_baja, fecha_baja, categoria_original_id |
 
 ---
 
@@ -406,6 +412,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | POST | /api/items | Crear ítem | Sí | admin, jefe, carga |
 | GET | /api/items/{id} | Ver detalle | Sí | Todos |
 | PUT | /api/items/{id} | Actualizar ítem | Sí | admin, jefe, carga |
+| POST | /api/items/{id}/reactivar | Reactivar ítem dado de baja | Sí | admin, jefe |
 | DELETE | /api/items/{id} | Eliminar ítem | Sí | admin, jefe, carga |
 
 **Parámetros de filtro para GET /api/items:**
@@ -515,7 +522,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | GET | /api/reportes/resumen | Datos agregados | Sí | admin, jefe |
 | GET | /api/reportes/items | Lista completa de ítems | Sí | admin, jefe |
 
-**Total: 41 endpoints (1 público, 40 autenticados)**
+**Total: 42 endpoints (1 público, 41 autenticados)**
 
 ---
 
@@ -564,6 +571,8 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | Editar Ítem | Si | Si | Si | No |
 | Eliminar Ítem | Si | Si | Si | No |
 | Ver Detalle Ítem | Si | Si | Si | Si |
+| Ver Motivo Baja | Si | Si | No | No |
+| Reactivar Ítem | Si | Si | No | No |
 | Ver Movimientos | Si | Si | Si | No |
 | Solicitar Traslado | Si | Si | Si | No |
 | Solicitar Baja | Si | Si | Si | No |
@@ -624,9 +633,26 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | 1 | Usuario solicita baja (POST /api/movimientos/bajas) |
 | 2 | Se crea movimiento con estado "pendiente" |
 | 3 | Se crea alerta "crítica" |
-| 4 | Admin/Jefe aprueba: estado del ítem = "baja", categoría = A8 |
-| 5 | Se cierra la alerta asociada |
-| 6 | Se registra en auditoría |
+| 4 | Admin/Jefe aprueba: estado del ítem = "baja" |
+| 5 | Se guarda `categoria_original_id` = categoría actual |
+| 6 | Se guarda `motivo_baja` = motivo del movimiento |
+| 7 | Se guarda `fecha_baja` = fecha y hora actual |
+| 8 | Se mueve ítem a categoría A8 (baja) |
+| 9 | Se cierra la alerta asociada |
+| 10 | Se registra en auditoría |
+
+### 8.4 Flujo de Reactivación
+
+| Paso | Descripción |
+|------|-------------|
+| 1 | Admin/Jefe accede al detalle del ítem (GET /api/items/{id}) |
+| 2 | Si el ítem tiene estado "baja", se muestra botón "Reactivar ítem" |
+| 3 | Se ingresa motivo de reactivación (requerido) |
+| 4 | Se envía POST /api/items/{id}/reactivar con motivo |
+| 5 | Se restaura `categoria_id` = `categoria_original_id` |
+| 6 | Se limpian `motivo_baja`, `fecha_baja`, `categoria_original_id` |
+| 7 | Se crea movimiento "alta" con estado "aprobado" |
+| 8 | Se registra en auditoría con acción "reactivar" |
 
 ### 8.4 Generación de Código Único
 
@@ -897,6 +923,31 @@ npm run dev
 ---
 
 ## 14. Changelog
+
+### v3.1 (27 agosto 2026)
+
+#### Baja con Trazabilidad
+- **Migration**: Agregados campos `motivo_baja`, `fecha_baja`, `categoria_original_id` a tabla items
+- **Modelo Item**: Campos fillable, casting datetime, relación `categoriaOriginal()`
+- **Lógica de baja**: Al aprobar baja se guarda categoría original, motivo y fecha
+- **Sin eliminación**: Los ítems dados de baja conservan todos sus registros
+
+#### Reactivación de Ítems
+- **Endpoint**: `POST /api/items/{id}/reactivar` (admin, jefe)
+- **Validación**: Solo ítems con estado "baja" pueden ser reactivados
+- **Motivo requerido**: Se debe ingresar motivo de reactivación
+- **Historial**: Se crea movimiento "alta" aprobado para trazabilidad
+- **Auditoría**: Se registra acción "reactivar" con detalle completo
+
+#### Frontend - ItemDetalle
+- **Botón reactivar**: Visible solo para admin/jefe en ítems de baja
+- **Modal reactivación**: Formulario con motivo requerido
+- **Información baja**: Muestra motivo_baja y fecha_baja para admin/jefe
+
+#### Frontend - Inventario
+- **Columna "Motivo Baja"**: Visible solo para admin/jefe
+- **Indicador en cards**: Muestra motivo de baja en vista móvil
+- **Estilos**: CSS para motivo_baja_text y item_card_motivo_baja
 
 ### v3.0 (26 agosto 2026)
 

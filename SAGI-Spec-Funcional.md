@@ -2,8 +2,8 @@
 title: "SAGI - Spec Funcional por Elemento"
 subtitle: "Inventario detallado de cada componente, elemento y comportamiento de la interfaz"
 author: "Instituto de Seguridad Publica (ISeP)"
-date: "26 de agosto de 2026"
-version: "1.0"
+date: "27 de agosto de 2026"
+version: "1.1"
 ---
 
 # SAGI - Spec Funcional por Elemento
@@ -182,17 +182,18 @@ Estado persistido en `localStorage.sagi_hidden_cols`.
 
 Flexbox table con header sticky y body con scroll (`max-height: 70vh`).
 
-| Columna | Flex | Contenido |
-|---------|------|-----------|
-| Codigo | 1.4 | `item.codigo_unico` en `<strong>` |
-| Categoria | 0.7 | `item.categoria.codigo` |
-| Detalle | 2 | `formatValores(item)`: tipo_item + primeros 2 valores dinamicos |
-| Estado | 0.6 | Badge color-coded: activo (verde), pendiente (naranja), baja (rojo) |
-| Conservacion | 0.8 | Badge: Muy bueno (verde), Bueno (azul), Regular (naranja), Malo (rojo) |
-| Cantidad | 0.4 | Numero |
-| Unidad | 0.7 | `item.unidad.nombre` |
-| Responsable | 0.9 | `item.responsable.name` |
-| Acciones | 1.2 | Ver (siempre), Editar (admin/jefe/carga + no baja), Eliminar (admin/jefe/carga + no baja) |
+| Columna | Flex | Contenido | Visibilidad |
+|---------|------|-----------|-------------|
+| Codigo | 1.4 | `item.codigo_unico` en `<strong>` | Siempre |
+| Categoria | 0.7 | `item.categoria.codigo` | Configurable |
+| Detalle | 2 | `formatValores(item)`: tipo_item + primeros 2 valores dinamicos | Configurable |
+| Estado | 0.6 | Badge color-coded: activo (verde), pendiente (naranja), baja (rojo) | Siempre |
+| Conservacion | 0.8 | Badge: Muy bueno (verde), Bueno (azul), Regular (naranja), Malo (rojo) | Configurable |
+| Cantidad | 0.4 | Numero | Configurable |
+| Unidad | 0.7 | `item.unidad.nombre` | Configurable |
+| Responsable | 0.9 | `item.responsable.name` | Configurable |
+| Motivo Baja | 1 | Texto truncado con tooltip. Solo muestra si estado=baja. | Solo admin/jefe |
+| Acciones | 1.2 | Ver (siempre), Editar (admin/jefe/carga + no baja), Eliminar (admin/jefe/carga + no baja) | Siempre |
 
 **Fila:** Click abre modal detalle. Items baja: opacity 0.55. Hover: fondo azul claro.
 
@@ -204,6 +205,7 @@ Visible en <768px. Grid 1 columna (2 en >=480px):
 |-------|-----------|
 | Header | Codigo + badge estado |
 | Body | Detalle, categoria + unidad, conservacion + cantidad |
+| Motivo Baja | Solo visible si estado=baja y usuario=admin/jefe. Texto rojo con borde izquierdo. |
 | Footer | Ver, Editar (si aplica), Eliminar (si aplica) |
 
 ### 4.5 Paginacion
@@ -282,6 +284,8 @@ Seccion visible solo si hay categoria + tipo_item seleccionados.
 | Unidad actual | `item.unidad.nombre` + sede |
 | Responsable | `item.responsable.name` |
 | Fecha de alta | Formateada DD/MM/YYYY HH:mm o "Desconocida" |
+| Motivo de baja | Solo visible si estado=baja y usuario=admin/jefe. Texto rojo con motivo. |
+| Fecha de baja | Solo visible si estado=baja y usuario=admin/jefe. |
 
 ### 6.2 Seccion: Campos del elemento
 
@@ -304,6 +308,24 @@ Timeline vertical con scroll (`max-height: 400px`):
 | Rechazo | Caja roja con motivo de rechazo (si aplica) |
 
 **API:** `GET /api/items/:id`
+
+### 6.4 Boton Reactivar (solo admin/jefe)
+
+Visible solo si `item.estado === 'baja'` y usuario es admin o jefe.
+
+| Elemento | Comportamiento |
+|----------|----------------|
+| Boton "Reactivar ítem" | Abre modal de reactivación |
+
+#### Modal Reactivar
+
+| Campo | Tipo | Validacion |
+|-------|------|------------|
+| Motivo de reactivación | `<textarea>` | Requerido, max 500 caracteres |
+
+**Botones:** Cancelar, Reactivar.
+**API:** `POST /api/items/:id/reactivar` con `{ motivo_reactivacion }`.
+**Comportamiento:** Al enviar, cambia estado a "activo", restaura categoría original, limpia motivo_baja/fecha_baja/categoria_original_id, crea movimiento "alta" aprobado, muestra toast success.
 
 ---
 
@@ -678,6 +700,8 @@ Se aplica via `data-theme="light"` en `<html>`. Persistido en `localStorage.sagi
 | Editar item | Si | Si | Si | No |
 | Eliminar item | Si | Si | Si | No |
 | Ver detalle item | Si | Si | Si | Si |
+| Ver motivo baja | Si | Si | No | No |
+| Reactivar item | Si | Si | No | No |
 | Ver Categorias | Si | No | No | No |
 | Gestionar Categorias | Si | No | No | No |
 | Ver Sedes/Unidades | Si | No | No | No |
