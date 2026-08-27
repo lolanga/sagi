@@ -95,15 +95,32 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
   const formatearDetalle = (detalle, accion, entidad) => {
     if (!detalle) return '-'
     if (detalle.antes && detalle.despues && typeof detalle.antes === 'object' && typeof detalle.despues === 'object') {
-      const campos = new Set([...Object.keys(detalle.antes), ...Object.keys(detalle.despues)])
+      const expandDinamicos = (obj) => {
+        if (!obj || typeof obj !== 'object') return obj
+        const out = {}
+        for (const [k, v] of Object.entries(obj)) {
+          if (k === 'valores_dinamicos' && typeof v === 'object' && v !== null) {
+            for (const [campoId, valor] of Object.entries(v)) {
+              out[`dyn_${campoId}`] = valor
+            }
+          } else {
+            out[k] = v
+          }
+        }
+        return out
+      }
+      const antes = expandDinamicos(detalle.antes)
+      const despues = expandDinamicos(detalle.despues)
+      const campos = new Set([...Object.keys(antes), ...Object.keys(despues)])
       const cambios = []
       for (const k of campos) {
-        const a = detalle.antes[k]
-        const d = detalle.despues[k]
-        const av = typeof a === 'object' ? JSON.stringify(a) : (a ?? '(vacío)')
-        const dv = typeof d === 'object' ? JSON.stringify(d) : (d ?? '(vacío)')
+        const a = antes[k]
+        const d = despues[k]
+        const av = a ?? '(vacío)'
+        const dv = d ?? '(vacío)'
         if (String(av) !== String(dv)) {
-          cambios.push({ campo: Etiquetas[k] || k, antes: av, despues: dv })
+          const label = Etiquetas[k] || (k.startsWith('dyn_') ? `Campo #${k.slice(4)}` : k)
+          cambios.push({ campo: label, antes: av, despues: dv })
         }
       }
       return cambios
