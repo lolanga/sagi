@@ -219,7 +219,7 @@ if ($request->filled('search')) {
             'accion' => 'editar',
             'entidad' => 'item',
             'entidad_id' => $item->id,
-            'detalle' => ['antes' => $antes, 'despues' => $despues],
+            'detalle' => ['codigo' => $item->codigo_unico, 'antes' => $antes, 'despues' => $despues],
         ]);
 
         $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);

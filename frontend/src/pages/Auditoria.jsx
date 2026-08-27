@@ -59,7 +59,8 @@ function formatearDetalle(detalle, accion, entidad) {
         cambios.push(`${label}: ${av} → ${dv}`)
       }
     }
-    return cambios.length > 0 ? cambios.join(' · ') : 'Sin cambios detectados'
+    const prefijo = detalle.codigo ? `${detalle.codigo} — ` : ''
+    return cambios.length > 0 ? prefijo + cambios.join(' · ') : 'Sin cambios detectados'
   }
 
   const e = entidad
