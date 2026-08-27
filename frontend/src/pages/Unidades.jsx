@@ -1,18 +1,35 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import api from '../services/api'
-import Aviso from '../components/Aviso'
 import Layout from '../components/Layout'
+import Modal from '../components/Modal'
 import '../styles/inventario.css'
+import '../styles/unidades.css'
 
 export default function Unidades() {
   const { user } = useAuth()
+  const toast = useToast()
   const [sedes, setSedes] = useState([])
   const [unidades, setUnidades] = useState([])
   const [loading, setLoading] = useState(true)
+  const [tab, setTab] = useState('sedes')
   const [busqueda, setBusqueda] = useState('')
   const [verInactivas, setVerInactivas] = useState(false)
-  const [error, setError] = useState('')
+
+  const [showCrearSede, setShowCrearSede] = useState(false)
+  const [sedeEdit, setSedeEdit] = useState(null)
+  const [sedeEliminar, setSedeEliminar] = useState(null)
+  const [formSede, setFormSede] = useState('')
+  const [errorSede, setErrorSede] = useState('')
+  const [savingSede, setSavingSede] = useState(false)
+
+  const [showCrearUnidad, setShowCrearUnidad] = useState(false)
+  const [unidadEdit, setUnidadEdit] = useState(null)
+  const [unidadEliminar, setUnidadEliminar] = useState(null)
+  const [formUnidad, setFormUnidad] = useState({ nombre: '', sede_id: '' })
+  const [errorUnidad, setErrorUnidad] = useState('')
+  const [savingUnidad, setSavingUnidad] = useState(false)
 
   const puedeGestionar = user?.rol?.slug === 'admin'
 
@@ -22,294 +39,407 @@ export default function Unidades() {
       setSedes(rS.data.sedes || [])
       setUnidades(rU.data.unidades || [])
     } catch {
-      setError('No se pudieron cargar los datos')
+      toast?.error('No se pudieron cargar los datos')
     } finally {
       setLoading(false)
     }
   }
 
-  useEffect(() => {
-    cargar()
-  }, [])
-
-  const sedeDe = (id) => sedes.find((s) => s.id === id)?.nombre ?? '-'
+  useEffect(() => { cargar() }, [])
 
   const norm = (s) => String(s ?? '').trim().toLowerCase()
+  const sedeDe = (id) => sedes.find((s) => s.id === id)?.nombre ?? '-'
 
-  const guardarSede = async (sede, nombre) => {
-    setError('')
-    if (sedes.some((x) => x.id !== sede.id && norm(x.nombre) === norm(nombre))) {
-      setError('Ya existe una sede con ese nombre.')
-      return false
-    }
-    const antes = sede.nombre
-    try {
-      const r = await api.put(`/sedes/${sede.id}`, { nombre })
-      setSedes((s) => s.map((x) => (x.id === sede.id ? { ...x, nombre: r.data.sede.nombre } : x)))
-      return true
-    } catch (err) {
-      setSedes((s) => s.map((x) => (x.id === sede.id ? { ...x, nombre: antes } : x)))
-      setError(err.response?.data?.message || 'Error al renombrar la sede')
-      return false
-    }
-  }
+  const abrirCrearSede = () => { setFormSede(''); setErrorSede(''); setShowCrearSede(true) }
+  const abrirEditarSede = (s) => { setSedeEdit(s); setFormSede(s.nombre); setErrorSede('') }
+  const abrirEliminarSede = (s) => { setSedeEliminar(s) }
 
-  const crearSede = async (e) => {
+  const submitCrearSede = async (e) => {
     e.preventDefault()
-    setError('')
-    const form = e.target
-    const nombre = new FormData(form).get('nueva_sede').trim()
-    if (!nombre) return
-    if (sedes.some((x) => norm(x.nombre) === norm(nombre))) {
-      setError('Ya existe una sede con ese nombre.')
-      return
-    }
+    const nombre = formSede.trim()
+    if (!nombre) { setErrorSede('El nombre es obligatorio'); return }
+    if (sedes.some((x) => norm(x.nombre) === norm(nombre))) { setErrorSede('Ya existe una sede con ese nombre'); return }
+    setSavingSede(true)
     try {
       const r = await api.post('/sedes', { nombre })
       setSedes((s) => [...s, r.data.sede])
-      form.reset()
+      setShowCrearSede(false)
+      toast?.success('Sede creada correctamente')
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al crear la sede')
+      setErrorSede(err.response?.data?.message || 'Error al crear la sede')
+    } finally {
+      setSavingSede(false)
     }
   }
 
-  const eliminarSede = async (sede) => {
-    setError('')
-    if (sede.unidades?.length > 0) {
-      setError('No se puede eliminar la sede porque tiene unidades asociadas.')
-      return
-    }
-    if (!window.confirm(`¿Eliminar la sede "${sede.nombre}"?`)) return
+  const submitEditarSede = async (e) => {
+    e.preventDefault()
+    const nombre = formSede.trim()
+    if (!nombre) { setErrorSede('El nombre es obligatorio'); return }
+    if (sedes.some((x) => x.id !== sedeEdit.id && norm(x.nombre) === norm(nombre))) { setErrorSede('Ya existe una sede con ese nombre'); return }
+    setSavingSede(true)
     try {
-      await api.delete(`/sedes/${sede.id}`)
-      setSedes((s) => s.filter((x) => x.id !== sede.id))
-      setUnidades((u) => u.filter((x) => x.sede_id !== sede.id))
+      const r = await api.put(`/sedes/${sedeEdit.id}`, { nombre })
+      setSedes((s) => s.map((x) => (x.id === sedeEdit.id ? r.data.sede : x)))
+      setSedeEdit(null)
+      toast?.success('Sede actualizada')
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al eliminar la sede')
+      setErrorSede(err.response?.data?.message || 'Error al guardar')
+    } finally {
+      setSavingSede(false)
+    }
+  }
+
+  const confirmEliminarSede = async () => {
+    if (!sedeEliminar) return
+    setSavingSede(true)
+    try {
+      await api.delete(`/sedes/${sedeEliminar.id}`)
+      setSedes((s) => s.filter((x) => x.id !== sedeEliminar.id))
+      setUnidades((u) => u.filter((x) => x.sede_id !== sedeEliminar.id))
+      setSedeEliminar(null)
+      toast?.success('Sede eliminada')
+    } catch (err) {
+      toast?.error(err.response?.data?.message || 'Error al eliminar')
+      setSedeEliminar(null)
+    } finally {
+      setSavingSede(false)
     }
   }
 
   const toggleSede = async (sede) => {
-    setError('')
-    const objetivo = !sede.activa
     try {
-      const r = await api.put(`/sedes/${sede.id}`, { activa: objetivo })
-      setSedes((s) => s.map((x) => (x.id === sede.id ? { ...x, activa: r.data.sede.activa } : x)))
+      const r = await api.put(`/sedes/${sede.id}`, { activa: !sede.activa })
+      setSedes((s) => s.map((x) => (x.id === sede.id ? r.data.sede : x)))
+      toast?.success(sede.activa ? 'Sede desactivada' : 'Sede activada')
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al cambiar el estado de la sede')
+      toast?.error(err.response?.data?.message || 'Error al cambiar estado')
     }
   }
 
-  const toggleUnidad = async (unidad) => {
-    setError('')
-    const objetivo = !unidad.activa
-    try {
-      const r = await api.put(`/unidades/${unidad.id}`, { activa: objetivo })
-      setUnidades((u) => u.map((x) => (x.id === unidad.id ? { ...x, activa: r.data.unidad.activa } : x)))
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error al cambiar el estado de la unidad')
-    }
-  }
+  const abrirCrearUnidad = () => { setFormUnidad({ nombre: '', sede_id: '' }); setErrorUnidad(''); setShowCrearUnidad(true) }
+  const abrirEditarUnidad = (u) => { setUnidadEdit(u); setFormUnidad({ nombre: u.nombre, sede_id: u.sede_id }); setErrorUnidad('') }
+  const abrirEliminarUnidad = (u) => { setUnidadEliminar(u) }
 
-  const guardarUnidad = async (unidad, cambios) => {
-    setError('')
-    const sedeFinal = cambios.sede_id ?? unidad.sede_id
-    const nombreFinal = cambios.nombre ?? unidad.nombre
-    if (unidades.some((x) => x.id !== unidad.id && x.sede_id === sedeFinal && norm(x.nombre) === norm(nombreFinal))) {
-      setError('Ya existe una unidad con ese nombre en la sede seleccionada.')
-      return false
-    }
-    try {
-      const r = await api.put(`/unidades/${unidad.id}`, cambios)
-      setUnidades((u) => u.map((x) => (x.id === unidad.id ? r.data.unidad : x)))
-      return true
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error al guardar la unidad')
-      return false
-    }
-  }
-
-  const crearUnidad = async (e) => {
+  const submitCrearUnidad = async (e) => {
     e.preventDefault()
-    setError('')
-    const form = e.target
-    const nombre = new FormData(form).get('nueva_unidad').trim()
-    const sedeId = form.sede_id.value
-    if (!nombre || !sedeId) return
-    if (unidades.some((x) => x.sede_id === Number(sedeId) && norm(x.nombre) === norm(nombre))) {
-      setError('Ya existe una unidad con ese nombre en la sede seleccionada.')
-      return
-    }
+    const nombre = formUnidad.nombre.trim()
+    const sedeId = Number(formUnidad.sede_id)
+    if (!nombre) { setErrorUnidad('El nombre es obligatorio'); return }
+    if (!sedeId) { setErrorUnidad('Seleccioná una sede'); return }
+    if (unidades.some((x) => x.sede_id === sedeId && norm(x.nombre) === norm(nombre))) { setErrorUnidad('Ya existe una unidad con ese nombre en la sede'); return }
+    setSavingUnidad(true)
     try {
-      const r = await api.post('/unidades', { nombre, sede_id: Number(sedeId) })
+      const r = await api.post('/unidades', { nombre, sede_id: sedeId })
       setUnidades((u) => [...u, r.data.unidad])
-      form.reset()
+      setShowCrearUnidad(false)
+      toast?.success('Unidad creada correctamente')
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al crear la unidad')
+      setErrorUnidad(err.response?.data?.message || 'Error al crear la unidad')
+    } finally {
+      setSavingUnidad(false)
     }
   }
 
-  const eliminarUnidad = async (unidad) => {
-    setError('')
-    if (!window.confirm(`¿Eliminar la unidad "${unidad.nombre}"?`)) return
+  const submitEditarUnidad = async (e) => {
+    e.preventDefault()
+    const nombre = formUnidad.nombre.trim()
+    const sedeId = Number(formUnidad.sede_id)
+    if (!nombre) { setErrorUnidad('El nombre es obligatorio'); return }
+    if (!sedeId) { setErrorUnidad('Seleccioná una sede'); return }
+    if (unidades.some((x) => x.id !== unidadEdit.id && x.sede_id === sedeId && norm(x.nombre) === norm(nombre))) { setErrorUnidad('Ya existe una unidad con ese nombre en la sede'); return }
+    setSavingUnidad(true)
     try {
-      await api.delete(`/unidades/${unidad.id}`)
-      setUnidades((u) => u.filter((x) => x.id !== unidad.id))
+      const r = await api.put(`/unidades/${unidadEdit.id}`, { nombre, sede_id: sedeId })
+      setUnidades((u) => u.map((x) => (x.id === unidadEdit.id ? r.data.unidad : x)))
+      setUnidadEdit(null)
+      toast?.success('Unidad actualizada')
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al eliminar la unidad')
+      setErrorUnidad(err.response?.data?.message || 'Error al guardar')
+    } finally {
+      setSavingUnidad(false)
+    }
+  }
+
+  const confirmEliminarUnidad = async () => {
+    if (!unidadEliminar) return
+    setSavingUnidad(true)
+    try {
+      await api.delete(`/unidades/${unidadEliminar.id}`)
+      setUnidades((u) => u.filter((x) => x.id !== unidadEliminar.id))
+      setUnidadEliminar(null)
+      toast?.success('Unidad eliminada')
+    } catch (err) {
+      toast?.error(err.response?.data?.message || 'Error al eliminar')
+      setUnidadEliminar(null)
+    } finally {
+      setSavingUnidad(false)
+    }
+  }
+
+  const toggleUnidad = async (u) => {
+    try {
+      const r = await api.put(`/unidades/${u.id}`, { activa: !u.activa })
+      setUnidades((us) => us.map((x) => (x.id === u.id ? r.data.unidad : x)))
+      toast?.success(u.activa ? 'Unidad desactivada' : 'Unidad activada')
+    } catch (err) {
+      toast?.error(err.response?.data?.message || 'Error al cambiar estado')
     }
   }
 
   const termino = busqueda.trim().toLowerCase()
-  const unidadesBase = unidades.filter((u) => verInactivas || u.activa)
-  const unidadesFiltradas = unidadesBase
+  const unidadesVisibles = unidades
+    .filter((u) => verInactivas || u.activa)
     .filter((u) => !termino || u.nombre.toLowerCase().includes(termino) || sedeDe(u.sede_id).toLowerCase().includes(termino))
     .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'))
 
   const sedesVisibles = sedes.filter((s) => verInactivas || s.activa)
 
+  const SkeletonCards = ({ count = 4 }) => (
+    <div className="sedes-grid">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="sede-card skeleton-card">
+          <div className="skeleton-line" style={{ width: '60%', height: 20 }} />
+          <div className="skeleton-line" style={{ width: '40%', height: 14, marginTop: 8 }} />
+          <div className="skeleton-line" style={{ width: '80%', height: 14, marginTop: 6 }} />
+        </div>
+      ))}
+    </div>
+  )
+
   return (
     <Layout title="Sedes y Unidades de destino" back="/">
-      <Aviso mensaje={error} onCerrar={() => setError('')} />
-      {loading ? (
-        <p className="muted">Cargando...</p>
-      ) : (
-        <>
-          {puedeGestionar && (
-            <div className="panel-admin">
-              <div className="panel-admin-section">
-                <h3>Sedes</h3>
-                <div className="sedes-grid">
-                  {sedesVisibles.map((sede) => (
-                    <div key={sede.id} className={`sede-card ${sede.activa ? '' : 'inactiva'}`}>
-                      <input
-                        className="editable-input"
-                        type="text"
-                        defaultValue={sede.nombre}
-                        onBlur={async (e) => {
-                          const valor = e.target.value.trim()
-                          if (valor && valor !== sede.nombre) {
-                            const ok = await guardarSede(sede, valor)
-                            if (!ok) e.target.value = sede.nombre
-                          } else {
-                            e.target.value = sede.nombre
-                          }
-                        }}
-                      />
-                      <div className="sede-card-meta">
-                        <span className="result-count">
-                          <strong className="sede-id">IdSede {String(sede.id).padStart(2, '0')}</strong> · {sede.unidades?.length ?? 0} unidades
-                        </span>
-                        {puedeGestionar && (
-                          <div className="row-actions">
-                            <button className="btn-link" onClick={() => toggleSede(sede)}>
-                              {sede.activa ? 'Desactivar' : 'Activar'}
-                            </button>
-                            <button className="btn-link btn-link-danger" onClick={() => eliminarSede(sede)}>Eliminar</button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <form className="inline-form" onSubmit={crearSede}>
-                  <input name="nueva_sede" type="text" placeholder="Nombre de la nueva sede" required />
-                  <button className="btn btn-primary" type="submit">+ Agregar sede</button>
-                </form>
-              </div>
-
-              <div className="panel-admin-section">
-                <h3>Nueva unidad de destino</h3>
-                <form className="inline-form" onSubmit={crearUnidad}>
-                  <input name="nueva_unidad" type="text" placeholder="Ej. Secretaría Académica" required />
-                  <select name="sede_id" required defaultValue="">
-                    <option value="" disabled>Seleccionar sede...</option>
-                    {sedes.filter((s) => s.activa).map((s) => (
-                      <option key={s.id} value={s.id}>{s.nombre}</option>
-                    ))}
-                  </select>
-                  <button className="btn btn-primary" type="submit">+ Crear unidad</button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          <div className="filters-bar">
-            <input
-              className="search-input"
-              type="text"
-              placeholder="Buscar por nombre o sede..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-            />
-            <label className="checkbox-inline">
-              <input
-                type="checkbox"
-                checked={verInactivas}
-                onChange={(e) => setVerInactivas(e.target.checked)}
-              />
-              Ver desactivadas
-            </label>
-            <span className="result-count">{unidadesFiltradas.length} unidades</span>
+      <div className="unidades-page">
+        {puedeGestionar && (
+          <div className="tabs-bar">
+            <button className={`tab-btn ${tab === 'sedes' ? 'tab-active' : ''}`} onClick={() => setTab('sedes')}>
+              Sedes
+            </button>
+            <button className={`tab-btn ${tab === 'unidades' ? 'tab-active' : ''}`} onClick={() => setTab('unidades')}>
+              Unidades de destino
+            </button>
           </div>
+        )}
 
-          {unidadesFiltradas.length === 0 ? (
-            <div className="placeholder">
-              <h2>Sin resultados</h2>
-              <p>No hay unidades que coincidan con la búsqueda.</p>
+        {tab === 'sedes' && (
+          <div className="tab-content">
+            <div className="filters-bar">
+              <input
+                className="search-input"
+                type="text"
+                placeholder="Buscar sede..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+              {puedeGestionar && (
+                <button className="btn btn-primary" onClick={abrirCrearSede}>+ Nueva sede</button>
+              )}
             </div>
-          ) : (
-            <div className="unidades-grid">
-              {unidadesFiltradas.map((u) => (
-                <div key={u.id} className={`unidad-card ${u.activa ? '' : 'inactiva'}`}>
-                  <div className="unidad-card-header">
-                    <span className="unidad-id">{String(u.id).padStart(2, '0')}</span>
-                    <span className="unidad-sede">{sedeDe(u.sede_id)}</span>
-                  </div>
-                  <div className="unidad-card-body">
-                    <input
-                      className="editable-input"
-                      type="text"
-                      defaultValue={u.nombre}
-                      onBlur={async (e) => {
-                        const valor = e.target.value.trim()
-                        if (valor && valor !== u.nombre) {
-                          const ok = await guardarUnidad(u, { nombre: valor })
-                          if (!ok) e.target.value = u.nombre
-                        } else {
-                          e.target.value = u.nombre
-                        }
-                      }}
-                    />
-                  </div>
-                  <div className="unidad-card-footer">
-                    <select
-                      className="editable-select"
-                      value={u.sede_id}
-                      onChange={async (e) => {
-                        const ok = await guardarUnidad(u, { sede_id: Number(e.target.value) })
-                        if (!ok) e.target.value = u.sede_id
-                      }}
-                    >
-                      {sedes.map((s) => (
-                        <option key={s.id} value={s.id}>{s.nombre}{s.activa ? '' : ' (inactiva)'}</option>
-                      ))}
-                    </select>
+
+            {loading ? (
+              <SkeletonCards />
+            ) : sedesVisibles.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">&#127970;</div>
+                <h3>No hay sedes</h3>
+                <p>Creá la primera sede para comenzar a organizar las unidades de destino.</p>
+                {puedeGestionar && <button className="btn btn-primary" onClick={abrirCrearSede}>+ Crear primera sede</button>}
+              </div>
+            ) : (
+              <div className="sedes-grid">
+                {sedesVisibles.map((sede) => (
+                  <div key={sede.id} className={`sede-card ${sede.activa ? '' : 'sede-inactiva'}`}>
+                    <div className="sede-card-header">
+                      <span className="sede-badge-id">#{String(sede.id).padStart(2, '0')}</span>
+                      <span className={`sede-badge-estado ${sede.activa ? 'badge-activa' : 'badge-inactiva'}`}>
+                        {sede.activa ? 'Activa' : 'Inactiva'}
+                      </span>
+                    </div>
+                    <div className="sede-card-body">
+                      <h4 className="sede-nombre">{sede.nombre}</h4>
+                      <span className="sede-count">{sede.unidades?.length ?? 0} unidad{(sede.unidades?.length ?? 0) !== 1 ? 'es' : ''}</span>
+                    </div>
                     {puedeGestionar && (
-                      <div className="row-actions">
-                        <button className="btn-link" onClick={() => toggleUnidad(u)}>
-                          {u.activa ? 'Desactivar' : 'Activar'}
+                      <div className="sede-card-actions">
+                        <button className="btn-icon" title="Editar" onClick={() => abrirEditarSede(sede)}>&#9998;</button>
+                        <button className="btn-icon" title={sede.activa ? 'Desactivar' : 'Activar'} onClick={() => toggleSede(sede)}>
+                          {sede.activa ? '&#128068;' : '&#128065;'}
                         </button>
-                        <button className="btn-link btn-link-danger" onClick={() => eliminarUnidad(u)}>Eliminar</button>
+                        <button className="btn-icon btn-icon-danger" title="Eliminar" onClick={() => abrirEliminarSede(sede)}>&#128465;</button>
                       </div>
                     )}
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab === 'unidades' && (
+          <div className="tab-content">
+            <div className="filters-bar">
+              <input
+                className="search-input"
+                type="text"
+                placeholder="Buscar por nombre o sede..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+              <label className="checkbox-inline">
+                <input type="checkbox" checked={verInactivas} onChange={(e) => setVerInactivas(e.target.checked)} />
+                Ver desactivadas
+              </label>
+              <span className="result-count">{unidadesVisibles.length} unidad{unidadesVisibles.length !== 1 ? 'es' : ''}</span>
+              {puedeGestionar && (
+                <button className="btn btn-primary" onClick={abrirCrearUnidad}>+ Nueva unidad</button>
+              )}
             </div>
+
+            {loading ? (
+              <SkeletonCards />
+            ) : unidadesVisibles.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">&#128230;</div>
+                <h3>No hay unidades</h3>
+                <p>{termino ? 'No hay unidades que coincidan con la búsqueda.' : 'Creá la primera unidad de destino para comenzar.'}</p>
+                {!termino && puedeGestionar && <button className="btn btn-primary" onClick={abrirCrearUnidad}>+ Crear primera unidad</button>}
+              </div>
+            ) : (
+              <div className="unidades-grid">
+                {unidadesVisibles.map((u) => (
+                  <div key={u.id} className={`unidad-card ${u.activa ? '' : 'unidad-inactiva'}`}>
+                    <div className="unidad-card-header">
+                      <span className="unidad-id">#{String(u.id).padStart(2, '0')}</span>
+                      <span className="unidad-sede">{sedeDe(u.sede_id)}</span>
+                      <span className={`unidad-badge-estado ${u.activa ? 'badge-activa' : 'badge-inactiva'}`}>
+                        {u.activa ? 'Activa' : 'Inactiva'}
+                      </span>
+                    </div>
+                    <div className="unidad-card-body">
+                      <h4 className="unidad-nombre">{u.nombre}</h4>
+                    </div>
+                    {puedeGestionar && (
+                      <div className="unidad-card-actions">
+                        <button className="btn-icon" title="Editar" onClick={() => abrirEditarUnidad(u)}>&#9998;</button>
+                        <button className="btn-icon" title={u.activa ? 'Desactivar' : 'Activar'} onClick={() => toggleUnidad(u)}>
+                          {u.activa ? '&#128068;' : '&#128065;'}
+                        </button>
+                        <button className="btn-icon btn-icon-danger" title="Eliminar" onClick={() => abrirEliminarUnidad(u)}>&#128465;</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <Modal open={showCrearSede} title="Nueva sede" onClose={() => setShowCrearSede(false)}>
+        <form onSubmit={submitCrearSede} className="form-modal">
+          <div className="field">
+            <label>Nombre de la sede *</label>
+            <input type="text" value={formSede} onChange={(e) => { setFormSede(e.target.value); setErrorSede('') }} autoFocus placeholder="Ej. Sede Central" />
+            {errorSede && <span className="field-error">{errorSede}</span>}
+          </div>
+          <div className="form-actions-modal">
+            <button type="button" className="btn btn-secondary" onClick={() => setShowCrearSede(false)}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={savingSede}>{savingSede ? 'Creando...' : 'Crear sede'}</button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal open={!!sedeEdit} title="Editar sede" onClose={() => setSedeEdit(null)}>
+        <form onSubmit={submitEditarSede} className="form-modal">
+          <div className="field">
+            <label>Nombre de la sede *</label>
+            <input type="text" value={formSede} onChange={(e) => { setFormSede(e.target.value); setErrorSede('') }} autoFocus />
+            {errorSede && <span className="field-error">{errorSede}</span>}
+          </div>
+          <div className="form-actions-modal">
+            <button type="button" className="btn btn-secondary" onClick={() => setSedeEdit(null)}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={savingSede}>{savingSede ? 'Guardando...' : 'Guardar'}</button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal open={!!sedeEliminar} title="Eliminar sede" onClose={() => setSedeEliminar(null)}>
+        <div className="form-modal">
+          <p className="modal-confirm-text">
+            ¿Eliminar la sede <strong>{sedeEliminar?.nombre}</strong>?
+          </p>
+          {(sedeEliminar?.unidades?.length ?? 0) > 0 && (
+            <p className="modal-confirm-warning">
+              Esta sede tiene {sedeEliminar.unidades.length} unidad{(sedeEliminar.unidades.length) !== 1 ? 'es' : ''} asociada{(sedeEliminar.unidades.length) !== 1 ? 's' : ''}. No se puede eliminar.
+            </p>
           )}
-        </>
-      )}
+          <div className="form-actions-modal">
+            <button type="button" className="btn btn-secondary" onClick={() => setSedeEliminar(null)}>Cancelar</button>
+            {(sedeEliminar?.unidades?.length ?? 0) === 0 && (
+              <button type="button" className="btn btn-danger" onClick={confirmEliminarSede} disabled={savingSede}>{savingSede ? 'Eliminando...' : 'Eliminar'}</button>
+            )}
+          </div>
+        </div>
+      </Modal>
+
+      <Modal open={showCrearUnidad} title="Nueva unidad de destino" onClose={() => setShowCrearUnidad(false)}>
+        <form onSubmit={submitCrearUnidad} className="form-modal">
+          <div className="field">
+            <label>Nombre *</label>
+            <input type="text" value={formUnidad.nombre} onChange={(e) => { setFormUnidad((f) => ({ ...f, nombre: e.target.value })); setErrorUnidad('') }} autoFocus placeholder="Ej. Secretaría Académica" />
+            {errorUnidad && <span className="field-error">{errorUnidad}</span>}
+          </div>
+          <div className="field">
+            <label>Sede *</label>
+            <select value={formUnidad.sede_id} onChange={(e) => { setFormUnidad((f) => ({ ...f, sede_id: e.target.value })); setErrorUnidad('') }}>
+              <option value="" disabled>Seleccionar sede...</option>
+              {sedes.filter((s) => s.activa).map((s) => (
+                <option key={s.id} value={s.id}>{s.nombre}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-actions-modal">
+            <button type="button" className="btn btn-secondary" onClick={() => setShowCrearUnidad(false)}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={savingUnidad}>{savingUnidad ? 'Creando...' : 'Crear unidad'}</button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal open={!!unidadEdit} title="Editar unidad" onClose={() => setUnidadEdit(null)}>
+        <form onSubmit={submitEditarUnidad} className="form-modal">
+          <div className="field">
+            <label>Nombre *</label>
+            <input type="text" value={formUnidad.nombre} onChange={(e) => { setFormUnidad((f) => ({ ...f, nombre: e.target.value })); setErrorUnidad('') }} autoFocus />
+            {errorUnidad && <span className="field-error">{errorUnidad}</span>}
+          </div>
+          <div className="field">
+            <label>Sede *</label>
+            <select value={formUnidad.sede_id} onChange={(e) => { setFormUnidad((f) => ({ ...f, sede_id: e.target.value })); setErrorUnidad('') }}>
+              <option value="" disabled>Seleccionar sede...</option>
+              {sedes.map((s) => (
+                <option key={s.id} value={s.id}>{s.nombre}{s.activa ? '' : ' (inactiva)'}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-actions-modal">
+            <button type="button" className="btn btn-secondary" onClick={() => setUnidadEdit(null)}>Cancelar</button>
+            <button type="submit" className="btn btn-primary" disabled={savingUnidad}>{savingUnidad ? 'Guardando...' : 'Guardar'}</button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal open={!!unidadEliminar} title="Eliminar unidad" onClose={() => setUnidadEliminar(null)}>
+        <div className="form-modal">
+          <p className="modal-confirm-text">
+            ¿Eliminar la unidad <strong>{unidadEliminar?.nombre}</strong>?
+          </p>
+          <p className="modal-confirm-warning">Esta acción no se puede deshacer.</p>
+          <div className="form-actions-modal">
+            <button type="button" className="btn btn-secondary" onClick={() => setUnidadEliminar(null)}>Cancelar</button>
+            <button type="button" className="btn btn-danger" onClick={confirmEliminarUnidad} disabled={savingUnidad}>{savingUnidad ? 'Eliminando...' : 'Eliminar'}</button>
+          </div>
+        </div>
+      </Modal>
     </Layout>
   )
 }
