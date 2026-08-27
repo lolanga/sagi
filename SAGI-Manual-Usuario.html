@@ -1,75 +1,76 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <title>SAGI - Manual de Usuario</title>
-  <style>
-    body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; color: #333; }
-    table { border-collapse: collapse; width: 100%; margin: 1em 0; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
-    th { background: #f4f4f4; }
-    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
-    pre { background: #f4f4f4; padding: 16px; border-radius: 6px; overflow-x: auto; }
-    pre code { background: none; padding: 0; }
-    hr { border: none; border-top: 1px solid #ddd; margin: 2em 0; }
-    h1 { color: #1a202c; font-size: 24px; }
-    h2 { color: #2d3748; font-size: 20px; border-bottom: 1px solid #eee; padding-bottom: 6px; }
-    h3 { color: #4a5568; font-size: 16px; }
-    h4 { color: #718096; font-size: 14px; }
-    strong { color: #2d3748; }
-    em { color: #718096; }
-  </style>
+<meta charset="utf-8">
+<title>SAGI - Manual de Usuario</title>
+<style>
+body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:20px;line-height:1.6;color:#333}
+table{border-collapse:collapse;width:100%;margin:1em 0}
+th,td{border:1px solid #ddd;padding:8px;text-align:left;font-size:14px}
+th{background:#f4f4f4}
+code{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-size:13px}
+pre{background:#f4f4f4;padding:16px;border-radius:6px;overflow-x:auto}
+pre code{background:none;padding:0}
+hr{border:none;border-top:1px solid #ddd;margin:2em 0}
+h1{color:#1a202c;font-size:24px}
+h2{color:#2d3748;font-size:20px;border-bottom:1px solid #eee;padding-bottom:6px}
+h3{color:#4a5568;font-size:16px}
+h4{color:#718096;font-size:14px}
+strong{color:#2d3748}
+em{color:#718096}
+</style>
 </head>
-<body><p>ï»¿# SAGI - Manual de Usuario</p>
-<p><strong>Sistema de AdministraciÃƒÂ³n y GestiÃƒÂ³n de Inventarios</strong>
-Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
-<p>VersiÃƒÂ³n: 3.3 | Fecha: 27 de agosto de 2026</p>
+<body>
+<h1>SAGI - Manual de Usuario</h1>
+<p><strong>Sistema de Administración y Gestión de Inventarios</strong>
+Instituto de Seguridad Pública (ISeP)</p>
+<p>Versión: 3.3 | Fecha: 27 de agosto de 2026</p>
 <hr>
-<h2>ÃƒÂndice</h2>
+<h2>Índice</h2>
 <ol>
-<li>IntroducciÃƒÂ³n</li>
+<li>Introducción</li>
 <li>Requisitos del Sistema</li>
 <li>Acceso al Sistema</li>
 <li>Interfaz General</li>
 <li>Dashboard</li>
-<li>GestiÃƒÂ³n de Inventario</li>
-<li>GestiÃƒÂ³n de Movimientos</li>
-<li>GestiÃƒÂ³n de Alertas</li>
-<li>GestiÃƒÂ³n de CategorÃƒÂ­as</li>
-<li>GestiÃƒÂ³n de Sedes y Unidades</li>
+<li>Gestión de Inventario</li>
+<li>Gestión de Movimientos</li>
+<li>Gestión de Alertas</li>
+<li>Gestión de Categorías</li>
+<li>Gestión de Sedes y Unidades</li>
 <li>Reportes</li>
-<li>AuditorÃƒÂ­a</li>
+<li>Auditoría</li>
 <li>Preguntas Frecuentes</li>
 </ol>
 <hr>
-<h2>1. IntroducciÃƒÂ³n</h2>
-<h3>1.1 Ã‚Â¿QuÃƒÂ© es SAGI?</h3>
-<p>SAGI (Sistema de AdministraciÃƒÂ³n y GestiÃƒÂ³n de Inventarios) es una plataforma web para administrar y controlar los bienes muebles del Instituto de Seguridad PÃƒÂºblica (ISeP).</p>
+<h2>1. Introducción</h2>
+<h3>1.1 ¿Qué es SAGI?</h3>
+<p>SAGI (Sistema de Administración y Gestión de Inventarios) es una plataforma web para administrar y controlar los bienes muebles del Instituto de Seguridad Pública (ISeP).</p>
 <table>
 <thead>
 <tr>
 <th>Funcionalidad</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Registro de ÃƒÂ­tems</td>
-<td>Alta con campos dinÃƒÂ¡micos por categorÃƒÂ­a</td>
+<td>Registro de ítems</td>
+<td>Alta con campos dinámicos por categoría</td>
 </tr>
 <tr>
 <td>Control de movimientos</td>
-<td>Altas, traslados, bajas con aprobaciÃƒÂ³n</td>
+<td>Altas, traslados, bajas con aprobación</td>
 </tr>
 <tr>
 <td>Reportes</td>
-<td>ExportaciÃƒÂ³n a Excel, CSV, JSON</td>
+<td>Exportación a Excel, CSV, JSON</td>
 </tr>
 <tr>
-<td>AuditorÃƒÂ­a</td>
+<td>Auditoría</td>
 <td>Registro completo de acciones</td>
 </tr>
 </tbody></table>
-<h3>1.2 Ã‚Â¿QuiÃƒÂ©n puede usar SAGI?</h3>
+<h3>1.2 ¿Quién puede usar SAGI?</h3>
 <table>
 <thead>
 <tr>
@@ -79,19 +80,19 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </thead>
 <tbody><tr>
 <td>Administrador</td>
-<td>GestiÃƒÂ³n completa del sistema, usuarios, categorÃƒÂ­as, sedes</td>
+<td>Gestión completa del sistema, usuarios, categorías, sedes</td>
 </tr>
 <tr>
-<td>Jefe de ÃƒÂrea</td>
+<td>Jefe de Área</td>
 <td>Aprobar movimientos, ver reportes, gestionar alertas</td>
 </tr>
 <tr>
 <td>Personal de Carga</td>
-<td>Registrar ÃƒÂ­tems, solicitar movimientos</td>
+<td>Registrar ítems, solicitar movimientos</td>
 </tr>
 <tr>
 <td>Personal de Consulta</td>
-<td>Solo visualizar informaciÃƒÂ³n</td>
+<td>Solo visualizar información</td>
 </tr>
 </tbody></table>
 <hr>
@@ -101,7 +102,7 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <thead>
 <tr>
 <th>Navegador</th>
-<th>VersiÃƒÂ³n MÃƒÂ­nima</th>
+<th>Versión Mínima</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -130,31 +131,31 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </tr>
 </thead>
 <tbody><tr>
-<td>ConexiÃƒÂ³n a internet</td>
+<td>Conexión a internet</td>
 <td>Estable</td>
 </tr>
 <tr>
-<td>ResoluciÃƒÂ³n mÃƒÂ­nima</td>
-<td>1024 x 768 pÃƒÂ­xeles</td>
+<td>Resolución mínima</td>
+<td>1024 x 768 píxeles</td>
 </tr>
 <tr>
 <td>Dispositivo</td>
-<td>Computador o mÃƒÂ³vil (responsive)</td>
+<td>Computador o móvil (responsive)</td>
 </tr>
 </tbody></table>
 <hr>
 <h2>3. Acceso al Sistema</h2>
-<h3>3.1 Iniciar SesiÃƒÂ³n</h3>
+<h3>3.1 Iniciar Sesión</h3>
 <ol>
 <li>Abra su navegador web</li>
 <li>Ingrese la URL del sistema</li>
-<li>VerÃƒÂ¡ la pantalla de inicio de sesiÃƒÂ³n</li>
+<li>Verá la pantalla de inicio de sesión</li>
 </ol>
 <table>
 <thead>
 <tr>
 <th>Campo</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -162,19 +163,19 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <td>Documento Nacional de Identidad</td>
 </tr>
 <tr>
-<td>ContraseÃƒÂ±a</td>
-<td>ContraseÃƒÂ±a asignada por el administrador</td>
+<td>Contraseña</td>
+<td>Contraseña asignada por el administrador</td>
 </tr>
 </tbody></table>
 <ol start="4">
-<li>Haga clic en <strong>&quot;Iniciar SesiÃƒÂ³n&quot;</strong></li>
+<li>Haga clic en <strong>&quot;Iniciar Sesión&quot;</strong></li>
 </ol>
-<h3>3.2 Cerrar SesiÃƒÂ³n</h3>
+<h3>3.2 Cerrar Sesión</h3>
 <ol>
 <li>Haga clic en su nombre de usuario (esquina superior derecha)</li>
-<li>Seleccione <strong>&quot;Cerrar SesiÃƒÂ³n&quot;</strong></li>
+<li>Seleccione <strong>&quot;Cerrar Sesión&quot;</strong></li>
 </ol>
-<h3>3.3 Ã‚Â¿OlvidÃƒÂ³ su ContraseÃƒÂ±a?</h3>
+<h3>3.3 ¿Olvidó su Contraseña?</h3>
 <p>Contacte al administrador del sistema para restablecerla.</p>
 <hr>
 <h2>4. Interfaz General</h2>
@@ -183,38 +184,38 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <thead>
 <tr>
 <th>Zona</th>
-<th>UbicaciÃƒÂ³n</th>
-<th>FunciÃƒÂ³n</th>
+<th>Ubicación</th>
+<th>Función</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Sidebar</td>
 <td>Izquierda</td>
-<td>MenÃƒÂº de navegaciÃƒÂ³n jerÃƒÂ¡rquico con iconos</td>
+<td>Menú de navegación jerárquico con iconos</td>
 </tr>
 <tr>
 <td>Topbar</td>
 <td>Arriba</td>
-<td>TÃƒÂ­tulo, botÃƒÂ³n de tema (oscuro/claro), usuario, cerrar sesiÃƒÂ³n</td>
+<td>Título, botón de tema (oscuro/claro), usuario, cerrar sesión</td>
 </tr>
 <tr>
 <td>Contenido</td>
 <td>Centro</td>
-<td>PÃƒÂ¡gina actual</td>
+<td>Página actual</td>
 </tr>
 <tr>
 <td>Bottom Nav</td>
-<td>Abajo (mÃƒÂ³vil)</td>
-<td>Accesos rÃƒÂ¡pidos a Operaciones e Inventario</td>
+<td>Abajo (móvil)</td>
+<td>Accesos rápidos a Operaciones e Inventario</td>
 </tr>
 </tbody></table>
-<h3>4.2 MenÃƒÂº JerÃƒÂ¡rquico</h3>
-<p>El menÃƒÂº se organiza en 4 bloques temÃƒÂ¡ticos:</p>
+<h3>4.2 Menú Jerárquico</h3>
+<p>El menú se organiza en 4 bloques temáticos:</p>
 <table>
 <thead>
 <tr>
 <th>Bloque</th>
-<th>MÃƒÂ³dulos</th>
+<th>Módulos</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -226,19 +227,19 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <td>Inventario, Movimientos</td>
 </tr>
 <tr>
-<td><strong>ConfiguraciÃƒÂ³n</strong></td>
-<td>CategorÃƒÂ­as, Sedes y Unidades</td>
+<td><strong>Configuración</strong></td>
+<td>Categorías, Sedes y Unidades</td>
 </tr>
 <tr>
 <td><strong>Control</strong></td>
-<td>Reportes, AuditorÃƒÂ­a</td>
+<td>Reportes, Auditoría</td>
 </tr>
 </tbody></table>
-<h3>4.3 MenÃƒÂº SegÃƒÂºn Rol</h3>
+<h3>4.3 Menú Según Rol</h3>
 <table>
 <thead>
 <tr>
-<th>MenÃƒÂº</th>
+<th>Menú</th>
 <th align="center">Admin</th>
 <th align="center">Jefe</th>
 <th align="center">Carga</th>
@@ -274,7 +275,7 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <td align="center">No</td>
 </tr>
 <tr>
-<td>CategorÃƒÂ­as</td>
+<td>Categorías</td>
 <td align="center">Si</td>
 <td align="center">No</td>
 <td align="center">No</td>
@@ -295,143 +296,143 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <td align="center">No</td>
 </tr>
 <tr>
-<td>AuditorÃƒÂ­a</td>
+<td>Auditoría</td>
 <td align="center">Si</td>
 <td align="center">Si</td>
 <td align="center">No</td>
 <td align="center">No</td>
 </tr>
 </tbody></table>
-<h3>4.4 Funcionalidades del MenÃƒÂº</h3>
+<h3>4.4 Funcionalidades del Menú</h3>
 <ul>
-<li><strong>Colapsar sidebar</strong>: Click en el botÃƒÂ³n <code>Ã¢â‚¬Â¹</code> para maximizar ÃƒÂ¡rea de trabajo</li>
-<li><strong>Expandir/colapsar grupos</strong>: Click en el nombre del bloque temÃƒÂ¡tico</li>
-<li><strong>Active route</strong>: La pÃƒÂ¡gina actual se resalta en azul</li>
+<li><strong>Colapsar sidebar</strong>: Click en el botón <code>‹</code> para maximizar área de trabajo</li>
+<li><strong>Expandir/colapsar grupos</strong>: Click en el nombre del bloque temático</li>
+<li><strong>Active route</strong>: La página actual se resalta en azul</li>
 <li><strong>Badge de alertas</strong>: Muestra contador de alertas abiertas</li>
 </ul>
-<h3>4.5 Dispositivos MÃƒÂ³viles</h3>
+<h3>4.5 Dispositivos Móviles</h3>
 <ul>
-<li><strong>Bottom nav</strong>: Accesos rÃƒÂ¡pidos a Dashboard, Alertas, Inventario, Movimientos</li>
-<li><strong>Hamburguesa</strong>: Abre el drawer con todos los mÃƒÂ³dulos</li>
-<li><strong>Filtros colapsables</strong>: BotÃƒÂ³n &quot;Filtros&quot; para expandir/ocultar</li>
-<li><strong>Cards</strong>: Los ÃƒÂ­tems se muestran como tarjetas en lugar de tabla</li>
-<li><strong>Skeleton loading</strong>: AnimaciÃƒÂ³n de carga en lugar de texto</li>
+<li><strong>Bottom nav</strong>: Accesos rápidos a Dashboard, Alertas, Inventario, Movimientos</li>
+<li><strong>Hamburguesa</strong>: Abre el drawer con todos los módulos</li>
+<li><strong>Filtros colapsables</strong>: Botón &quot;Filtros&quot; para expandir/ocultar</li>
+<li><strong>Cards</strong>: Los ítems se muestran como tarjetas en lugar de tabla</li>
+<li><strong>Skeleton loading</strong>: Animación de carga en lugar de texto</li>
 </ul>
 <hr>
 <h2>5. Dashboard</h2>
 <p>El Dashboard muestra un resumen del estado del inventario.</p>
-<h3>5.1 Tarjetas de EstadÃƒÂ­sticas</h3>
+<h3>5.1 Tarjetas de Estadísticas</h3>
 <table>
 <thead>
 <tr>
 <th>Tarjeta</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Total de ÃƒÂtems</td>
-<td>Cantidad total de ÃƒÂ­tems registrados</td>
+<td>Total de Ítems</td>
+<td>Cantidad total de ítems registrados</td>
 </tr>
 <tr>
-<td>ÃƒÂtems activos</td>
-<td>ÃƒÂtems en estado activo</td>
+<td>Ítems activos</td>
+<td>Ítems en estado activo</td>
 </tr>
 <tr>
 <td>Movimientos pendientes</td>
-<td>Traslados o bajas esperando aprobaciÃƒÂ³n</td>
+<td>Traslados o bajas esperando aprobación</td>
 </tr>
 <tr>
 <td>Alertas activas</td>
-<td>Alertas abiertas que requieren atenciÃƒÂ³n</td>
+<td>Alertas abiertas que requieren atención</td>
 </tr>
 </tbody></table>
-<h3>5.2 GrÃƒÂ¡ficos</h3>
-<p>El Dashboard incluye dos grÃƒÂ¡ficos interactivos:</p>
+<h3>5.2 Gráficos</h3>
+<p>El Dashboard incluye dos gráficos interactivos:</p>
 <table>
 <thead>
 <tr>
-<th>GrÃƒÂ¡fico</th>
+<th>Gráfico</th>
 <th>Tipo</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>ÃƒÂtems por CategorÃƒÂ­a</td>
+<td>Ítems por Categoría</td>
 <td>Barras (Bar Chart)</td>
-<td>Muestra la cantidad de ÃƒÂ­tems agrupados por categorÃƒÂ­a</td>
+<td>Muestra la cantidad de ítems agrupados por categoría</td>
 </tr>
 <tr>
-<td>DistribuciÃƒÂ³n General</td>
+<td>Distribución General</td>
 <td>Dona (Doughnut Chart)</td>
-<td>Muestra la distribuciÃƒÂ³n porcentarial de ÃƒÂ­tems por estado</td>
+<td>Muestra la distribución porcentarial de ítems por estado</td>
 </tr>
 </tbody></table>
-<h3>5.3 ÃƒÂtems por CategorÃƒÂ­a (Tabla)</h3>
-<p>Tabla con la cantidad de ÃƒÂ­tems agrupados por categorÃƒÂ­a:</p>
+<h3>5.3 Ítems por Categoría (Tabla)</h3>
+<p>Tabla con la cantidad de ítems agrupados por categoría:</p>
 <table>
 <thead>
 <tr>
 <th>Columna</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>CÃƒÂ³digo</td>
-<td>Identificador de la categorÃƒÂ­a (A1, A2, etc.)</td>
+<td>Código</td>
+<td>Identificador de la categoría (A1, A2, etc.)</td>
 </tr>
 <tr>
-<td>CategorÃƒÂ­a</td>
+<td>Categoría</td>
 <td>Nombre completo</td>
 </tr>
 <tr>
-<td>ÃƒÂtems</td>
-<td>Cantidad de ÃƒÂ­tems en esa categorÃƒÂ­a</td>
+<td>Ítems</td>
+<td>Cantidad de ítems en esa categoría</td>
 </tr>
 </tbody></table>
 <h3>5.4 Backup de Base de Datos</h3>
-<p><strong>Solo administradores</strong> tienen acceso a esta funciÃƒÂ³n.</p>
+<p><strong>Solo administradores</strong> tienen acceso a esta función.</p>
 <ol>
-<li>Haga clic en el botÃƒÂ³n <strong>&quot;Backup&quot;</strong> en el Dashboard</li>
-<li>El sistema crearÃƒÂ¡ un archivo SQL de respaldo</li>
-<li>El archivo se descargarÃƒÂ¡ automÃƒÂ¡ticamente</li>
+<li>Haga clic en el botón <strong>&quot;Backup&quot;</strong> en el Dashboard</li>
+<li>El sistema creará un archivo SQL de respaldo</li>
+<li>El archivo se descargará automáticamente</li>
 </ol>
 <hr>
-<h2>6. GestiÃƒÂ³n de Inventario</h2>
-<h3>6.1 Ver Lista de ÃƒÂtems</h3>
-<p>Haga clic en <strong>&quot;Inventario&quot;</strong> en el menÃƒÂº lateral.</p>
+<h2>6. Gestión de Inventario</h2>
+<h3>6.1 Ver Lista de Ítems</h3>
+<p>Haga clic en <strong>&quot;Inventario&quot;</strong> en el menú lateral.</p>
 <p><strong>En escritorio:</strong> Se muestra una tabla con columnas configurables.
-<strong>En mÃƒÂ³vil:</strong> Se muestran tarjetas con la informaciÃƒÂ³n del ÃƒÂ­tem.</p>
+<strong>En móvil:</strong> Se muestran tarjetas con la información del ítem.</p>
 <table>
 <thead>
 <tr>
 <th>Columna</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 <th>Ancho</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>CÃƒÂ³digo</td>
-<td>CÃƒÂ³digo ÃƒÂºnico del ÃƒÂ­tem (ej: A1-03-47-000001)</td>
+<td>Código</td>
+<td>Código único del ítem (ej: A1-03-47-000001)</td>
 <td>1.5</td>
 </tr>
 <tr>
-<td>CategorÃƒÂ­a</td>
-<td>CÃƒÂ³digo de categorÃƒÂ­a</td>
+<td>Categoría</td>
+<td>Código de categoría</td>
 <td>0.5</td>
 </tr>
 <tr>
 <td>Detalle</td>
-<td>Campos dinÃƒÂ¡micos del ÃƒÂ­tem</td>
+<td>Campos dinámicos del ítem</td>
 <td>2.5</td>
 </tr>
 <tr>
 <td>Estado</td>
-<td>Estado del ÃƒÂ­tem (activo/pendiente/baja)</td>
+<td>Estado del ítem (activo/pendiente/baja)</td>
 <td>0.5</td>
 </tr>
 <tr>
-<td>ConservaciÃƒÂ³n</td>
-<td>Estado de conservaciÃƒÂ³n</td>
+<td>Conservación</td>
+<td>Estado de conservación</td>
 <td>0.7</td>
 </tr>
 <tr>
@@ -451,7 +452,7 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </tr>
 <tr>
 <td>Motivo Baja</td>
-<td>RazÃƒÂ³n de la baja (solo admin/jefe)</td>
+<td>Razón de la baja (solo admin/jefe)</td>
 <td>0.8</td>
 </tr>
 <tr>
@@ -461,7 +462,7 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </tr>
 </tbody></table>
 <h3>6.2 Configurar Columnas (Escritorio)</h3>
-<p>Debajo de los filtros verÃƒÂ¡ una barra de pills con las columnas disponibles:</p>
+<p>Debajo de los filtros verá una barra de pills con las columnas disponibles:</p>
 <table>
 <thead>
 <tr>
@@ -470,16 +471,16 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </tr>
 </thead>
 <tbody><tr>
-<td>CategorÃƒÂ­a</td>
-<td>Oculta/muestra columna de categorÃƒÂ­a</td>
+<td>Categoría</td>
+<td>Oculta/muestra columna de categoría</td>
 </tr>
 <tr>
 <td>Detalle</td>
 <td>Oculta/muestra columna de detalle</td>
 </tr>
 <tr>
-<td>ConservaciÃƒÂ³n</td>
-<td>Oculta/muestra columna de conservaciÃƒÂ³n</td>
+<td>Conservación</td>
+<td>Oculta/muestra columna de conservación</td>
 </tr>
 <tr>
 <td>Cant.</td>
@@ -494,9 +495,9 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <td>Oculta/muestra columna de responsable</td>
 </tr>
 </tbody></table>
-<p><strong>Las columnas CÃƒÂ³digo, Estado y Acciones siempre estÃƒÂ¡n visibles.</strong></p>
-<p>Su configuraciÃƒÂ³n se guarda automÃƒÂ¡ticamente y se recuerda en su prÃƒÂ³xima visita.</p>
-<h3>6.3 Buscar ÃƒÂtems</h3>
+<p><strong>Las columnas Código, Estado y Acciones siempre están visibles.</strong></p>
+<p>Su configuración se guarda automáticamente y se recuerda en su próxima visita.</p>
+<h3>6.3 Buscar Ítems</h3>
 <table>
 <thead>
 <tr>
@@ -505,20 +506,20 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </tr>
 </thead>
 <tbody><tr>
-<td>Campo de bÃƒÂºsqueda</td>
-<td>Buscar por cÃƒÂ³digo, estado conservaciÃƒÂ³n, estado, valores dinÃƒÂ¡micos, categorÃƒÂ­a, elemento, unidad o responsable. Use el botÃƒÂ³n &quot;Ãƒâ€”&quot; para limpiar.</td>
+<td>Campo de búsqueda</td>
+<td>Buscar por código, estado conservación, estado, valores dinámicos, categoría, elemento, unidad o responsable. Use el botón &quot;×&quot; para limpiar.</td>
 </tr>
 <tr>
-<td>CategorÃƒÂ­a (desplegable)</td>
-<td>Filtrar por categorÃƒÂ­a especÃƒÂ­fica</td>
+<td>Categoría (desplegable)</td>
+<td>Filtrar por categoría específica</td>
 </tr>
 <tr>
 <td>Estado (desplegable)</td>
 <td>Filtrar por estado: Activo, Pendiente, Baja o Todos</td>
 </tr>
 </tbody></table>
-<p><strong>Nota:</strong> Al cambiar bÃƒÂºsqueda, categorÃƒÂ­a o estado, la paginaciÃƒÂ³n vuelve a la pÃƒÂ¡gina 1.</p>
-<h3>6.4 Registrar Nuevo ÃƒÂtem (Alta)</h3>
+<p><strong>Nota:</strong> Al cambiar búsqueda, categoría o estado, la paginación vuelve a la página 1.</p>
+<h3>6.4 Registrar Nuevo Ítem (Alta)</h3>
 <ol>
 <li>Haga clic en <strong>&quot;+ Registrar alta&quot;</strong></li>
 <li>Complete el formulario:</li>
@@ -528,33 +529,33 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <tr>
 <th>Campo</th>
 <th align="center">Requerido</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>CategorÃƒÂ­a</td>
+<td>Categoría</td>
 <td align="center">Si</td>
-<td>Seleccione la categorÃƒÂ­a</td>
+<td>Seleccione la categoría</td>
 </tr>
 <tr>
 <td>Elemento</td>
 <td align="center">Si</td>
-<td>Tipo de elemento (segÃƒÂºn categorÃƒÂ­a)</td>
+<td>Tipo de elemento (según categoría)</td>
 </tr>
 <tr>
-<td>Estado conservaciÃƒÂ³n</td>
+<td>Estado conservación</td>
 <td align="center">Si</td>
 <td>Muy bueno, Bueno, Regular, Malo</td>
 </tr>
 <tr>
 <td>Cantidad</td>
 <td align="center">Si</td>
-<td>NÃƒÂºmero de unidades</td>
+<td>Número de unidades</td>
 </tr>
 <tr>
 <td>Fecha de alta</td>
 <td align="center">No</td>
-<td>Fecha de incorporaciÃƒÂ³n (puede marcar &quot;Desocida&quot;)</td>
+<td>Fecha de incorporación (puede marcar &quot;Desocida&quot;)</td>
 </tr>
 <tr>
 <td>Unidad de destino</td>
@@ -564,76 +565,76 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <tr>
 <td>Motivo de alta</td>
 <td align="center">Si</td>
-<td>RazÃƒÂ³n del registro</td>
+<td>Razón del registro</td>
 </tr>
 <tr>
-<td>Campos dinÃƒÂ¡micos</td>
+<td>Campos dinámicos</td>
 <td align="center">Variable</td>
-<td>SegÃƒÂºn categorÃƒÂ­a seleccionada</td>
+<td>Según categoría seleccionada</td>
 </tr>
 </tbody></table>
 <ol start="3">
 <li>Haga clic en <strong>&quot;Registrar&quot;</strong></li>
-<li>El sistema genera automÃƒÂ¡ticamente:<ul>
-<li>CÃƒÂ³digo ÃƒÂºnico (ej: A1-03-47-000001)</li>
+<li>El sistema genera automáticamente:<ul>
+<li>Código único (ej: A1-03-47-000001)</li>
 <li>Movimiento de alta aprobado</li>
-<li>Registro de auditorÃƒÂ­a</li>
+<li>Registro de auditoría</li>
 </ul>
 </li>
 </ol>
-<h3>6.5 Ver Detalle de un ÃƒÂtem</h3>
+<h3>6.5 Ver Detalle de un Ítem</h3>
 <ol>
 <li>Haga clic en <strong>&quot;Ver&quot;</strong> en la columna de Acciones</li>
-<li>VerÃƒÂ¡ informaciÃƒÂ³n completa del ÃƒÂ­tem:</li>
+<li>Verá información completa del ítem:</li>
 </ol>
 <table>
 <thead>
 <tr>
-<th>SecciÃƒÂ³n</th>
+<th>Sección</th>
 <th>Contenido</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Datos del ÃƒÂtem</td>
-<td>CÃƒÂ³digo, categorÃƒÂ­a, elemento, estado, conservaciÃƒÂ³n, cantidad, unidad, responsable, fecha</td>
+<td>Datos del Ítem</td>
+<td>Código, categoría, elemento, estado, conservación, cantidad, unidad, responsable, fecha</td>
 </tr>
 <tr>
 <td>Detalles Adicionales</td>
-<td>Campos dinÃƒÂ¡micos especÃƒÂ­ficos de la categorÃƒÂ­a</td>
+<td>Campos dinámicos específicos de la categoría</td>
 </tr>
 <tr>
 <td>Historial</td>
-<td>Timeline unificado de movimientos (altas, traslados, bajas) y ediciones del ÃƒÂ­tem</td>
+<td>Timeline unificado de movimientos (altas, traslados, bajas) y ediciones del ítem</td>
 </tr>
 </tbody></table>
-<p><strong>Historial unificado:</strong> El timeline muestra tanto los movimientos del ÃƒÂ­tem como las ediciones realizadas, ordenados cronolÃƒÂ³gicamente. Las ediciones se identifican con un badge azul y muestran quÃƒÂ© campos cambiaron.</p>
-<h3>6.6 Editar un ÃƒÂtem</h3>
+<p><strong>Historial unificado:</strong> El timeline muestra tanto los movimientos del ítem como las ediciones realizadas, ordenados cronológicamente. Las ediciones se identifican con un badge azul y muestran qué campos cambiaron.</p>
+<h3>6.6 Editar un Ítem</h3>
 <ol>
 <li>Haga clic en <strong>&quot;Editar&quot;</strong> en la columna de Acciones</li>
 <li>Modifique los campos que desee</li>
 <li>Haga clic en <strong>&quot;Guardar&quot;</strong></li>
 </ol>
-<h3>6.7 Eliminar un ÃƒÂtem</h3>
-<p><strong>Solo administradores</strong> pueden eliminar ÃƒÂ­tems.</p>
+<h3>6.7 Eliminar un Ítem</h3>
+<p><strong>Solo administradores</strong> pueden eliminar ítems.</p>
 <ol>
 <li>Haga clic en <strong>&quot;Eliminar&quot;</strong> en la columna de Acciones</li>
-<li>Confirme la eliminaciÃƒÂ³n</li>
+<li>Confirme la eliminación</li>
 </ol>
-<p><strong>Nota:</strong> El ÃƒÂ­tem serÃƒÂ¡ eliminado permanentemente. Sus movimientos se conservarÃƒÂ¡n como histÃƒÂ³ricos.</p>
+<p><strong>Nota:</strong> El ítem será eliminado permanentemente. Sus movimientos se conservarán como históricos.</p>
 <hr>
-<h2>7. GestiÃƒÂ³n de Movimientos</h2>
-<p>Los movimientos registran los cambios de ubicaciÃƒÂ³n o estado de los ÃƒÂ­tems.</p>
+<h2>7. Gestión de Movimientos</h2>
+<p>Los movimientos registran los cambios de ubicación o estado de los ítems.</p>
 <h3>7.1 Tipos de Movimiento</h3>
 <table>
 <thead>
 <tr>
 <th>Tipo</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Alta</td>
-<td>Registro inicial de un ÃƒÂ­tem</td>
+<td>Registro inicial de un ítem</td>
 </tr>
 <tr>
 <td>Traslado</td>
@@ -645,7 +646,7 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </tr>
 </tbody></table>
 <h3>7.2 Ver Lista de Movimientos</h3>
-<p>Haga clic en <strong>&quot;Movimientos&quot;</strong> en el menÃƒÂº lateral.</p>
+<p>Haga clic en <strong>&quot;Movimientos&quot;</strong> en el menú lateral.</p>
 <table>
 <thead>
 <tr>
@@ -666,7 +667,7 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <thead>
 <tr>
 <th>Columna</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -678,11 +679,11 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <td>Alta, Traslado o Baja</td>
 </tr>
 <tr>
-<td>ÃƒÂtem</td>
-<td>CÃƒÂ³digo del ÃƒÂ­tem afectado</td>
+<td>Ítem</td>
+<td>Código del ítem afectado</td>
 </tr>
 <tr>
-<td>Origen Ã¢â€ â€™ Destino</td>
+<td>Origen → Destino</td>
 <td>Unidades involucradas</td>
 </tr>
 <tr>
@@ -691,7 +692,7 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </tr>
 <tr>
 <td>Solicitante</td>
-<td>Quien realizÃƒÂ³ la solicitud</td>
+<td>Quien realizó la solicitud</td>
 </tr>
 <tr>
 <td>Acciones</td>
@@ -702,21 +703,21 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <ol>
 <li>Haga clic en <strong>&quot;+ Nueva solicitud&quot;</strong></li>
 <li>Seleccione <strong>&quot;Traslado&quot;</strong></li>
-<li>Seleccione el <strong>ÃƒÂ­tem</strong> a trasladar</li>
+<li>Seleccione el <strong>ítem</strong> a trasladar</li>
 <li>Seleccione la <strong>unidad de destino</strong></li>
 <li>Ingrese el <strong>motivo</strong></li>
 <li>Haga clic en <strong>&quot;Registrar&quot;</strong></li>
 </ol>
-<p><strong>Nota:</strong> Se crearÃƒÂ¡ una alerta para aprobaciÃƒÂ³n.</p>
+<p><strong>Nota:</strong> Se creará una alerta para aprobación.</p>
 <h3>7.4 Solicitar Baja</h3>
 <ol>
 <li>Haga clic en <strong>&quot;+ Nueva solicitud&quot;</strong></li>
 <li>Seleccione <strong>&quot;Baja&quot;</strong></li>
-<li>Seleccione el <strong>ÃƒÂ­tem</strong></li>
+<li>Seleccione el <strong>ítem</strong></li>
 <li>Ingrese el <strong>motivo</strong></li>
 <li>Haga clic en <strong>&quot;Registrar&quot;</strong></li>
 </ol>
-<p><strong>Nota:</strong> La baja tiene prioridad crÃƒÂ­tica.</p>
+<p><strong>Nota:</strong> La baja tiene prioridad crítica.</p>
 <h3>7.5 Aprobar o Rechazar Movimiento</h3>
 <p><strong>Solo administradores y jefes.</strong></p>
 <ol>
@@ -726,17 +727,17 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <table>
 <thead>
 <tr>
-<th>AcciÃƒÂ³n</th>
+<th>Acción</th>
 <th>Resultado</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Aprobar traslado</td>
-<td>Cambia la unidad del ÃƒÂ­tem</td>
+<td>Cambia la unidad del ítem</td>
 </tr>
 <tr>
 <td>Aprobar baja</td>
-<td>Estado del ÃƒÂ­tem = &quot;baja&quot;, categorÃƒÂ­a = A8</td>
+<td>Estado del ítem = &quot;baja&quot;, categoría = A8</td>
 </tr>
 <tr>
 <td>Rechazar</td>
@@ -744,19 +745,19 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </tr>
 </tbody></table>
 <hr>
-<h2>8. GestiÃƒÂ³n de Alertas</h2>
+<h2>8. Gestión de Alertas</h2>
 <h3>8.1 Tipos de Alerta</h3>
 <table>
 <thead>
 <tr>
 <th>Tipo</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 <th>Prioridad</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>Pendiente de aprobaciÃƒÂ³n</td>
-<td>Movimiento esperando revisiÃƒÂ³n</td>
+<td>Pendiente de aprobación</td>
+<td>Movimiento esperando revisión</td>
 <td>Importante</td>
 </tr>
 <tr>
@@ -775,16 +776,16 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <thead>
 <tr>
 <th>Prioridad</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>CrÃƒÂ­tica</td>
-<td>Requiere atenciÃƒÂ³n inmediata (bajas)</td>
+<td>Crítica</td>
+<td>Requiere atención inmediata (bajas)</td>
 </tr>
 <tr>
 <td>Importante</td>
-<td>Requiere atenciÃƒÂ³n pronto (traslados)</td>
+<td>Requiere atención pronto (traslados)</td>
 </tr>
 <tr>
 <td>Informativa</td>
@@ -792,7 +793,7 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </tr>
 </tbody></table>
 <h3>8.3 Ver Alertas</h3>
-<p>Haga clic en <strong>&quot;Alertas&quot;</strong> en el menÃƒÂº lateral.</p>
+<p>Haga clic en <strong>&quot;Alertas&quot;</strong> en el menú lateral.</p>
 <table>
 <thead>
 <tr>
@@ -809,24 +810,24 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <thead>
 <tr>
 <th>Columna</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Fecha</td>
-<td>CreaciÃƒÂ³n de la alerta</td>
+<td>Creación de la alerta</td>
 </tr>
 <tr>
 <td>Prioridad</td>
-<td>CrÃƒÂ­tica, Importante, Informativa</td>
+<td>Crítica, Importante, Informativa</td>
 </tr>
 <tr>
 <td>Mensaje</td>
-<td>DescripciÃƒÂ³n de la alerta</td>
+<td>Descripción de la alerta</td>
 </tr>
 <tr>
-<td>ÃƒÂtem</td>
-<td>ÃƒÂtem relacionado (si aplica)</td>
+<td>Ítem</td>
+<td>Ítem relacionado (si aplica)</td>
 </tr>
 <tr>
 <td>Estado</td>
@@ -842,24 +843,24 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <thead>
 <tr>
 <th>Campo</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Mensaje</td>
-<td>DescripciÃƒÂ³n de la alerta</td>
+<td>Descripción de la alerta</td>
 </tr>
 <tr>
 <td>Prioridad</td>
-<td>CrÃƒÂ­tica, Importante o Informativa</td>
+<td>Crítica, Importante o Informativa</td>
 </tr>
 <tr>
 <td>Unidad</td>
 <td>Unidad afectada</td>
 </tr>
 <tr>
-<td>ÃƒÂtem</td>
-<td>Opcional, ÃƒÂ­tem relacionado</td>
+<td>Ítem</td>
+<td>Opcional, ítem relacionado</td>
 </tr>
 </tbody></table>
 <ol start="3">
@@ -871,9 +872,9 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <li>Haga clic en <strong>&quot;Cerrar&quot;</strong></li>
 </ol>
 <hr>
-<h2>9. GestiÃƒÂ³n de CategorÃƒÂ­as</h2>
+<h2>9. Gestión de Categorías</h2>
 <p><strong>Solo administradores pueden acceder.</strong></p>
-<h3>9.1 Panel de CategorÃƒÂ­as</h3>
+<h3>9.1 Panel de Categorías</h3>
 <table>
 <thead>
 <tr>
@@ -882,32 +883,32 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 </tr>
 </thead>
 <tbody><tr>
-<td>Lista de categorÃƒÂ­as</td>
-<td>Seleccionar categorÃƒÂ­a para ver/editar</td>
+<td>Lista de categorías</td>
+<td>Seleccionar categoría para ver/editar</td>
 </tr>
 <tr>
-<td>Campos dinÃƒÂ¡micos</td>
+<td>Campos dinámicos</td>
 <td>Crear, editar, reordenar campos</td>
 </tr>
 <tr>
 <td>Elementos</td>
-<td>Crear, editar, reordenar tipos de ÃƒÂ­tem</td>
+<td>Crear, editar, reordenar tipos de ítem</td>
 </tr>
 </tbody></table>
-<h3>9.2 Crear CategorÃƒÂ­a</h3>
+<h3>9.2 Crear Categoría</h3>
 <ol>
 <li>En el formulario inferior, ingrese:<ul>
-<li><strong>CÃƒÂ³digo</strong> (ej: A9)</li>
+<li><strong>Código</strong> (ej: A9)</li>
 <li><strong>Nombre</strong></li>
 </ul>
 </li>
 <li>Haga clic en <strong>&quot;Crear&quot;</strong></li>
 </ol>
-<h3>9.3 Gestionar Campos DinÃƒÂ¡micos</h3>
+<h3>9.3 Gestionar Campos Dinámicos</h3>
 <p><strong>Crear campo:</strong></p>
 <ol>
-<li>Seleccione la categorÃƒÂ­a</li>
-<li>Seleccione el <strong>ÃƒÂ¡mbito</strong> (General o elemento especÃƒÂ­fico)</li>
+<li>Seleccione la categoría</li>
+<li>Seleccione el <strong>ámbito</strong> (General o elemento específico)</li>
 <li>Haga clic en <strong>&quot;+ Nuevo campo&quot;</strong></li>
 <li>Configure:</li>
 </ol>
@@ -915,7 +916,7 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <thead>
 <tr>
 <th>Campo</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -945,11 +946,11 @@ Instituto de Seguridad PÃƒÂºblica (ISeP)</p>
 <li>Haga clic en <strong>&quot;Guardar&quot;</strong></li>
 </ol>
 <p><strong>Reordenar:</strong>
-Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ</strong> para cambiar el orden.</p>
+Use las flechas <strong>↑</strong> y <strong>↓</strong> para cambiar el orden.</p>
 <h3>9.4 Gestionar Elementos</h3>
 <p><strong>Crear elemento:</strong></p>
 <ol>
-<li>Seleccione la categorÃƒÂ­a</li>
+<li>Seleccione la categoría</li>
 <li>Haga clic en <strong>&quot;+ Nuevo elemento&quot;</strong></li>
 <li>Ingrese el <strong>nombre</strong></li>
 <li>Haga clic en <strong>&quot;Crear&quot;</strong></li>
@@ -961,16 +962,16 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 <li>Haga clic en <strong>&quot;Guardar&quot;</strong></li>
 </ol>
 <hr>
-<h2>10. GestiÃƒÂ³n de Sedes y Unidades</h2>
+<h2>10. Gestión de Sedes y Unidades</h2>
 <p><strong>Solo administradores pueden acceder.</strong></p>
-<p>La pÃƒÂ¡gina se organiza en dos pestaÃƒÂ±as: <strong>Sedes</strong> y <strong>Unidades de destino</strong>.</p>
-<h3>10.1 Sedes (PestaÃƒÂ±a &quot;Sedes&quot;)</h3>
-<p>Las sedes representan las ubicaciones fÃƒÂ­sicas del instituto. Se muestran como tarjetas con badge de ID, estado y contador de unidades.</p>
+<p>La página se organiza en dos pestañas: <strong>Sedes</strong> y <strong>Unidades de destino</strong>.</p>
+<h3>10.1 Sedes (Pestaña &quot;Sedes&quot;)</h3>
+<p>Las sedes representan las ubicaciones físicas del instituto. Se muestran como tarjetas con badge de ID, estado y contador de unidades.</p>
 <table>
 <thead>
 <tr>
-<th>AcciÃƒÂ³n</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Acción</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -979,19 +980,19 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 </tr>
 <tr>
 <td>Editar sede</td>
-<td>Haga clic en el icono Ã¢Å“Å½ en la tarjeta, modifique nombre en el modal</td>
+<td>Haga clic en el icono ✎ en la tarjeta, modifique nombre en el modal</td>
 </tr>
 <tr>
 <td>Desactivar</td>
-<td>Haga clic en Ã°Å¸â€˜Â para desactivar (la sede aparece con borde punteado)</td>
+<td>Haga clic en 👁 para desactivar (la sede aparece con borde punteado)</td>
 </tr>
 <tr>
 <td>Activar</td>
-<td>Haga clic en Ã°Å¸Å¡Â« para reactivar</td>
+<td>Haga clic en 🚫 para reactivar</td>
 </tr>
 <tr>
 <td>Eliminar</td>
-<td>Haga clic en Ã°Å¸â€”â€˜, confirme en el modal (no se puede eliminar si tiene unidades)</td>
+<td>Haga clic en 🗑, confirme en el modal (no se puede eliminar si tiene unidades)</td>
 </tr>
 </tbody></table>
 <p><strong>Filtros:</strong></p>
@@ -999,13 +1000,13 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 <li><strong>Buscar</strong>: Filtra sedes por nombre</li>
 <li><strong>Ver desactivadas</strong>: Incluye sedes inactivas en la lista</li>
 </ul>
-<h3>10.2 Unidades (PestaÃƒÂ±a &quot;Unidades de destino&quot;)</h3>
-<p>Las unidades son departamentos o ÃƒÂ¡reas dentro de cada sede. Se muestran <strong>agrupadas por sede</strong> en secciones colapsables (accordion), reduciendo el scroll.</p>
+<h3>10.2 Unidades (Pestaña &quot;Unidades de destino&quot;)</h3>
+<p>Las unidades son departamentos o áreas dentro de cada sede. Se muestran <strong>agrupadas por sede</strong> en secciones colapsables (accordion), reduciendo el scroll.</p>
 <table>
 <thead>
 <tr>
 <th>Elemento</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -1026,14 +1027,14 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 </ol>
 <p><strong>Editar unidad:</strong></p>
 <ol>
-<li>Haga clic en el icono <strong>Ã¢Å“Å½</strong> en la fila de la unidad</li>
+<li>Haga clic en el icono <strong>✎</strong> en la fila de la unidad</li>
 <li>Modifique nombre y/o sede en el modal</li>
 <li>Haga clic en <strong>&quot;Guardar&quot;</strong></li>
 </ol>
 <p><strong>Otras acciones:</strong></p>
 <ul>
-<li><strong>Desactivar/Activar</strong>: Icono Ã°Å¸â€˜Â / Ã°Å¸Å¡Â« en la fila</li>
-<li><strong>Eliminar</strong>: Icono Ã°Å¸â€”â€˜, confirma en modal</li>
+<li><strong>Desactivar/Activar</strong>: Icono 👁 / 🚫 en la fila</li>
+<li><strong>Eliminar</strong>: Icono 🗑, confirma en modal</li>
 </ul>
 <p><strong>Filtros:</strong></p>
 <ul>
@@ -1052,12 +1053,12 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 </tr>
 </thead>
 <tbody><tr>
-<td>Por CategorÃƒÂ­a</td>
-<td>CÃƒÂ³digo, nombre, cantidad de ÃƒÂ­tems</td>
+<td>Por Categoría</td>
+<td>Código, nombre, cantidad de ítems</td>
 </tr>
 <tr>
 <td>Por Estado</td>
-<td>Estado de conservaciÃƒÂ³n, cantidad</td>
+<td>Estado de conservación, cantidad</td>
 </tr>
 <tr>
 <td>Por Sede</td>
@@ -1069,11 +1070,11 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 </tr>
 <tr>
 <td>Por Elemento</td>
-<td>Los 20 elementos mÃƒÂ¡s frecuentes</td>
+<td>Los 20 elementos más frecuentes</td>
 </tr>
 <tr>
 <td>Movimientos</td>
-<td>Movimientos por mes (ÃƒÂºltimos 6 meses)</td>
+<td>Movimientos por mes (últimos 6 meses)</td>
 </tr>
 </tbody></table>
 <h3>11.2 Exportar Datos</h3>
@@ -1081,19 +1082,19 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 <thead>
 <tr>
 <th>Formato</th>
-<th>BotÃƒÂ³n</th>
+<th>Botón</th>
 <th>Contenido</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Excel (.xlsx)</td>
 <td>&quot;Exportar Excel&quot;</td>
-<td>Hoja por categorÃƒÂ­a con campos dinÃƒÂ¡micos</td>
+<td>Hoja por categoría con campos dinámicos</td>
 </tr>
 <tr>
 <td>CSV</td>
 <td>&quot;Exportar CSV&quot;</td>
-<td>Todos los ÃƒÂ­tems, separado por comas</td>
+<td>Todos los ítems, separado por comas</td>
 </tr>
 <tr>
 <td>PDF</td>
@@ -1102,13 +1103,13 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 </tr>
 </tbody></table>
 <hr>
-<h2>12. AuditorÃƒÂ­a</h2>
+<h2>12. Auditoría</h2>
 <p><strong>Solo administradores y jefes pueden acceder.</strong></p>
-<h3>12.1 Ã‚Â¿QuÃƒÂ© se Registra?</h3>
+<h3>12.1 ¿Qué se Registra?</h3>
 <table>
 <thead>
 <tr>
-<th>CategorÃƒÂ­a</th>
+<th>Categoría</th>
 <th>Acciones</th>
 </tr>
 </thead>
@@ -1117,19 +1118,19 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 <td>login</td>
 </tr>
 <tr>
-<td>ÃƒÂtems</td>
+<td>Ítems</td>
 <td>crear, editar, eliminar</td>
 </tr>
 <tr>
-<td>CategorÃƒÂ­as</td>
+<td>Categorías</td>
 <td>crear, editar, eliminar</td>
 </tr>
 <tr>
-<td>Campos dinÃƒÂ¡micos</td>
+<td>Campos dinámicos</td>
 <td>crear, editar, eliminar, mover</td>
 </tr>
 <tr>
-<td>Tipos de ÃƒÂ­tem</td>
+<td>Tipos de ítem</td>
 <td>crear, editar, eliminar, mover</td>
 </tr>
 <tr>
@@ -1150,7 +1151,7 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 </tr>
 </tbody></table>
 <h3>12.2 Ver Registro</h3>
-<p>Haga clic en <strong>&quot;AuditorÃƒÂ­a&quot;</strong> en el menÃƒÂº lateral.</p>
+<p>Haga clic en <strong>&quot;Auditoría&quot;</strong> en el menú lateral.</p>
 <table>
 <thead>
 <tr>
@@ -1163,7 +1164,7 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 <td>Item, Categoria, CampoDinamico, etc.</td>
 </tr>
 <tr>
-<td>AcciÃƒÂ³n</td>
+<td>Acción</td>
 <td>crear, editar, eliminar, aprobar, etc.</td>
 </tr>
 </tbody></table>
@@ -1171,20 +1172,20 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 <thead>
 <tr>
 <th>Columna</th>
-<th>DescripciÃƒÂ³n</th>
+<th>Descripción</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Fecha</td>
-<td>Fecha y hora de la acciÃƒÂ³n</td>
+<td>Fecha y hora de la acción</td>
 </tr>
 <tr>
 <td>Usuario</td>
-<td>QuiÃƒÂ©n realizÃƒÂ³ la acciÃƒÂ³n</td>
+<td>Quién realizó la acción</td>
 </tr>
 <tr>
-<td>AcciÃƒÂ³n</td>
-<td>Tipo de acciÃƒÂ³n realizada</td>
+<td>Acción</td>
+<td>Tipo de acción realizada</td>
 </tr>
 <tr>
 <td>Entidad</td>
@@ -1197,18 +1198,18 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 </tbody></table>
 <p><strong>Ejemplos de detalle:</strong></p>
 <ul>
-<li>ÃƒÂtem editado: <code>A1-08-15-000001 Ã¢â‚¬â€ NÃ‚Â° Serie: no visible Ã¢â€ â€™ SA1243FDSA</code></li>
-<li>Traslado: <code>Traslado de A1-08-15-000001: Recreo Ã¢â€ â€™ Rosario</code></li>
-<li>Sede activada: <code>Sede Central Ã¢â‚¬â€ Activa: false Ã¢â€ â€™ true</code></li>
+<li>Ítem editado: <code>A1-08-15-000001 — N° Serie: no visible → SA1243FDSA</code></li>
+<li>Traslado: <code>Traslado de A1-08-15-000001: Recreo → Rosario</code></li>
+<li>Sede activada: <code>Sede Central — Activa: false → true</code></li>
 <li>Unidad creada: <code>Unidad &quot;Recreo&quot; creada en Sede Central</code></li>
 </ul>
-<p><strong>PaginaciÃƒÂ³n:</strong> Use el selector de cantidad (10/25/50) y los botones de navegaciÃƒÂ³n para recorrer los registros.</p>
-<h3>12.3 Exportar AuditorÃƒÂ­a</h3>
+<p><strong>Paginación:</strong> Use el selector de cantidad (10/25/50) y los botones de navegación para recorrer los registros.</p>
+<h3>12.3 Exportar Auditoría</h3>
 <table>
 <thead>
 <tr>
 <th>Formato</th>
-<th>BotÃƒÂ³n</th>
+<th>Botón</th>
 </tr>
 </thead>
 <tbody><tr>
@@ -1222,12 +1223,12 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 </tbody></table>
 <hr>
 <h2>13. Preguntas Frecuentes</h2>
-<h3>Ã‚Â¿CÃƒÂ³mo cambio el tema de la interfaz?</h3>
-<p>Haga clic en el botÃƒÂ³n de tema (sol/luna) en la barra superior para alternar entre modo oscuro y claro. Su preferencia se guarda automÃƒÂ¡ticamente.</p>
-<h3>Ã‚Â¿Por quÃƒÂ© no veo ciertas opciones?</h3>
+<h3>¿Cómo cambio el tema de la interfaz?</h3>
+<p>Haga clic en el botón de tema (sol/luna) en la barra superior para alternar entre modo oscuro y claro. Su preferencia se guarda automáticamente.</p>
+<h3>¿Por qué no veo ciertas opciones?</h3>
 <p>Las opciones dependen de su rol. Solicite acceso al administrador.</p>
-<h3>Ã‚Â¿CÃƒÂ³mo funciona el cÃƒÂ³digo ÃƒÂºnico?</h3>
-<p><strong>Formato:</strong> <code>CategorÃƒÂ­a-Sede-Unidad-Secuencial</code></p>
+<h3>¿Cómo funciona el código único?</h3>
+<p><strong>Formato:</strong> <code>Categoría-Sede-Unidad-Secuencial</code></p>
 <p><strong>Ejemplo:</strong> <code>A1-03-47-000001</code></p>
 <table>
 <thead>
@@ -1238,7 +1239,7 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 </thead>
 <tbody><tr>
 <td>A1</td>
-<td>CategorÃƒÂ­a (Equipamiento TecnolÃƒÂ³gico)</td>
+<td>Categoría (Equipamiento Tecnológico)</td>
 </tr>
 <tr>
 <td>03</td>
@@ -1253,18 +1254,18 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 <td>Secuencial</td>
 </tr>
 </tbody></table>
-<h3>Ã‚Â¿Puedo recuperar un ÃƒÂ­tem eliminado?</h3>
-<p>No, la eliminaciÃƒÂ³n es permanente. Sin embargo, los movimientos asociados se conservan como histÃƒÂ³ricos. Debe crear uno nuevo si desea restaurar el registro.</p>
-<h3>Ã‚Â¿QuÃƒÂ© pasa si rechazo un movimiento?</h3>
-<p>El movimiento queda registrado como rechazado. El ÃƒÂ­tem mantiene su ubicaciÃƒÂ³n.</p>
-<h3>Ã‚Â¿Puedo crear ÃƒÂ­tems sin fecha?</h3>
-<p>SÃƒÂ­, marque la casilla &quot;Fecha desconocida&quot;.</p>
-<h3>Ã‚Â¿CÃƒÂ³mo creo campos personalizados?</h3>
-<p>Vaya a <strong>CategorÃƒÂ­as</strong> (solo admin), seleccione la categorÃƒÂ­a y haga clic en <strong>&quot;+ Nuevo campo&quot;</strong>.</p>
-<h3>Ã‚Â¿Las sedes inactivas afectan el inventario?</h3>
-<p>No, solo desaparecen de los formularios de selecciÃƒÂ³n.</p>
-<h3>Ã‚Â¿CÃƒÂ³mo funciona la paginaciÃƒÂ³n?</h3>
-<p>Los ÃƒÂ­tems se muestran 25 por pÃƒÂ¡gina (configurable: 10/25/50). Use &quot;Anterior&quot; y &quot;Siguiente&quot; para navegar. Su preferencia se guarda automÃƒÂ¡ticamente.</p>
+<h3>¿Puedo recuperar un ítem eliminado?</h3>
+<p>No, la eliminación es permanente. Sin embargo, los movimientos asociados se conservan como históricos. Debe crear uno nuevo si desea restaurar el registro.</p>
+<h3>¿Qué pasa si rechazo un movimiento?</h3>
+<p>El movimiento queda registrado como rechazado. El ítem mantiene su ubicación.</p>
+<h3>¿Puedo crear ítems sin fecha?</h3>
+<p>Sí, marque la casilla &quot;Fecha desconocida&quot;.</p>
+<h3>¿Cómo creo campos personalizados?</h3>
+<p>Vaya a <strong>Categorías</strong> (solo admin), seleccione la categoría y haga clic en <strong>&quot;+ Nuevo campo&quot;</strong>.</p>
+<h3>¿Las sedes inactivas afectan el inventario?</h3>
+<p>No, solo desaparecen de los formularios de selección.</p>
+<h3>¿Cómo funciona la paginación?</h3>
+<p>Los ítems se muestran 25 por página (configurable: 10/25/50). Use &quot;Anterior&quot; y &quot;Siguiente&quot; para navegar. Su preferencia se guarda automáticamente.</p>
 <hr>
 <h2>Changelog</h2>
 <h3>v3.3 (27 agosto 2026)</h3>
@@ -1274,84 +1275,85 @@ Use las flechas <strong>Ã¢â€ â€˜</strong> y <strong>Ã¢â€ â€œ
 <li><strong>Cards de Sedes</strong>: Tarjetas con badge ID, estado (Activa/Inactiva) y contador de unidades</li>
 <li><strong>Accordion de Unidades</strong>: Unidades agrupadas por sede en secciones colapsables</li>
 <li><strong>Modales</strong>: Crear, editar y eliminar en ventana modal (consistente con el resto de la app)</li>
-<li><strong>Toast notifications</strong>: ConfirmaciÃƒÂ³n visual en cada acciÃƒÂ³n</li>
-<li><strong>Skeleton loading</strong>: AnimaciÃƒÂ³n de carga mientras se obtienen datos</li>
+<li><strong>Toast notifications</strong>: Confirmación visual en cada acción</li>
+<li><strong>Skeleton loading</strong>: Animación de carga mientras se obtienen datos</li>
 <li><strong>Empty state</strong>: Mensaje ilustrado cuando no hay datos</li>
 </ul>
-<h4>AuditorÃƒÂ­a</h4>
+<h4>Auditoría</h4>
 <ul>
 <li><strong>Nombres legibles</strong>: Todos los IDs se muestran como nombres reales (ej: &quot;Recreo&quot; en vez de &quot;5&quot;)</li>
-<li><strong>Detalle del ÃƒÂ­tem</strong>: Al editar, se muestra el cÃƒÂ³digo del ÃƒÂ­tem (ej: &quot;A1-08-15-000001 Ã¢â‚¬â€ ...&quot;)</li>
-<li><strong>Campos dinÃƒÂ¡micos</strong>: Solo se muestran los campos que cambiaron, con sus nombres reales</li>
+<li><strong>Detalle del ítem</strong>: Al editar, se muestra el código del ítem (ej: &quot;A1-08-15-000001 — ...&quot;)</li>
+<li><strong>Campos dinámicos</strong>: Solo se muestran los campos que cambiaron, con sus nombres reales</li>
 <li><strong>Sedes/Unidades</strong>: El detalle incluye el nombre de la entidad modificada</li>
 </ul>
 <h4>Dashboard</h4>
 <ul>
-<li><strong>Doughnut con cifras</strong>: Los valores y porcentajes se muestran directamente en el grÃƒÂ¡fico</li>
+<li><strong>Doughnut con cifras</strong>: Los valores y porcentajes se muestran directamente en el gráfico</li>
 </ul>
 <h3>v3.2 (27 agosto 2026)</h3>
 <h4>Inventario</h4>
 <ul>
 <li><strong>Filtro por estado</strong>: Nuevo desplegable para filtrar por Activo, Pendiente, Baja o Todos</li>
-<li><strong>Eliminar restringido</strong>: Solo administradores pueden eliminar ÃƒÂ­tems</li>
-<li><strong>Movimientos preservados</strong>: Al eliminar un ÃƒÂ­tem, sus movimientos se conservan como histÃƒÂ³ricos</li>
+<li><strong>Eliminar restringido</strong>: Solo administradores pueden eliminar ítems</li>
+<li><strong>Movimientos preservados</strong>: Al eliminar un ítem, sus movimientos se conservan como históricos</li>
 </ul>
-<h4>AuditorÃƒÂ­a</h4>
+<h4>Auditoría</h4>
 <ul>
-<li><strong>Detalle mejorado</strong>: Solo muestra los campos que cambiaron en cada ediciÃƒÂ³n (diff antes/despuÃƒÂ©s)</li>
-<li><strong>PaginaciÃƒÂ³n mejorada</strong>: Selector de cantidad de registros (10/25/50) reemplaza paginaciÃƒÂ³n simple</li>
+<li><strong>Detalle mejorado</strong>: Solo muestra los campos que cambiaron en cada edición (diff antes/después)</li>
+<li><strong>Paginación mejorada</strong>: Selector de cantidad de registros (10/25/50) reemplaza paginación simple</li>
 </ul>
-<h4>Historial del ÃƒÂtem</h4>
+<h4>Historial del Ítem</h4>
 <ul>
 <li><strong>Timeline unificado</strong>: Combina movimientos (altas, traslados, bajas) y ediciones en un solo historial</li>
-<li><strong>Ediciones visibles</strong>: Las ediciones del ÃƒÂ­tem aparecen con badge azul mostrando quÃƒÂ© campos cambiaron</li>
-<li><strong>Orden cronolÃƒÂ³gico</strong>: Todos los eventos se muestran de mÃƒÂ¡s reciente a mÃƒÂ¡s antiguo</li>
+<li><strong>Ediciones visibles</strong>: Las ediciones del ítem aparecen con badge azul mostrando qué campos cambiaron</li>
+<li><strong>Orden cronológico</strong>: Todos los eventos se muestran de más reciente a más antiguo</li>
 </ul>
 <h4>Responsive</h4>
 <ul>
-<li><strong>Modal mejorado</strong>: Se ajusta al alto de la pantalla en desktop, tablet y mÃƒÂ³vil</li>
-<li><strong>NavegaciÃƒÂ³n visible</strong>: BotÃƒÂ³n &quot;Cerrar&quot; siempre visible en todos los tamaÃƒÂ±os de pantalla</li>
-<li><strong>Tabla optimizada</strong>: Iconos de acciones mÃƒÂ¡s compactos, mejor uso del espacio</li>
+<li><strong>Modal mejorado</strong>: Se ajusta al alto de la pantalla en desktop, tablet y móvil</li>
+<li><strong>Navegación visible</strong>: Botón &quot;Cerrar&quot; siempre visible en todos los tamaños de pantalla</li>
+<li><strong>Tabla optimizada</strong>: Iconos de acciones más compactos, mejor uso del espacio</li>
 </ul>
 <h3>v3.0 (26 agosto 2026)</h3>
 <h4>Nuevas Funcionalidades</h4>
 <ul>
 <li><strong>Columnas configurables</strong>: Muestre/oculte columnas en la tabla de inventario con pills clickeables</li>
-<li><strong>BÃƒÂºsqueda mejorada</strong>: BotÃƒÂ³n &quot;Ãƒâ€”&quot; para limpiar bÃƒÂºsqueda rÃƒÂ¡pidamente</li>
-<li><strong>Anchos proporcionales</strong>: Columnas con anchos adaptables (Detalle mÃƒÂ¡s ancho, Cantidad mÃƒÂ¡s estrecho)</li>
-<li><strong>Carga rÃƒÂ¡pida</strong>: Las pÃƒÂ¡ginas se cargan bajo demanda (mÃƒÂ¡s ÃƒÂ¡gil)</li>
-<li><strong>ImÃƒÂ¡genes optimizadas</strong>: Las imÃƒÂ¡genes cargan solo cuando son visibles</li>
+<li><strong>Búsqueda mejorada</strong>: Botón &quot;×&quot; para limpiar búsqueda rápidamente</li>
+<li><strong>Anchos proporcionales</strong>: Columnas con anchos adaptables (Detalle más ancho, Cantidad más estrecho)</li>
+<li><strong>Carga rápida</strong>: Las páginas se cargan bajo demanda (más ágil)</li>
+<li><strong>Imágenes optimizadas</strong>: Las imágenes cargan solo cuando son visibles</li>
 </ul>
 <h4>Mejoras de UX</h4>
 <ul>
-<li><strong>Filtros resetean paginaciÃƒÂ³n</strong>: Al buscar o filtrar, vuelve a pÃƒÂ¡gina 1 automÃƒÂ¡ticamente</li>
-<li><strong>Tabla responsive</strong>: Se adapta al tamaÃƒÂ±o de pantalla automÃƒÂ¡ticamente</li>
+<li><strong>Filtros resetean paginación</strong>: Al buscar o filtrar, vuelve a página 1 automáticamente</li>
+<li><strong>Tabla responsive</strong>: Se adapta al tamaño de pantalla automáticamente</li>
 <li><strong>Mejor accesibilidad</strong>: Descripciones para lectores de pantalla en toda la app</li>
 </ul>
 <h3>v2.0 (26 agosto 2026)</h3>
 <h4>Nuevas Funcionalidades</h4>
 <ul>
-<li><strong>Sidebar jerÃƒÂ¡rquico</strong>: MenÃƒÂº organizado en 4 bloques temÃƒÂ¡ticos</li>
-<li><strong>Iconos SVG</strong>: Cada mÃƒÂ³dulo tiene un icono visual</li>
-<li><strong>Sidebar colapsable</strong>: Maximice el ÃƒÂ¡rea de trabajo con el botÃƒÂ³n <code>Ã¢â‚¬Â¹</code></li>
-<li><strong>Bottom nav en mÃƒÂ³vil</strong>: Accesos rÃƒÂ¡pidos a las funciones principales</li>
-<li><strong>Active route</strong>: La pÃƒÂ¡gina actual se resalta automÃƒÂ¡ticamente</li>
-<li><strong>Badge de alertas</strong>: Contador de alertas abiertas en el menÃƒÂº</li>
-<li><strong>Skeleton loading</strong>: AnimaciÃƒÂ³n de carga moderna</li>
-<li><strong>Empty states ilustrados</strong>: Mensajes vacÃƒÂ­os con iconos SVG</li>
+<li><strong>Sidebar jerárquico</strong>: Menú organizado en 4 bloques temáticos</li>
+<li><strong>Iconos SVG</strong>: Cada módulo tiene un icono visual</li>
+<li><strong>Sidebar colapsable</strong>: Maximice el área de trabajo con el botón <code>‹</code></li>
+<li><strong>Bottom nav en móvil</strong>: Accesos rápidos a las funciones principales</li>
+<li><strong>Active route</strong>: La página actual se resalta automáticamente</li>
+<li><strong>Badge de alertas</strong>: Contador de alertas abiertas en el menú</li>
+<li><strong>Skeleton loading</strong>: Animación de carga moderna</li>
+<li><strong>Empty states ilustrados</strong>: Mensajes vacíos con iconos SVG</li>
 <li><strong>Toast notifications</strong>: Confirmaciones emergentes para acciones</li>
 <li><strong>Ordenar columnas</strong>: Click en encabezados de tabla para ordenar</li>
 </ul>
 <h4>Mejoras de UX</h4>
 <ul>
-<li><strong>Cards en mÃƒÂ³vil</strong>: ÃƒÂtems como tarjetas en lugar de tabla</li>
-<li><strong>Filtros colapsables</strong>: Ocultar/mostrar filtros en mÃƒÂ³vil</li>
+<li><strong>Cards en móvil</strong>: Ítems como tarjetas en lugar de tabla</li>
+<li><strong>Filtros colapsables</strong>: Ocultar/mostrar filtros en móvil</li>
 <li><strong>Sticky header</strong>: Encabezado de tabla fijo al hacer scroll</li>
-<li><strong>Touch area mejorado</strong>: Botones mÃƒÂ­nimo 44x44px en mÃƒÂ³vil</li>
+<li><strong>Touch area mejorado</strong>: Botones mínimo 44x44px en móvil</li>
 </ul>
 <hr>
 <p><em>Manual de Usuario - SAGI v3.3</em>
 <em>Fecha: 27 de agosto de 2026</em>
-<em>Instituto de Seguridad PÃƒÂºblica</em></p>
+<em>Instituto de Seguridad Pública</em></p>
+
 </body>
 </html>
