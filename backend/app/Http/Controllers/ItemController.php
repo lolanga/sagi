@@ -200,15 +200,17 @@ if ($request->filled('search')) {
             'unidad' => $item->unidad->nombre ?? '-',
         ], $item->only(['estado_conservacion', 'cantidad']));
 
-        $camposDinamicos = $item->categoria->camposDinamicos()->get()->keyBy('id');
         $todosLosIds = array_unique(array_merge(array_keys($antesDinamicos), array_keys($despuesDinamicos)));
-        foreach ($todosLosIds as $campoId) {
-            $av = $antesDinamicos[$campoId] ?? null;
-            $dv = $despuesDinamicos[$campoId] ?? null;
-            if (String($av) !== String($dv)) {
-                $nombreCampo = $camposDinamicos[$campoId]->nombre ?? "Campo #{$campoId}";
-                $antes[$nombreCampo] = $av ?? '(vacío)';
-                $despues[$nombreCampo] = $dv ?? '(vacío)';
+        if (!empty($todosLosIds)) {
+            $todosCampos = \App\Models\CampoDinamico::whereIn('id', $todosLosIds)->get()->keyBy('id');
+            foreach ($todosLosIds as $campoId) {
+                $av = $antesDinamicos[$campoId] ?? null;
+                $dv = $despuesDinamicos[$campoId] ?? null;
+                if (String($av) !== String($dv)) {
+                    $nombreCampo = $todosCampos[$campoId]->nombre ?? "Campo #{$campoId}";
+                    $antes[$nombreCampo] = $av ?? '(vacío)';
+                    $despues[$nombreCampo] = $dv ?? '(vacío)';
+                }
             }
         }
 
