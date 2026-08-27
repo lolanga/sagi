@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+import useMediaQuery from '../hooks/useMediaQuery'
 import api from '../services/api'
 import { extractApiError } from '../utils/helpers'
 import Aviso from '../components/Aviso'
@@ -17,6 +18,7 @@ import '../styles/inventario.css'
 export default function Inventario() {
   const { user } = useAuth()
   const toast = useToast()
+  const isMobile = useMediaQuery('(max-width: 768px)')
   const [items, setItems] = useState([])
   const [categorias, setCategorias] = useState([])
   const [unidades, setUnidades] = useState([])
@@ -221,111 +223,113 @@ export default function Inventario() {
         />
       ) : (
         <>
-          <div className="table-wrap desktop-only">
-            <table className="table" aria-label="Inventario de ítems">
-              <thead>
-                <tr>
-                  <th
-                    onClick={() => handleSort('codigo_unico')}
-                    className="sortable-th"
-                    role="button"
-                    tabIndex={0}
-                    aria-sort={sortKey === 'codigo_unico' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('codigo_unico') }}
-                  >
-                    Código {sortKey === 'codigo_unico' && (sortDir === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th
-                    onClick={() => handleSort('categoria')}
-                    className="sortable-th"
-                    role="button"
-                    tabIndex={0}
-                    aria-sort={sortKey === 'categoria' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('categoria') }}
-                  >
-                    Categoría {sortKey === 'categoria' && (sortDir === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th>Detalle</th>
-                  <th onClick={() => handleSort('estado')} className="sortable-th">
-                    Estado {sortKey === 'estado' && (sortDir === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th onClick={() => handleSort('estado_conservacion')} className="sortable-th">
-                    Conservación {sortKey === 'estado_conservacion' && (sortDir === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th onClick={() => handleSort('cantidad')} className="sortable-th">
-                    Cant. {sortKey === 'cantidad' && (sortDir === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th onClick={() => handleSort('unidad')} className="sortable-th">
-                    Unidad {sortKey === 'unidad' && (sortDir === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th onClick={() => handleSort('responsable')} className="sortable-th">
-                    Responsable {sortKey === 'responsable' && (sortDir === 'asc' ? '▲' : '▼')}
-                  </th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedItems.map((item) => (
-                  <tr key={item.id} className={item.estado === 'baja' ? 'fila-baja' : ''}>
-                    <td data-label="Código"><strong>{item.codigo_unico}</strong></td>
-                    <td data-label="Categoría">{item.categoria?.codigo ?? '-'}</td>
-                    <td data-label="Detalle">{formatValores(item)}</td>
-                    <td data-label="Estado">
-                      <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
-                    </td>
-                    <td data-label="Conservación">
-                      <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>{item.estado_conservacion ?? '-'}</span>
-                    </td>
-                    <td data-label="Cant.">{item.cantidad}</td>
-                    <td data-label="Unidad">{item.unidad?.nombre ?? '-'}</td>
-                    <td data-label="Responsable">{item.responsable?.name ?? '-'}</td>
-                    <td data-label="Acciones">
-                      <div className="row-actions">
-                        <button className="btn-link btn-link-ver" onClick={() => setViendo(item)} aria-label={`Ver ${item.codigo_unico}`}>Ver</button>
-                        {puedeEditar && item.estado !== 'baja' && (
-                          <>
-                            <button className="btn-link btn-link-editar" onClick={() => setEditando(item)} aria-label={`Editar ${item.codigo_unico}`}>Editar</button>
-                            <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`}>Eliminar</button>
-                          </>
-                        )}
-                      </div>
-                    </td>
+          {!isMobile ? (
+            <div className="table-wrap">
+              <table className="table" aria-label="Inventario de ítems">
+                <thead>
+                  <tr>
+                    <th
+                      onClick={() => handleSort('codigo_unico')}
+                      className="sortable-th"
+                      role="button"
+                      tabIndex={0}
+                      aria-sort={sortKey === 'codigo_unico' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('codigo_unico') }}
+                    >
+                      Código {sortKey === 'codigo_unico' && (sortDir === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th
+                      onClick={() => handleSort('categoria')}
+                      className="sortable-th"
+                      role="button"
+                      tabIndex={0}
+                      aria-sort={sortKey === 'categoria' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleSort('categoria') }}
+                    >
+                      Categoría {sortKey === 'categoria' && (sortDir === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th>Detalle</th>
+                    <th onClick={() => handleSort('estado')} className="sortable-th">
+                      Estado {sortKey === 'estado' && (sortDir === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => handleSort('estado_conservacion')} className="sortable-th">
+                      Conservación {sortKey === 'estado_conservacion' && (sortDir === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => handleSort('cantidad')} className="sortable-th">
+                      Cant. {sortKey === 'cantidad' && (sortDir === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => handleSort('unidad')} className="sortable-th">
+                      Unidad {sortKey === 'unidad' && (sortDir === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th onClick={() => handleSort('responsable')} className="sortable-th">
+                      Responsable {sortKey === 'responsable' && (sortDir === 'asc' ? '▲' : '▼')}
+                    </th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="cards-grid mobile-only">
-            {sortedItems.map((item) => (
-              <div key={item.id} className={`item-card ${item.estado === 'baja' ? 'item-card-baja' : ''}`}>
-                <div className="item-card-header">
-                  <span className="item-card-codigo">{item.codigo_unico}</span>
-                  <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
-                </div>
-                <div className="item-card-body">
-                  <p className="item-card-detalle">{formatValores(item)}</p>
-                  <div className="item-card-meta">
-                    <span>{item.categoria?.codigo ?? '-'}</span>
-                    <span>{item.unidad?.nombre ?? '-'}</span>
+                </thead>
+                <tbody>
+                  {sortedItems.map((item) => (
+                    <tr key={item.id} className={item.estado === 'baja' ? 'fila-baja' : ''}>
+                      <td data-label="Código"><strong>{item.codigo_unico}</strong></td>
+                      <td data-label="Categoría">{item.categoria?.codigo ?? '-'}</td>
+                      <td data-label="Detalle">{formatValores(item)}</td>
+                      <td data-label="Estado">
+                        <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
+                      </td>
+                      <td data-label="Conservación">
+                        <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>{item.estado_conservacion ?? '-'}</span>
+                      </td>
+                      <td data-label="Cant.">{item.cantidad}</td>
+                      <td data-label="Unidad">{item.unidad?.nombre ?? '-'}</td>
+                      <td data-label="Responsable">{item.responsable?.name ?? '-'}</td>
+                      <td data-label="Acciones">
+                        <div className="row-actions">
+                          <button className="btn-link btn-link-ver" onClick={() => setViendo(item)} aria-label={`Ver ${item.codigo_unico}`}>Ver</button>
+                          {puedeEditar && item.estado !== 'baja' && (
+                            <>
+                              <button className="btn-link btn-link-editar" onClick={() => setEditando(item)} aria-label={`Editar ${item.codigo_unico}`}>Editar</button>
+                              <button className="btn-link btn-link-danger" onClick={() => setEliminando(item)} aria-label={`Eliminar ${item.codigo_unico}`}>Eliminar</button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="cards-grid">
+              {sortedItems.map((item) => (
+                <div key={item.id} className={`item-card ${item.estado === 'baja' ? 'item-card-baja' : ''}`}>
+                  <div className="item-card-header">
+                    <span className="item-card-codigo">{item.codigo_unico}</span>
+                    <span className={`badge badge-estado-${item.estado}`}>{item.estado}</span>
                   </div>
-                  <div className="item-card-meta">
-                    <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>{item.estado_conservacion ?? '-'}</span>
-                    <span>Cant: {item.cantidad}</span>
+                  <div className="item-card-body">
+                    <p className="item-card-detalle">{formatValores(item)}</p>
+                    <div className="item-card-meta">
+                      <span>{item.categoria?.codigo ?? '-'}</span>
+                      <span>{item.unidad?.nombre ?? '-'}</span>
+                    </div>
+                    <div className="item-card-meta">
+                      <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>{item.estado_conservacion ?? '-'}</span>
+                      <span>Cant: {item.cantidad}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="item-card-footer">
-                  <button className="btn btn-sm btn-secondary" onClick={() => setViendo(item)}>Ver</button>
-                  {puedeEditar && item.estado !== 'baja' && (
-                    <>
-                      <button className="btn btn-sm btn-secondary" onClick={() => setEditando(item)}>Editar</button>
-                      <button className="btn btn-sm btn-danger" onClick={() => setEliminando(item)}>Eliminar</button>
+                  <div className="item-card-footer">
+                    <button className="btn btn-sm btn-secondary" onClick={() => setViendo(item)}>Ver</button>
+                    {puedeEditar && item.estado !== 'baja' && (
+                      <>
+                        <button className="btn btn-sm btn-secondary" onClick={() => setEditando(item)}>Editar</button>
+                        <button className="btn btn-sm btn-danger" onClick={() => setEliminando(item)}>Eliminar</button>
                     </>
                   )}
                 </div>
               </div>
             ))}
           </div>
+          )}
         </>
       )}
 
