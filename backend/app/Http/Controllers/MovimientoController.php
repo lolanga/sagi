@@ -175,7 +175,10 @@ class MovimientoController extends Controller
             if ($movimiento->tipo === 'baja') {
                 $item->update([
                     'estado' => 'baja',
+                    'categoria_original_id' => $item->categoria_id,
                     'categoria_id' => Categoria::where('codigo', 'A8')->value('id') ?? $item->categoria_id,
+                    'motivo_baja' => $movimiento->motivo,
+                    'fecha_baja' => now(),
                 ]);
             }
 

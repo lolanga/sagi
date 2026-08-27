@@ -152,12 +152,14 @@ export default function Inventario() {
     { key: 'cantidad', label: 'Cant.', flex: '0.4' },
     { key: 'unidad', label: 'Unidad', flex: '0.7' },
     { key: 'responsable', label: 'Responsable', flex: '0.9' },
+    { key: 'motivo_baja', label: 'Motivo Baja', flex: '1', showFor: ['admin', 'jefe'] },
     { key: 'acciones', label: '', mandatory: true, flex: '1.2' },
   ], [])
 
   const columns = useMemo(() =>
     allColumns
       .filter((col) => !hiddenCols.includes(col.key))
+      .filter((col) => !col.showFor || col.showFor.includes(user?.rol?.slug))
       .map((col) => ({
         ...col,
         render: col.key === 'codigo_unico' ? (item) => <strong>{item.codigo_unico}</strong>
@@ -172,6 +174,11 @@ export default function Inventario() {
           : col.key === 'cantidad' ? (item) => item.cantidad
           : col.key === 'unidad' ? (item) => item.unidad?.nombre ?? '-'
           : col.key === 'responsable' ? (item) => item.responsable?.name ?? '-'
+          : col.key === 'motivo_baja' ? (item) => item.estado === 'baja' ? (
+              <span className="motivo-baja-text" title={item.motivo_baja}>
+                {item.motivo_baja?.length > 30 ? item.motivo_baja.substring(0, 30) + '...' : item.motivo_baja ?? '-'}
+              </span>
+            ) : '-'
           : col.key === 'acciones' ? (item) => (
               <div className="row-actions" onClick={(e) => e.stopPropagation()}>
                 <button className="btn-link btn-link-ver" onClick={() => setViendo(item)} aria-label={`Ver ${item.codigo_unico}`}>Ver</button>
@@ -185,7 +192,7 @@ export default function Inventario() {
             )
           : undefined
       }))
-  , [hiddenCols, allColumns, puedeEditar])
+    , [hiddenCols, allColumns, puedeEditar, user])
 
   return (
     <Layout
@@ -319,6 +326,11 @@ export default function Inventario() {
                       <span className={`badge badge-estado-${(item.estado_conservacion || '').replace(/\s+/g, '-')}`}>{item.estado_conservacion ?? '-'}</span>
                       <span>Cant: {item.cantidad}</span>
                     </div>
+                    {item.estado === 'baja' && ['admin', 'jefe'].includes(user?.rol?.slug) && item.motivo_baja && (
+                      <div className="item-card-motivo-baja">
+                        <span className="motivo-baja-label">Baja:</span> {item.motivo_baja}
+                      </div>
+                    )}
                   </div>
                   <div className="item-card-footer">
                     <button className="btn btn-sm btn-secondary" onClick={() => setViendo(item)}>Ver</button>

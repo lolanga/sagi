@@ -183,6 +183,59 @@ if ($request->filled('search')) {
         return response()->json(['item' => $item]);
     }
 
+    public function reactivar(Request $request, Item $item): JsonResponse
+    {
+        if ($item->estado !== 'baja') {
+            return response()->json(['message' => 'Solo se pueden reactivar ítems en estado baja'], 422);
+        }
+
+        $validated = $request->validate([
+            'motivo_reactivacion' => 'required|string|max:500',
+        ]);
+
+        $user = $request->user();
+
+        DB::transaction(function () use ($item, $user, $validated) {
+            $categoriaOriginalId = $item->categoria_original_id ?? $item->categoria_id;
+
+            $item->update([
+                'estado' => 'activo',
+                'categoria_id' => $categoriaOriginalId,
+                'categoria_original_id' => null,
+                'motivo_baja' => null,
+                'fecha_baja' => null,
+            ]);
+
+            Movimiento::create([
+                'item_id' => $item->id,
+                'tipo' => 'alta',
+                'unidad_origen_id' => $item->unidad_id,
+                'unidad_destino_id' => null,
+                'motivo' => $validated['motivo_reactivacion'],
+                'estado' => 'aprobado',
+                'solicitante_id' => $user->id,
+                'validador_id' => $user->id,
+                'fecha_validacion' => now(),
+            ]);
+
+            Auditoria::create([
+                'user_id' => $user->id,
+                'accion' => 'reactivar',
+                'entidad' => 'item',
+                'entidad_id' => $item->id,
+                'detalle' => [
+                    'codigo' => $item->codigo_unico,
+                    'categoria_original' => $categoriaOriginalId,
+                    'motivo' => $validated['motivo_reactivacion'],
+                ],
+            ]);
+        });
+
+        $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);
+
+        return response()->json(['item' => $item]);
+    }
+
     public function destroy(Request $request, Item $item): JsonResponse
     {
         $user = $request->user();

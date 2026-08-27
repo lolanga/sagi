@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
-import api from '../services/api'
+import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
+import api, { reactivarItem } from '../services/api'
+import Aviso from './Aviso'
 import '../styles/detalle.css'
 
 const badgeTipo = {
@@ -15,8 +18,15 @@ const badgeEstado = {
 }
 
 export default function ItemDetalle({ itemId, categorias, onClose }) {
+  const { user } = useAuth()
+  const toast = useToast()
   const [item, setItem] = useState(null)
   const [error, setError] = useState('')
+  const [reactivando, setReactivando] = useState(false)
+  const [motivoReactivar, setMotivoReactivar] = useState('')
+  const [errorReactivar, setErrorReactivar] = useState('')
+
+  const puedeReactivar = ['admin', 'jefe'].includes(user?.rol?.slug) && item?.estado === 'baja'
 
   useEffect(() => {
     api
@@ -37,6 +47,22 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
   }
 
   if (!item) return <p className="muted">Cargando...</p>
+
+  const handleReactivar = async () => {
+    setErrorReactivar('')
+    try {
+      await reactivarItem(item.id, motivoReactivar)
+      toast.success('Ítem reactivado correctamente')
+      setReactivando(false)
+      setMotivoReactivar('')
+      const res = await api.get(`/items/${itemId}`)
+      setItem(res.data.item)
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Error al reactivar el ítem'
+      setErrorReactivar(msg)
+      toast.error(msg)
+    }
+  }
 
   const campos = categorias
     .find((c) => c.id === item.categoria_id)
@@ -64,6 +90,12 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
             <div><dt>Unidad actual</dt><dd>{item.unidad?.nombre ?? '-'}{item.unidad?.sede ? ` (${item.unidad.sede.nombre})` : ''}</dd></div>
             <div><dt>Responsable</dt><dd>{item.responsable?.name ?? '-'}</dd></div>
             <div><dt>Fecha de alta</dt><dd>{item.fecha_alta ? formatearFecha(item.fecha_alta) : 'Desconocida'}</dd></div>
+            {item.estado === 'baja' && ['admin', 'jefe'].includes(user?.rol?.slug) && (
+              <>
+                <div><dt>Motivo de baja</dt><dd className="text-danger">{item.motivo_baja ?? '-'}</dd></div>
+                <div><dt>Fecha de baja</dt><dd>{item.fecha_baja ? formatearFecha(item.fecha_baja) : '-'}</dd></div>
+              </>
+            )}
           </dl>
         </div>
 
@@ -125,8 +157,43 @@ export default function ItemDetalle({ itemId, categorias, onClose }) {
       </div>
 
       <div className="form-actions">
+        {puedeReactivar && (
+          <button type="button" className="btn btn-primary" onClick={() => setReactivando(true)}>
+            Reactivar ítem
+          </button>
+        )}
         <button type="button" className="btn btn-secondary" onClick={onClose}>Cerrar</button>
       </div>
+
+      {reactivando && (
+        <div className="modal-overlay" onClick={() => setReactivando(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Reactivar ítem {item.codigo_unico}</h3>
+            <p className="muted">Ingrese el motivo de la reactivación:</p>
+            <textarea
+              value={motivoReactivar}
+              onChange={(e) => setMotivoReactivar(e.target.value)}
+              placeholder="Motivo de reactivación..."
+              rows={3}
+              className="form-input"
+            />
+            <Aviso mensaje={errorReactivar} onCerrar={() => setErrorReactivar('')} />
+            <div className="form-actions">
+              <button type="button" className="btn btn-secondary" onClick={() => setReactivando(false)}>
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleReactivar}
+                disabled={!motivoReactivar.trim()}
+              >
+                Reactivar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

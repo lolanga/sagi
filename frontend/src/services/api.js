@@ -27,4 +27,7 @@ api.interceptors.response.use(
   }
 )
 
+export const reactivarItem = (itemId, motivo) =>
+  api.post(`/items/${itemId}/reactivar`, { motivo_reactivacion: motivo })
+
 export default api

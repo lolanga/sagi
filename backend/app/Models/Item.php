@@ -9,16 +9,23 @@ class Item extends Model
     protected $fillable = [
         'codigo_unico', 'categoria_id', 'tipo_item_id', 'responsable_id', 'unidad_id',
         'estado_conservacion', 'cantidad', 'fecha_alta', 'valores_dinamicos', 'estado',
+        'motivo_baja', 'fecha_baja', 'categoria_original_id',
     ];
 
     protected $casts = [
         'valores_dinamicos' => 'array',
         'fecha_alta' => 'date',
+        'fecha_baja' => 'datetime',
     ];
 
     public function categoria()
     {
         return $this->belongsTo(Categoria::class);
+    }
+
+    public function categoriaOriginal()
+    {
+        return $this->belongsTo(Categoria::class, 'categoria_original_id');
     }
 
     public function tipoItem()
