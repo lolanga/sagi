@@ -127,7 +127,7 @@ export default function Layout({ title, actions, children, back }) {
             <path d="M3 7.5 12 12l9-4.5M12 12v9" stroke="url(#logo-grad)" strokeWidth="1.8" strokeLinejoin="round" />
             <path d="M7.5 5.25 16.5 9.75" stroke="#ffa94d" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
-          {!collapsed && <span className="logo-text">SAGI</span>}
+              {!collapsed && <span className="logo-text">SAGI ISeP</span>}
         </div>
 
         <button
