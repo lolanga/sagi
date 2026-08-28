@@ -73,7 +73,7 @@ class ReporteController extends Controller
 
     public function items(Request $request): JsonResponse
     {
-        $query = Item::with(['categoria', 'tipoItem', 'responsable', 'unidad'])->orderBy('codigo_unico');
+        $query = Item::with(['categoria', 'categoriaOriginal', 'tipoItem', 'responsable', 'unidad.sede'])->orderBy('codigo_unico');
 
         if ($request->filled('estado')) {
             $query->where('estado', $request->string('estado'));

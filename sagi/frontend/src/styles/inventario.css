@@ -58,7 +58,7 @@
 .badge-crear { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
 .badge-editar { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
 .badge-eliminar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
-.badge-mover { background-color: var(--color-secondary); color: var(--color-text); }
+.badge-mover { background-color: var(--color-secondary); color: var(--color-white); }
 .badge-solicitar { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
 .badge-aprobar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
 .badge-rechazar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }

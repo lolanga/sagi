@@ -504,6 +504,7 @@ button {
 .table thead th {
   background-color: var(--color-secondary);
   border-bottom: 2px solid var(--color-border);
+  color: var(--color-white);
 }
 
 /* Solo las tablas principales de página fuerzan ancho minimo; las de tarjetas se adaptan */
@@ -700,6 +701,7 @@ button {
 .table th {
   background-color: var(--color-secondary);
   font-weight: 600;
+  color: var(--color-white);
 }
 
 /* Sortable columns */
