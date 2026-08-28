@@ -680,6 +680,11 @@ Los ítems se muestran 25 por página (configurable: 10/25/50). Use "Anterior" y
 #### Dashboard
 - **Doughnut con cifras**: Los valores y porcentajes se muestran directamente en el gráfico
 
+#### Favicon y branding
+- **Favicon**: Icono personalizado con "S" sobre fondo azul en la pestaña del navegador
+- **Título**: La pestaña muestra "Inventario ISeP"
+- **Sidebar**: Encabezado muestra "SAGI ISeP"
+
 ### v3.2 (27 agosto 2026)
 
 #### Inventario

@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>SAGI - Manual de Especificaciones Tecnicas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAGI - Manual de Especificaciones Técnicas</title>
 <style>
 body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:20px;line-height:1.6;color:#333}
 table{border-collapse:collapse;width:100%;margin:1em 0}
@@ -13,11 +14,9 @@ pre{background:#f4f4f4;padding:16px;border-radius:6px;overflow-x:auto}
 pre code{background:none;padding:0}
 hr{border:none;border-top:1px solid #ddd;margin:2em 0}
 h1{color:#1a202c;font-size:24px}
-h2{color:#2d3748;font-size:20px;border-bottom:1px solid #eee;padding-bottom:6px}
+h2{color:#2d3748;font-size:20px;border-bottom:2px solid #e2e8f0;padding-bottom:8px}
 h3{color:#4a5568;font-size:16px}
-h4{color:#718096;font-size:14px}
-strong{color:#2d3748}
-em{color:#718096}
+strong{color:#1a202c}
 </style>
 </head>
 <body>
@@ -1359,6 +1358,13 @@ Instituto de Seguridad Pública (ISeP)</p>
 <td>POST</td>
 <td>/api/logout</td>
 <td>Cerrar sesión</td>
+<td>Sí</td>
+<td>Todos</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/api/change-password</td>
+<td>Cambiar contraseña</td>
 <td>Sí</td>
 <td>Todos</td>
 </tr>
@@ -3142,6 +3148,14 @@ npm run dev
 <li><strong>Favicon</strong>: SVG personalizado con &quot;S&quot; sobre fondo azul</li>
 <li><strong>Título</strong>: Pestaña muestra &quot;Inventario ISeP&quot;</li>
 <li><strong>Sidebar</strong>: Logo &quot;SAGI ISeP&quot; en el encabezado</li>
+</ul>
+<h4>Seguridad y corrección de bugs</h4>
+<ul>
+<li><strong>Rate limiting login</strong>: <code>POST /api/login</code> limitado a 10 intentos por minuto</li>
+<li><strong>Auth items</strong>: <code>show()</code>, <code>update()</code> y <code>reactivar()</code> verifican que el ítem pertenezca a la sede del usuario (excepto admin)</li>
+<li><strong>Unidad delete</strong>: <code>DELETE /api/unidades/{id}</code> verifica que no existan ítems asociados antes de eliminar</li>
+<li><strong>Movimiento null item</strong>: <code>aprobar()</code> valida que el ítem asociado exista antes de procesar</li>
+<li><strong>AuthContext JSON.parse</strong>: Manejo de errores al leer <code>sagi_user</code> de localStorage</li>
 </ul>
 <h3>v3.2 (27 agosto 2026)</h3>
 <h4>Inventario - Filtros y Permisos</h4>

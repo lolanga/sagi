@@ -109,6 +109,10 @@ class UnidadController extends Controller
 
     public function destroy(Request $request, Unidad $unidad): JsonResponse
     {
+        if ($unidad->items()->count() > 0) {
+            return response()->json(['message' => 'No se puede eliminar una unidad con ítems asociados. Desactívela en su lugar.'], 422);
+        }
+
         Auditoria::create([
             'user_id' => $request->user()->id,
             'accion' => 'eliminar',

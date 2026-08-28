@@ -6,7 +6,8 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem('sagi_user')
-    return stored ? JSON.parse(stored) : null
+    if (!stored) return null
+    try { return JSON.parse(stored) } catch { return null }
   })
 
   const login = useCallback(async (dni, password) => {

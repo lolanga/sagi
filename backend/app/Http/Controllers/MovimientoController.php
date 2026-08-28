@@ -167,6 +167,10 @@ class MovimientoController extends Controller
         $user = $request->user();
         $item = $movimiento->item;
 
+        if (!$item) {
+            return response()->json(['message' => 'El ítem asociado ya no existe'], 422);
+        }
+
         DB::transaction(function () use ($movimiento, $item, $user) {
             if ($movimiento->tipo === 'traslado') {
                 $item->update(['unidad_id' => $movimiento->unidad_destino_id]);

@@ -395,6 +395,7 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 | POST | /api/login | Iniciar sesión | No | Público |
 | GET | /api/me | Obtener usuario actual | Sí | Todos |
 | POST | /api/logout | Cerrar sesión | Sí | Todos |
+| POST | /api/change-password | Cambiar contraseña | Sí | Todos |
 
 ### 6.2 Dashboard
 
@@ -1006,6 +1007,13 @@ npm run dev
 - **Favicon**: SVG personalizado con "S" sobre fondo azul
 - **Título**: Pestaña muestra "Inventario ISeP"
 - **Sidebar**: Logo "SAGI ISeP" en el encabezado
+
+#### Seguridad y corrección de bugs
+- **Rate limiting login**: `POST /api/login` limitado a 10 intentos por minuto
+- **Auth items**: `show()`, `update()` y `reactivar()` verifican que el ítem pertenezca a la sede del usuario (excepto admin)
+- **Unidad delete**: `DELETE /api/unidades/{id}` verifica que no existan ítems asociados antes de eliminar
+- **Movimiento null item**: `aprobar()` valida que el ítem asociado exista antes de procesar
+- **AuthContext JSON.parse**: Manejo de errores al leer `sagi_user` de localStorage
 
 ### v3.2 (27 agosto 2026)
 
