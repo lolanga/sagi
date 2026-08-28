@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import api from '../services/api'
 import Aviso from './Aviso'
 
 const tiposCampo = ['texto', 'numero', 'fecha', 'select', 'textarea']
-const norm = (s) => String(s ?? '').trim().toLowerCase()
+const norm = (s) => String(s ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
+const CAMPOS_FIJOS = ['Marca', 'Modelo', 'Procedencia']
 
 export default function NuevoElementoWizard({ categoria, onGuardado, onCancel }) {
   const [paso, setPaso] = useState(1)
@@ -11,6 +13,15 @@ export default function NuevoElementoWizard({ categoria, onGuardado, onCancel })
   const [campos, setCampos] = useState([])
   const [error, setError] = useState('')
   const [guardando, setGuardando] = useState(false)
+
+  const tiposExistentes = useMemo(() => {
+    return (categoria?.tipos_items || []).map((t) => t.nombre)
+  }, [categoria])
+
+  const nombreDuplicado = useMemo(() => {
+    if (!nombre.trim()) return false
+    return tiposExistentes.some((t) => norm(t) === norm(nombre))
+  }, [nombre, tiposExistentes])
 
   const agregarCampo = () => {
     setCampos([
@@ -39,6 +50,10 @@ export default function NuevoElementoWizard({ categoria, onGuardado, onCancel })
     setError('')
     if (!nombre.trim()) {
       setError('Ingresa un nombre para el elemento.')
+      return
+    }
+    if (nombreDuplicado) {
+      setError(`Ya existe un elemento similar: "${tiposExistentes.find((t) => norm(t) === norm(nombre))}"`)
       return
     }
     setPaso(2)
@@ -99,23 +114,41 @@ export default function NuevoElementoWizard({ categoria, onGuardado, onCancel })
 
       {paso === 1 && (
         <div className="wizard-paso">
+          <div className="campos-fijos-info">
+            <span className="campos-fijos-info-icon">ℹ️</span>
+            <div>
+              <strong>Campos que ya existen para todos los elementos:</strong>
+              <span className="campos-fijos-lista">{CAMPOS_FIJOS.join(' · ')}</span>
+              No es necesario volver a crearlos.
+            </div>
+          </div>
+
           <div className="field">
             <label>Nombre del elemento *</label>
             <input
               type="text"
               placeholder="Ej. Escritorio, Computadora, Teclado"
               value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              onChange={(e) => {
+                setNombre(e.target.value)
+                if (error) setError('')
+              }}
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && siguiente()}
+              aria-invalid={nombreDuplicado}
             />
+            {nombreDuplicado && (
+              <span className="field-error">
+                Ya existe un elemento similar: "{tiposExistentes.find((t) => norm(t) === norm(nombre))}"
+              </span>
+            )}
           </div>
           <p className="muted small">
             La categoría es: <strong>{categoria.codigo} — {categoria.nombre}</strong>
           </p>
           <div className="wizard-actions">
             <button className="btn btn-secondary" onClick={onCancel}>Cancelar</button>
-            <button className="btn btn-primary" onClick={siguiente}>Siguiente →</button>
+            <button className="btn btn-primary" onClick={siguiente} disabled={nombreDuplicado}>Siguiente →</button>
           </div>
         </div>
       )}
