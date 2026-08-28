@@ -119,47 +119,45 @@ export default function Categorias() {
             />
           ) : (
             <>
-              <div className="main-header">
+              <div className="main-header main-header--with-btn">
                 <h3>{selected.codigo} — {selected.nombre}</h3>
+                <button className="btn-add-elemento" onClick={() => setMostrarWizard(true)}>
+                  + Nuevo elemento
+                </button>
               </div>
 
-              <div className="elemento-card" onClick={() => setEditandoCampo('general')} role="button" tabIndex={0}>
-                <div className="elemento-card-icono">📋</div>
-                <div className="elemento-card-info">
-                  <span className="elemento-card-nombre">Campos generales de la categoría</span>
-                  <span className="elemento-card-meta">{camposGenerales.length} campo{camposGenerales.length !== 1 ? 's' : ''}</span>
-                </div>
-                <span className="elemento-card-arrow">→</span>
+              <div className="elemento-lista">
+                <button
+                  className="elemento-item"
+                  onClick={() => setEditandoCampo('general')}
+                >
+                  <span className="elemento-item-icono">📋</span>
+                  <span className="elemento-item-nombre">Campos generales</span>
+                  <span className="elemento-item-meta">{camposGenerales.length} campo{camposGenerales.length !== 1 ? 's' : ''}</span>
+                  <span className="elemento-item-arrow">→</span>
+                </button>
+
+                {ordenar(selected.tipos_items).map((tipo) => (
+                  <div key={tipo.id} className="elemento-item-row">
+                    <button
+                      className="elemento-item"
+                      onClick={() => setEditandoCampo(tipo)}
+                    >
+                      <span className="elemento-item-icono">📦</span>
+                      <span className="elemento-item-nombre">{tipo.nombre}</span>
+                      <span className="elemento-item-meta">{contarCamposElemento(tipo)} campo{contarCamposElemento(tipo) !== 1 ? 's' : ''}</span>
+                      <span className="elemento-item-arrow">→</span>
+                    </button>
+                    <button
+                      className="btn-icon btn-danger elemento-item-delete"
+                      onClick={(e) => { e.stopPropagation(); eliminarElemento(tipo) }}
+                      title="Eliminar elemento"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
               </div>
-
-              {ordenar(selected.tipos_items).map((tipo) => (
-                <div key={tipo.id} className="elemento-card-row">
-                  <button
-                    className="elemento-card"
-                    onClick={() => setEditandoCampo(tipo)}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className="elemento-card-icono">📦</div>
-                    <div className="elemento-card-info">
-                      <span className="elemento-card-nombre">{tipo.nombre}</span>
-                      <span className="elemento-card-meta">{contarCamposElemento(tipo)} campo{contarCamposElemento(tipo) !== 1 ? 's' : ''}</span>
-                    </div>
-                    <span className="elemento-card-arrow">→</span>
-                  </button>
-                  <button
-                    className="btn-icon btn-danger elemento-card-delete"
-                    onClick={(e) => { e.stopPropagation(); eliminarElemento(tipo) }}
-                    title="Eliminar elemento"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-
-              <button className="btn-add-elemento" onClick={() => setMostrarWizard(true)}>
-                + Nuevo elemento
-              </button>
             </>
           )}
         </div>
