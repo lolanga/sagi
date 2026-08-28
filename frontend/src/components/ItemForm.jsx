@@ -27,6 +27,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
   const [camposAdicionalesAbierto, setCamposAdicionalesAbierto] = useState(false)
+  const [touchedFields, setTouchedFields] = useState(new Set())
   const abortRef = useRef(null)
 
   const esEdicion = Boolean(item)
@@ -94,6 +95,15 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
     })
   }
 
+  const markTouched = (key) => {
+    setTouchedFields((prev) => {
+      if (prev.has(key)) return prev
+      const next = new Set(prev)
+      next.add(key)
+      return next
+    })
+  }
+
   const handleTipoChange = (e) => {
     const newTipo = e.target.value
     if (newTipo !== tipoItemId && Object.keys(valores).some((k) => valores[k])) {
@@ -103,6 +113,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
     }
     setTipoItemId(newTipo)
     setValores({})
+    markTouched('tipo_item_id')
   }
 
   const camposFijos = useMemo(() => {
@@ -117,27 +128,27 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
 
   const camposObligatorios = useMemo(() => {
     const obligatorios = [
-      { key: 'categoria_id', value: categoriaId, label: 'Categoría' },
-      { key: 'estado_conservacion', value: estadoConservacion, label: 'Estado' },
-      { key: 'cantidad', value: cantidad, label: 'Cantidad' },
+      { key: 'categoria_id', filled: touchedFields.has('categoria_id') && Boolean(categoriaId), label: 'Categoría' },
+      { key: 'estado_conservacion', filled: touchedFields.has('estado_conservacion') && Boolean(estadoConservacion), label: 'Estado' },
+      { key: 'cantidad', filled: touchedFields.has('cantidad') && Boolean(cantidad), label: 'Cantidad' },
     ]
 
     if (tipos.length > 0) {
-      obligatorios.push({ key: 'tipo_item_id', value: tipoItemId, label: 'Elemento' })
+      obligatorios.push({ key: 'tipo_item_id', filled: touchedFields.has('tipo_item_id') && Boolean(tipoItemId), label: 'Elemento' })
     }
 
     if (!esEdicion) {
-      obligatorios.push({ key: 'unidad_id', value: unidadId, label: 'Unidad' })
-      obligatorios.push({ key: 'motivo_alta', value: motivoAlta?.trim(), label: 'Motivo' })
+      obligatorios.push({ key: 'unidad_id', filled: touchedFields.has('unidad_id') && Boolean(unidadId), label: 'Unidad' })
+      obligatorios.push({ key: 'motivo_alta', filled: touchedFields.has('motivo_alta') && Boolean(motivoAlta?.trim()), label: 'Motivo' })
       if (!fechaDesconocida) {
-        obligatorios.push({ key: 'fecha_alta', value: fechaAlta, label: 'Fecha' })
+        obligatorios.push({ key: 'fecha_alta', filled: touchedFields.has('fecha_alta') && Boolean(fechaAlta), label: 'Fecha' })
       }
     }
 
     return obligatorios
-  }, [categoriaId, tipoItemId, estadoConservacion, cantidad, unidadId, motivoAlta, fechaAlta, fechaDesconocida, tipos.length, esEdicion])
+  }, [categoriaId, tipoItemId, estadoConservacion, cantidad, unidadId, motivoAlta, fechaAlta, fechaDesconocida, tipos.length, esEdicion, touchedFields])
 
-  const completados = camposObligatorios.filter((c) => c.value).length
+  const completados = camposObligatorios.filter((c) => c.filled).length
   const total = camposObligatorios.length
   const porcentaje = total > 0 ? (completados / total) * 100 : 0
 
@@ -224,6 +235,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
                 setCategoriaId(e.target.value)
                 if (!esEdicion) setTipoItemId('')
                 clearFieldError('categoria_id')
+                markTouched('categoria_id')
               }}
               required
               disabled={esEdicion}
@@ -265,7 +277,10 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
             <select
               id="estado"
               value={estadoConservacion}
-              onChange={(e) => setEstadoConservacion(e.target.value)}
+              onChange={(e) => {
+                setEstadoConservacion(e.target.value)
+                markTouched('estado_conservacion')
+              }}
               required
             >
               {estadosConservacion.map((e) => (
@@ -284,7 +299,10 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
               type="number"
               min="1"
               value={cantidad}
-              onChange={(e) => setCantidad(Number(e.target.value))}
+              onChange={(e) => {
+                setCantidad(Number(e.target.value))
+                markTouched('cantidad')
+              }}
               placeholder="Ej. 1"
               required
             />
@@ -300,7 +318,10 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
                 id="fecha-alta"
                 type="date"
                 value={fechaDesconocida ? '' : fechaAlta}
-                onChange={(e) => setFechaAlta(e.target.value)}
+                onChange={(e) => {
+                  setFechaAlta(e.target.value)
+                  markTouched('fecha_alta')
+                }}
                 max={new Date().toISOString().slice(0, 10)}
                 disabled={fechaDesconocida}
                 required={!fechaDesconocida}
@@ -310,7 +331,10 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
                 <input
                   type="checkbox"
                   checked={fechaDesconocida}
-                  onChange={(e) => setFechaDesconocida(e.target.checked)}
+                  onChange={(e) => {
+                  setFechaDesconocida(e.target.checked)
+                  markTouched('fecha_alta')
+                }}
                 />
                 Fecha desconocida
               </label>
@@ -330,6 +354,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
                 onChange={(e) => {
                   setUnidadId(e.target.value)
                   clearFieldError('unidad_id')
+                  markTouched('unidad_id')
                 }}
                 required
                 aria-invalid={!!fieldErrors.unidad_id}
@@ -428,6 +453,7 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
                   if (e.target.value.length <= MAX_MOTIVO) {
                     setMotivoAlta(e.target.value)
                     clearFieldError('motivo_alta')
+                    markTouched('motivo_alta')
                   }
                 }}
                 placeholder="Ej. Compra, donación, ingreso nuevo"
