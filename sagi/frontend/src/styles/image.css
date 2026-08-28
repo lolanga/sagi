@@ -1,0 +1,22 @@
+.image {
+  max-width: 100%;
+  height: auto;
+  transition: opacity 0.3s ease;
+}
+
+.image--loading {
+  opacity: 0;
+}
+
+.image--loaded {
+  opacity: 1;
+}
+
+.image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-secondary);
+  border-radius: var(--radius);
+  color: var(--color-muted);
+}

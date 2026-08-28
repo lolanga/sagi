@@ -1,0 +1,10 @@
+node_modules/
+dist/
+vendor/
+.env
+*.log
+.idea/
+.vscode/
+*.swp
+*.sqlite
+storage/app/backups/
