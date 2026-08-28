@@ -5,7 +5,7 @@ import Aviso from './Aviso'
 const tiposCampo = ['texto', 'numero', 'fecha', 'select', 'textarea']
 const norm = (s) => String(s ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
-const CAMPOS_FIJOS = ['Categoría', 'Elemento', 'Estado de conservación', 'Cantidad', 'Fecha de alta', 'Unidad de destino', 'Motivo del alta', 'Marca', 'Modelo', 'Procedencia']
+const CAMPOS_FIJOS = ['Categoría', 'Elemento', 'Estado de conservación', 'Cantidad', 'Fecha de alta', 'Unidad de destino', 'Motivo del alta']
 
 export default function NuevoElementoWizard({ categoria, onGuardado, onCancel }) {
   const [paso, setPaso] = useState(1)
