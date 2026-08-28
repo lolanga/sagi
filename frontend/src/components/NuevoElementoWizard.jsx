@@ -5,7 +5,7 @@ import Aviso from './Aviso'
 const tiposCampo = ['texto', 'numero', 'fecha', 'select', 'textarea']
 const norm = (s) => String(s ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
-const CAMPOS_FIJOS = ['Marca', 'Modelo', 'Procedencia']
+const CAMPOS_FIJOS = ['Categoría', 'Elemento', 'Estado de conservación', 'Cantidad', 'Fecha de alta', 'Unidad de destino', 'Motivo del alta', 'Marca', 'Modelo', 'Procedencia']
 
 export default function NuevoElementoWizard({ categoria, onGuardado, onCancel }) {
   const [paso, setPaso] = useState(1)
@@ -117,9 +117,9 @@ export default function NuevoElementoWizard({ categoria, onGuardado, onCancel })
           <div className="campos-fijos-info">
             <span className="campos-fijos-info-icon">ℹ️</span>
             <div>
-              <strong>Campos que ya existen para todos los elementos:</strong>
+              <strong>Estos campos ya existen en el formulario de alta:</strong>
               <span className="campos-fijos-lista">{CAMPOS_FIJOS.join(' · ')}</span>
-              No es necesario volver a crearlos.
+              No es necesario volver a crearlos como campos adicionales.
             </div>
           </div>
 
