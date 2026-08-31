@@ -325,6 +325,21 @@ class CategoriaController extends Controller
 
     public function destroy(Request $request, Categoria $categoria): JsonResponse
     {
+        $itemsCount = $categoria->items()->count();
+        $tiposCount = $categoria->tiposItems()->count();
+        $camposCount = $categoria->camposDinamicos()->count();
+
+        if ($itemsCount > 0) {
+            return response()->json([
+                'message' => "No se puede eliminar: hay {$itemsCount} item(s) asociados a esta categoría",
+            ], 422);
+        }
+
+        if ($tiposCount > 0 || $camposCount > 0) {
+            $categoria->camposDinamicos()->delete();
+            $categoria->tiposItems()->delete();
+        }
+
         $detalle = ['codigo' => $categoria->codigo, 'nombre' => $categoria->nombre];
         $categoria->delete();
 

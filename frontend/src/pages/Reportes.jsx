@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import api from '../services/api'
 import { extractApiError } from '../utils/helpers'
+import { exportarFormatoOficial } from '../utils/exportarFormatoOficial'
 import Aviso from '../components/Aviso'
 import Layout from '../components/Layout'
 import '../styles/dashboard.css'
@@ -36,6 +37,7 @@ export default function Reportes() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [exportando, setExportando] = useState(false)
 
   useEffect(() => {
     api
@@ -203,13 +205,28 @@ export default function Reportes() {
     }
   }
 
+  const handleExportarFormatoOficial = async () => {
+    setError('')
+    setExportando(true)
+    try {
+      await exportarFormatoOficial()
+    } catch (err) {
+      setError(extractApiError(err, 'Error al exportar formato oficial'))
+    } finally {
+      setExportando(false)
+    }
+  }
+
   return (
     <Layout
       title="Reportes"
       back="/"
       actions={
         <>
-          <button className="btn btn-primary" onClick={exportarExcel}>Excel</button>
+          <button className="btn btn-primary" onClick={handleExportarFormatoOficial} disabled={exportando}>
+            {exportando ? 'Exportando...' : 'Formato Oficial'}
+          </button>
+          <button className="btn btn-secondary" onClick={exportarExcel}>Excel</button>
           <button className="btn btn-secondary" onClick={exportarCsv}>CSV</button>
           <button className="btn btn-secondary" onClick={exportarPdf}>PDF</button>
         </>

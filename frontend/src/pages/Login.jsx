@@ -8,6 +8,7 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showHint, setShowHint] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
 
@@ -53,7 +54,7 @@ export default function Login() {
               type="text"
               value={dni}
               onChange={(e) => setDni(e.target.value)}
-              placeholder="Ej. 10000001 o admin"
+              placeholder="Ingresá tu DNI o usuario"
               required
             />
           </div>
@@ -65,7 +66,7 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Ej. Admin1234"
+              placeholder="Ingresá tu contraseña"
               required
             />
           </div>
@@ -77,13 +78,25 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="auth-hint">
-          <p>Usuarios de prueba (DNI o usuario / clave):</p>
-          <p>10000001 (admin) / Admin1234 — Administrador</p>
-          <p>10000002 (jefe) / Jefe1234 — Jefe de área</p>
-          <p>10000003 (carga) / Carga1234 — Personal de carga</p>
-          <p>10000004 (consulta) / Consulta1234 — Consulta</p>
-        </div>
+        {import.meta.env.DEV && (
+          <div className="auth-hint">
+            <button
+              type="button"
+              className="auth-hint-toggle"
+              onClick={() => setShowHint(!showHint)}
+            >
+              {showHint ? 'Ocultar credenciales de prueba' : 'Mostrar credenciales de prueba'}
+            </button>
+            {showHint && (
+              <div className="auth-hint-list">
+                <p>Admin: <code>10000001</code> / <code>Admin1234</code></p>
+                <p>Jefe: <code>10000002</code> / <code>Jefe1234</code></p>
+                <p>Carga: <code>10000003</code> / <code>Carga1234</code></p>
+                <p>Consulta: <code>10000004</code> / <code>Consulta1234</code></p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

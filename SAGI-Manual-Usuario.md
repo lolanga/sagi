@@ -2,8 +2,8 @@
 title: "SAGI - Manual de Usuario"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
-date: "27 de agosto de 2026"
-version: "3.3"
+date: "31 de agosto de 2026"
+version: "3.4"
 ---
 
 # SAGI - Manual de Usuario
@@ -11,7 +11,7 @@ version: "3.3"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 3.3 | Fecha: 27 de agosto de 2026
+Versión: 3.4 | Fecha: 31 de agosto de 2026
 
 ---
 
@@ -334,10 +334,10 @@ Haga clic en **"Movimientos"** en el menú lateral.
 
 1. Haga clic en **"+ Nueva solicitud"**
 2. Seleccione **"Traslado"**
-3. Seleccione el **ítem** a trasladar
+3. Seleccione el **ítem** a trasladar (use el campo de búsqueda)
 4. Seleccione la **unidad de destino**
 5. Ingrese el **motivo**
-6. Haga clic en **"Registrar"**
+6. Haga clic en **"Solicitar"**
 
 **Nota:** Se creará una alerta para aprobación.
 
@@ -347,9 +347,20 @@ Haga clic en **"Movimientos"** en el menú lateral.
 2. Seleccione **"Baja"**
 3. Seleccione el **ítem**
 4. Ingrese el **motivo**
-5. Haga clic en **"Registrar"**
+5. Haga clic en **"Solicitar"**
 
 **Nota:** La baja tiene prioridad crítica.
+
+### 7.5 Protección contra movimientos duplicados
+
+El sistema previene que se creen múltiples movimientos pendientes para el mismo ítem:
+
+- Al abrir el formulario de nueva solicitud, se cargan los movimientos pendientes
+- Al buscar un ítem, los que ya tienen un movimiento pendiente muestran un tag **"⚠ Pendiente"** al lado
+- Al seleccionar un ítem con movimiento pendiente, se muestra un **aviso amarillo** indicando el tipo de movimiento y quién lo solicitó
+- Si intenta guardar, el sistema **bloquea** la solicitud y muestra un error explicativo
+
+**Esto garantiza que no se puedan crear traslados o bajas simultáneos sobre el mismo ítem hasta que el primero se resuelva.**
 
 ### 7.5 Aprobar o Rechazar Movimiento
 
@@ -467,16 +478,57 @@ Use las flechas **↑** y **↓** para cambiar el orden.
 
 ### 9.4 Gestionar Elementos
 
-**Crear elemento:**
-1. Seleccione la categoría
-2. Haga clic en **"+ Nuevo elemento"**
-3. Ingrese el **nombre**
-4. Haga clic en **"Crear"**
+Los elementos son los tipos de ítems dentro de cada categoría (ej: "Computadora", "Escritorio", "Silla" dentro de la categoría A1).
 
-**Editar elemento:**
-1. Haga clic en **"Editar"**
+#### Crear elemento (paso a paso)
+
+1. Seleccione la categoría en el panel izquierdo
+2. Haga clic en **"+ Nuevo elemento"**
+3. Se abre el wizard de creación en **2 pasos**:
+
+**Paso 1 — Introducción:**
+- Se muestra un resumen indicando que se creará un nuevo tipo de elemento en la categoría seleccionada
+- Haga clic en **"Comenzar →"** para avanzar
+
+**Paso 2 — Configuración:**
+El paso 2 tiene un layout de dos columnas:
+
+*Columna izquierda (Formulario):*
+
+| Campo | Descripción |
+|-------|-------------|
+| Nombre del elemento * | Nombre del tipo de elemento (ej: "Computadora de escritorio") |
+| Info de campos fijos | Aviso indicando que Categoría, Elemento, Estado de conservación, Cantidad, Fecha de alta y Unidad de destino ya existen en el formulario de alta |
+| Campos adicionales | Campos personalizados que apliquen a este elemento específico |
+
+*Columna derecha (Vista previa):*
+- Muestra en tiempo real cómo quedará el elemento con todos sus campos
+- Se actualiza automáticamente al escribir el nombre o agregar campos
+- Los campos fijos aparecen con valores de ejemplo
+- Los campos adicionales muestran el tipo de dato esperado (select muestra primera opción, fecha muestra dd/mm/aaaa, etc.)
+
+**Agregar campos adicionales:**
+
+1. Haga clic en **"+ Agregar campo"**
+2. Complete:
+   - **Nombre del campo** (ej: "Marca", "Modelo", "Número de serie")
+   - **Tipo**: texto, numero, fecha, select, textarea
+   - **Opciones** (solo para tipo select): separadas por coma (ej: "Samsung, LG, Dell")
+   - **Requerido**: marca si el campo es obligatorio
+3. El campo aparece inmediatamente en la vista previa
+4. Repita para cada campo adicional que necesite
+
+3. Haga clic en **"Crear elemento"**
+
+#### Editar elemento
+
+1. Haga clic en **"Editar"** en la tabla de elementos
 2. Modifique el nombre
 3. Haga clic en **"Guardar"**
+
+#### Reordenar elementos
+
+Use las flechas **↑** y **↓** para cambiar el orden en la lista.
 
 ---
 
@@ -551,9 +603,36 @@ Las unidades son departamentos o áreas dentro de cada sede. Se muestran **agrup
 
 | Formato | Botón | Contenido |
 |---------|-------|-----------|
-| Excel (.xlsx) | "Exportar Excel" | Hoja por categoría con campos dinámicos |
-| CSV | "Exportar CSV" | Todos los ítems, separado por comas |
-| PDF | "Exportar PDF" | Reportes generados con formato tabular usando jsPDF |
+| Formato Oficial (.xlsx) | "Formato Oficial" | Archivo institucional con 10 hojas (A1-A8, B1-B2), encabezados oficiales y datos del inventario |
+| Excel (.xlsx) | "Excel" | Hoja por categoría con campos dinámicos |
+| CSV | "CSV" | Todos los ítems, separado por comas |
+| PDF | "PDF" | Reportes generados con formato tabular usando jsPDF |
+
+#### Formato Oficial
+
+El botón **"Formato Oficial"** genera un archivo `.xlsx` que sigue el formato institucional del ISeP:
+
+| Hoja | Contenido |
+|------|-----------|
+| A1 | Amoblamiento y útiles (mobiliario, equipamiento de oficina) |
+| A2 | Artefactos eléctricos (aires, heladeras, estufas) |
+| A3 | Equipo de radiocomunicación, telefonía e informática |
+| A4 | Armamento, municiones y equipo de protección |
+| A5 | Máquinas y herramientas |
+| A6 | Vehículos |
+| A7 | Altas (todos los ítems activos como registros de alta) |
+| A8 | Bajas (ítems dados de baja con motivo y fecha) |
+| B1 | Propiedad provincial (solo encabezados) |
+| B2 | Propiedad no provincial (solo encabezados) |
+
+Cada hoja incluye:
+- **Fila 1**: Título de la hoja (ej: "A1 - AMOBLAMIENTO Y UTILES")
+- **Fila 2**: "DEPENDENCIA: División Secretaría General, sede Rosario."
+- **Fila 3**: "DIRECCION / UNIDAD REGIONAL: I.Se.P."
+- **Fila 4**: Encabezados de columnas (según formato institucional)
+- **Filas 5+**: Datos del inventario
+
+**Nota:** Las hojas B1 y B2 solo contienen encabezados ya que no hay datos de propiedad en el sistema.
 
 ---
 
@@ -660,6 +739,29 @@ Los ítems se muestran 25 por página (configurable: 10/25/50). Use "Anterior" y
 
 ## Changelog
 
+### v3.4 (31 agosto 2026)
+
+#### Wizard de Elementos (Categorías)
+- **Paso 1 simplificado**: Solo muestra introducción con la categoría y botón "Comenzar"
+- **Paso 2 mejorado**: Nombre del elemento + campos adicionales + vista previa en tiempo real
+- **Vista previa**: Layout de dos columnas con tarjeta que muestra cómo quedará el elemento mientras se configura
+- **Campos fijos visibles**: Se muestran los campos que ya existen en el formulario de alta
+
+#### Movimientos - Protección contra duplicados
+- **Detección de pendientes**: Al buscar un ítem, se verifican movimientos pendientes
+- **Tag visual**: Ítems con movimiento pendiente muestran "⚠ Pendiente" en los resultados de búsqueda
+- **Aviso preventivo**: Al seleccionar un ítem con pendiente, se muestra aviso amarillo con detalles
+- **Bloqueo de submit**: No se puede crear un movimiento si ya existe uno pendiente para el mismo ítem
+
+#### Reportes - Formato Oficial
+- **Nueva exportación**: Botón "Formato Oficial" genera archivo .xlsx con 10 hojas (A1-A8, B1-B2)
+- **Encabezados institucionales**: Cada hoja incluye título, dependencia y dirección en las primeras 3 filas
+- **Columnas oficiales**: Encabezados exactos del formato institucional del ISeP
+
+#### Correcciones
+- **Headers en modo claro**: Texto de headers de tablas ahora es legible (color blanco sobre fondo oscuro)
+- **Badge mover**: Corregido color de texto en badge de tipo de movimiento
+
 ### v3.3 (27 agosto 2026)
 
 #### Sedes y Unidades
@@ -742,6 +844,6 @@ Los ítems se muestran 25 por página (configurable: 10/25/50). Use "Anterior" y
 
 ---
 
-*Manual de Usuario - SAGI v3.3*
-*Fecha: 27 de agosto de 2026*
+*Manual de Usuario - SAGI v3.4*
+*Fecha: 31 de agosto de 2026*
 *Instituto de Seguridad Pública*

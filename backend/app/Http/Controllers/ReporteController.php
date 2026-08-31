@@ -52,12 +52,12 @@ class ReporteController extends Controller
             ->get();
 
         $movimientosMes = Movimiento::select(
-            DB::raw("DATE_FORMAT(created_at, '%Y-%m') as mes"),
+            DB::raw("strftime('%Y-%m', created_at) as mes"),
             'tipo',
             DB::raw('COUNT(*) as total')
         )
             ->where('created_at', '>=', now()->subMonths(6))
-            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y-%m')"), 'tipo')
+            ->groupBy(DB::raw("strftime('%Y-%m', created_at)"), 'tipo')
             ->orderBy('mes')
             ->get();
 
@@ -73,7 +73,7 @@ class ReporteController extends Controller
 
     public function items(Request $request): JsonResponse
     {
-        $query = Item::with(['categoria', 'tipoItem', 'responsable', 'unidad'])->orderBy('codigo_unico');
+        $query = Item::with(['categoria', 'categoriaOriginal', 'tipoItem', 'responsable', 'unidad.sede'])->orderBy('codigo_unico');
 
         if ($request->filled('estado')) {
             $query->where('estado', $request->string('estado'));

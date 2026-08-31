@@ -31,6 +31,9 @@ export default function Movimientos() {
   const [rechazando, setRechazando] = useState(null)
   const [motivoRechazo, setMotivoRechazo] = useState('')
   const [error, setError] = useState('')
+  const [busquedaItem, setBusquedaItem] = useState('')
+  const [movimientosPendientes, setMovimientosPendientes] = useState([])
+  const [itemPendiente, setItemPendiente] = useState(null)
 
   const puedeSolicitar = ['admin', 'jefe', 'carga'].includes(user?.rol?.slug)
   const puedeValidar = ['admin', 'jefe'].includes(user?.rol?.slug)
@@ -56,13 +59,46 @@ export default function Movimientos() {
   useEffect(cargar, [filtroTipo, filtroEstado])
 
   useEffect(() => {
-    api.get('/items').then((res) => setItems((res.data.data || []).filter((i) => i.estado === 'activo')))
     api.get('/unidades').then((res) => setUnidades((res.data.unidades || []).filter((u) => u.activa))).catch(() => {})
   }, [])
+
+  useEffect(() => {
+    if (showNuevo) {
+      api.get('/movimientos?estado=pendiente&per_page=100')
+        .then((res) => setMovimientosPendientes(res.data.data || []))
+        .catch(() => setMovimientosPendientes([]))
+    } else {
+      setMovimientosPendientes([])
+      setItemPendiente(null)
+    }
+  }, [showNuevo])
+
+  const buscarItems = (termino) => {
+    setBusquedaItem(termino)
+    if (termino.length < 2) {
+      setItems([])
+      return
+    }
+    api.get(`/items?search=${encodeURIComponent(termino)}&estado=activo&per_page=20`)
+      .then((res) => setItems(res.data.data || []))
+      .catch(() => setItems([]))
+  }
+
+  const seleccionarItem = (item) => {
+    setItemId(item.id)
+    setBusquedaItem(`${item.codigo_unico} · ${item.tipo_item?.nombre ?? item.categoria?.codigo}`)
+    setItems([])
+    const pendiente = movimientosPendientes.find((m) => m.item_id === item.id)
+    setItemPendiente(pendiente || null)
+  }
 
   const guardar = async (e) => {
     e.preventDefault()
     setError('')
+    if (itemPendiente) {
+      setError(`Este ítem ya tiene un movimiento ${itemPendiente.tipo} pendiente (solicitado por ${itemPendiente.solicitante?.name ?? 'otro usuario'}). Esperá a que se resuelva.`)
+      return
+    }
     try {
       const payload = { item_id: Number(itemId), motivo }
       if (tipo === 'traslado') payload.unidad_destino_id = Number(unidadDestino)
@@ -181,7 +217,7 @@ export default function Movimientos() {
         </div>
       )}
 
-      <Modal open={showNuevo} title="Nueva solicitud de movimiento" onClose={() => setShowNuevo(false)} wide>
+      <Modal open={showNuevo} title="Nueva solicitud de movimiento" onClose={() => { setShowNuevo(false); setBusquedaItem(''); setItems([]); setItemId('') }} wide>
         <form onSubmit={guardar} className="item-form">
           <fieldset className="form-fieldset">
             <legend>Datos del movimiento</legend>
@@ -202,12 +238,41 @@ export default function Movimientos() {
                   <span className="field-icon">📦</span>
                   Ítem *
                 </label>
-                <select id="m-item" value={itemId} onChange={(e) => setItemId(e.target.value)} required>
-                  <option value="">Seleccionar ítem...</option>
-                  {items.map((i) => (
-                    <option key={i.id} value={i.id}>{i.codigo_unico} · {i.tipo_item?.nombre ?? i.categoria?.codigo}</option>
-                  ))}
-                </select>
+                <input
+                  id="m-item"
+                  type="text"
+                  value={busquedaItem}
+                  onChange={(e) => buscarItems(e.target.value)}
+                  placeholder="Buscar por código o nombre..."
+                  required
+                />
+                {busquedaItem.length >= 2 && items.length > 0 && (
+                  <ul className="item-search-results">
+                    {items.map((i) => {
+                      const tienePendiente = movimientosPendientes.some((m) => m.item_id === i.id)
+                      return (
+                        <li
+                          key={i.id}
+                          className={`${String(i.id) === String(itemId) ? 'selected' : ''} ${tienePendiente ? 'item-con-pendiente' : ''}`}
+                          onClick={() => seleccionarItem(i)}
+                        >
+                          <span>{i.codigo_unico} · {i.tipo_item?.nombre ?? i.categoria?.codigo}</span>
+                          {tienePendiente && <span className="item-pendiente-tag">⚠ Pendiente</span>}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+                {busquedaItem.length >= 2 && items.length === 0 && (
+                  <p className="muted small">No se encontraron ítems</p>
+                )}
+                {itemPendiente && (
+                  <div className="item-pendiente-aviso">
+                    ⚠ Este ítem tiene un movimiento <strong>{itemPendiente.tipo}</strong> pendiente
+                    (solicitado por <strong>{itemPendiente.solicitante?.name ?? 'otro usuario'}</strong>).
+                    No se puede crear otro movimiento hasta que se resuelva.
+                  </div>
+                )}
               </div>
               {tipo === 'traslado' && (
                 <div className="field">
@@ -242,7 +307,7 @@ export default function Movimientos() {
 
           {itemId && tipo === 'traslado' && (() => {
             const itemSeleccionado = items.find((i) => String(i.id) === String(itemId))
-            const unidadOrigen = itemSeleccionado?.unidad?.nombre ?? 'Sin unidad actual'
+            const unidadOrigen = itemSeleccionado?.unidad?.nombre ?? 'Unidad actual del ítem'
             const unidadDestinoSeleccionada = unidades.find((u) => String(u.id) === String(unidadDestino))
             const destino = unidadDestinoSeleccionada
               ? `${unidadDestinoSeleccionada.nombre} (${unidadDestinoSeleccionada.sede?.nombre ?? ''})`

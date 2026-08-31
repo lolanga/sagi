@@ -58,7 +58,7 @@
 .badge-crear { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
 .badge-editar { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
 .badge-eliminar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
-.badge-mover { background-color: var(--color-secondary); color: var(--color-text); }
+.badge-mover { background-color: var(--color-secondary); color: var(--color-white); }
 .badge-solicitar { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
 .badge-aprobar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
 .badge-rechazar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
@@ -767,6 +767,73 @@
   font-weight: 700;
   color: var(--color-primary);
   flex-shrink: 0;
+}
+
+.item-search-results {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: var(--color-white, #fff);
+  position: relative;
+  z-index: 10;
+}
+
+.item-search-results li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.item-search-results li:last-child {
+  border-bottom: none;
+}
+
+.item-search-results li:hover {
+  background-color: var(--color-bg);
+}
+
+.item-search-results li.selected {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.item-search-results li.item-con-pendiente {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-pendiente-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.item-search-results li.selected .item-pendiente-tag {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.item-pendiente-aviso {
+  margin-top: 6px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius);
+}
+
+[data-theme="dark"] .item-pendiente-aviso {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
 }
 
 @media (max-width: 768px) {
