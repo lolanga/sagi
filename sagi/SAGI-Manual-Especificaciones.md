@@ -2,8 +2,8 @@
 title: "SAGI - Manual de Especificaciones Técnicas"
 subtitle: "Sistema de Administración y Gestión de Inventarios"
 author: "Instituto de Seguridad Pública (ISeP)"
-date: "27 de agosto de 2026"
-version: "3.3"
+date: "31 de agosto de 2026"
+version: "3.4"
 ---
 
 # SAGI - Manual de Especificaciones Técnicas
@@ -11,7 +11,7 @@ version: "3.3"
 **Sistema de Administración y Gestión de Inventarios**
 Instituto de Seguridad Pública (ISeP)
 
-Versión: 3.3 | Fecha: 27 de agosto de 2026 | Estado: Producción
+Versión: 3.4 | Fecha: 31 de agosto de 2026 | Estado: Producción
 
 ---
 
@@ -522,8 +522,12 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 
 | Método | Endpoint | Descripción | Autenticación | Roles |
 |--------|----------|-------------|---------------|-------|
-| GET | /api/reportes/resumen | Datos agregados | Sí | admin, jefe |
-| GET | /api/reportes/items | Lista completa de ítems | Sí | admin, jefe |
+| GET | /api/reportes/resumen | Datos agregados (items activos, por categoría, conservación, sede, unidad, elemento, movimientos/mes) | Sí | admin, jefe |
+| GET | /api/reportes/items | Lista completa de ítems con eager-loading: `categoria`, `tipoItem`, `unidad`, `unidad.sede`, `categoriaOriginal`, `responsable`, `campoDinamico`, `responsableAsignado` | Sí | admin, jefe |
+
+**Exportación en frontend:**
+- `src/utils/exportarFormatoOficial.js` — Formato institucional (10 hojas .xlsx)
+- `Reportes.jsx` — Botones "Formato Oficial", "Excel", "CSV", "PDF"
 
 **Total: 42 endpoints (1 público, 41 autenticados)**
 
@@ -693,12 +697,12 @@ SAGI es un sistema web full-stack diseñado para la administración, registro y 
 
 | Directorio | Contenido |
 |------------|-----------|
-| src/components/ | Layout, Modal, Aviso, ItemForm, ItemDetalle, VirtualTable, Pagination, EmptyState, Skeleton, Image |
+| src/components/ | Layout, Modal, Aviso, ItemForm, ItemDetalle, NuevoElementoWizard, VirtualTable, Pagination, EmptyState, Skeleton, Image |
 | src/pages/ | Login, Dashboard, Inventario, Movimientos, Categorias, Unidades, Alertas, Auditoria, Reportes |
 | src/services/ | api.js (instancia Axios con AbortController) |
 | src/context/ | AuthContext, ToastContext |
 | src/hooks/ | useMediaQuery (responsive table/cards) |
-| src/utils/ | helpers.js (extractApiError) |
+| src/utils/ | helpers.js (extractApiError), exportarFormatoOficial.js (10 hojas .xlsx formato ISeP) |
 | src/styles/ | auth, dashboard, inventario, categorias, form, modal, aviso, detalle, virtual-table, skeleton, empty-state, toast, image |
 | src/index.css | Estilos globales |
 
@@ -980,6 +984,37 @@ npm run dev
 
 ## 14. Changelog
 
+### v3.4 (31 agosto 2026)
+
+#### Exportación Formato Oficial
+- **Nuevo archivo**: `src/utils/exportarFormatoOficial.js` — genera `.xlsx` con 10 hojas (A1-A8, B1-B2) siguiendo formato institucional ISeP
+- **Estructura por hoja**: 4 filas de encabezado (título merged, dependencia, dirección, columnas) + datos
+- **Hoja A7**: Movimientos tipo "alta" con código, elemento, detalle, cantidad, marca, modelo, serie, unidad, sede, fecha
+- **Hoja A8**: Movimientos tipo "baja" con motivo de baja adicional
+- **Hojas B1/B2**: Solo encabezados (propiedad provincial/no provincial)
+- **Dependencia**: `xlsx` library en `package.json`
+- **Controller**: `ReporteController` eager-loads `categoriaOriginal` y `unidad.sede` para datos completos
+
+#### NuevoElementoWizard - Flow de 2 pasos
+- **Paso 1**: Intro informativa — código de categoría, nombre, descripción, botón "Comenzar"
+- **Paso 2**: Layout 2 columnas — formulario izquierda + vista previa derecha
+- **Vista previa en tiempo real**: Se actualiza al escribir nombre, agregar/eliminar campos, cambiar tipo u opciones
+- **Campos fijos**: Se muestran como referencia (ya existen en el formulario de alta)
+- **Estilos**: `categorias.css` — `.wizard-intro`, `.wizard-form-preview-layout`, `.wizard-preview-section`, `.preview-card`, responsive (stacked en mobile)
+
+#### Movimientos - Prevención de duplicados
+- **Carga de pendientes**: Al abrir modal, carga movimientos pendientes del usuario (`GET /api/movimientos?estado=pendiente&user_id={userId}`)
+- **Tag visual**: Items con movimiento pendiente muestran "⚠ Pendiente" en resultados de búsqueda
+- **Aviso preventivo**: Al seleccionar item con pendiente, muestra aviso amarillo con tipo de movimiento y solicitante
+- **Bloqueo de submit**: Botón "Solicitar" se deshabilita si el item tiene movimiento pendiente
+- **Validación server-side**: `POST /api/movimientos` revalida que no exista movimiento pendiente para el item (retorna 422)
+- **Estilos**: `inventario.css` — `.item-con-pendiente`, `.item-pendiente-tag`, `.item-pendiente-aviso` con soporte dark mode
+
+#### Correcciones UI
+- **Headers legibles**: `.virtual-header-cell`, `.table thead th`, `.table th` usan `color: var(--color-white)` en vez de `var(--color-text)` — resuelve texto ilegible en modo claro
+- **Badge mover**: Corregido color de texto en `.badge-mover` (`inventario.css`)
+- **Virtual table**: `.virtual-header-row` usa fondo `var(--color-secondary)` para consistencia
+
 ### v3.3 (27 agosto 2026)
 
 #### Auditoría - Nombres resueltos
@@ -1145,4 +1180,4 @@ npm run dev
 ---
 
 *Documento generado el 27 de agosto de 2026*
-*SAGI v3.3 - Instituto de Seguridad Pública*
+*SAGI v3.4 - Instituto de Seguridad Pública*

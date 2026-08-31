@@ -452,6 +452,146 @@
 }
 
 /* ============================================
+   WIZARD - Intro paso 1
+   ============================================ */
+
+.wizard-intro {
+  text-align: center;
+  padding: 32px 20px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.wizard-intro-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.wizard-intro h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--color-text);
+}
+
+.wizard-intro .muted {
+  margin: 4px 0;
+}
+
+/* ============================================
+   WIZARD - Layout formulario + preview
+   ============================================ */
+
+.wizard-form-preview-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.wizard-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-label-seccion {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+/* ============================================
+   WIZARD - Preview
+   ============================================ */
+
+.wizard-preview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preview-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preview-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--color-white);
+}
+
+.preview-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--color-secondary);
+  color: var(--color-white);
+}
+
+.preview-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.preview-nombre {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.preview-card-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preview-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.preview-field-label {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.preview-required {
+  color: var(--color-danger);
+  margin-left: 2px;
+}
+
+.preview-field-value {
+  color: var(--color-text);
+  text-align: right;
+}
+
+.preview-field-value.placeholder {
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.preview-divider {
+  border-top: 1px dashed var(--color-border);
+  margin: 4px 0;
+}
+
+/* ============================================
    BOTONES (compatibilidad)
    ============================================ */
 
@@ -531,6 +671,22 @@
   .btn-add-elemento {
     width: auto;
     padding: 8px 16px;
+  }
+
+  .wizard-form-preview-layout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .wizard-form-section {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .wizard-preview-section {
+    flex: 0 0 320px;
+    position: sticky;
+    top: 20px;
   }
 }
 

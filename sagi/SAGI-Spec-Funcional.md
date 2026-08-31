@@ -2,13 +2,15 @@
 title: "SAGI - Spec Funcional por Elemento"
 subtitle: "Inventario detallado de cada componente, elemento y comportamiento de la interfaz"
 author: "Instituto de Seguridad Publica (ISeP)"
-date: "27 de agosto de 2026"
-version: "1.1"
+date: "31 de agosto de 2026"
+version: "1.2"
 ---
 
 # SAGI - Spec Funcional por Elemento
 
 Inventario detallado de cada componente, elemento y comportamiento de la interfaz.
+
+Versión: 1.2 | Fecha: 31 de agosto de 2026
 
 ---
 
@@ -366,15 +368,60 @@ Filas inactivas: opacity 0.5.
 
 | Elemento | Comportamiento |
 |----------|----------------|
-| Form agregar elemento | Input nombre + boton "+ Agregar" |
+| Boton "+ Nuevo elemento" | Abre wizard de creacion en 2 pasos |
+| Tabla de elementos | Muestra #, nombre, acciones (editar, eliminar, orden) |
 
-**Tabla de elementos:**
+### 7.3 Wizard NuevoElementoWizard
 
-| Columna | Contenido |
-|---------|-----------|
-| # | Numero de orden |
-| Elemento | `tipo.nombre` |
-| Acciones | Orden (arriba/abajo), Editar, Eliminar |
+Componente: `NuevoElementoWizard.jsx`
+
+#### Paso 1: Introduccion
+
+| Elemento | Comportamiento |
+|----------|----------------|
+| Icono | Emoji de paquete |
+| Titulo | "Nuevo elemento en {codigo}" |
+| Subtitulo | Indica que se creara un nuevo tipo de elemento en la categoria seleccionada |
+| Boton "Cancelar" | Cierra el wizard |
+| Boton "Comenzar →" | Avanza al paso 2 |
+
+#### Paso 2: Configuracion
+
+Layout de dos columnas (desktop: lado a lado, mobile: apilado).
+
+**Columna izquierda - Formulario:**
+
+| Campo | Tipo | Comportamiento |
+|-------|------|----------------|
+| Nombre del elemento * | `<input type="text">` | Placeholder: "Ej. Escritorio, Computadora, Teclado". Validacion de duplicados en tiempo real (case-insensitive, normalizado). |
+| Info campos fijos | `<div>` | Aviso con lista de campos que ya existen: Categoria, Elemento, Estado de conservacion, Cantidad, Fecha de alta, Unidad de destino |
+| Campos adicionales | Lista dinamica | Cada campo: nombre + tipo + opciones (si select) + requerido + boton eliminar |
+
+**Columna derecha - Vista previa:**
+
+| Elemento | Comportamiento |
+|----------|----------------|
+| Preview card | Tarjeta con header (codigo + nombre) y body (lista de campos) |
+| Header | Badge con codigo de categoria + nombre del elemento (o placeholder si esta vacio) |
+| Campos fijos | Se muestran con valores de ejemplo (ej: "Bueno" para estado, fecha actual para fecha alta) |
+| Campos adicionales | Se agregan en tiempo real al escribir/eliminar campos. Tipo select muestra primera opcion, fecha muestra "dd/mm/aaaa", numero muestra "0", textarea muestra "Texto..." |
+| Divider | Linea punteada separando campos fijos de adicionales |
+| Campo requerido | Indicador "*" al lado del nombre |
+
+**Funcionamiento de campos adicionales:**
+
+| Accion | Resultado |
+|--------|-----------|
+| Click "+ Agregar campo" | Agrega nueva fila con: nombre vacio, tipo "texto", sin opciones, no requerido |
+| Cambiar nombre | Se refleja inmediatamente en la vista previa |
+| Cambiar tipo | Se actualiza el placeholder en la vista previa |
+| Cambiar opciones (select) | La primera opcion se muestra como ejemplo en la vista previa |
+| Marcar requerido | Aparece "*" junto al nombre en la vista previa |
+| Eliminar campo | Se elimina de la lista y de la vista previa |
+
+**API calls al guardar:**
+1. `POST /categorias/{id}/tipos` con `{ nombre }`
+2. Por cada campo con nombre: `POST /categorias/{id}/campos` con `{ nombre, tipo, requerido, tipo_item_id, orden, opciones? }`
 
 ### 7.3 Modales
 
@@ -412,14 +459,35 @@ Contador: "{N} movimientos"
 
 ### 8.3 Modal Nueva Solicitud
 
+Componente: `Movimientos.jsx`
+
+**Al abrir el modal:**
+1. Se cargan los movimientos pendientes del usuario actual (`GET /api/movimientos?estado=pendiente&user_id={userId}`)
+2. Se extraen los `item_id` de los movimientos pendientes
+3. Se almacenan en `itemsConPendientes` para validacion
+
 | Campo | Tipo | Notas |
 |-------|------|-------|
-| Tipo | `<select>` | Alta, Traslado, Baja |
-| Item | `<select>` | Items activos con codigo + nombre |
-| Unidad destino | `<select>` | Solo si tipo = traslado |
-| Motivo | `<input>` | Placeholder segun tipo |
+| Tipo | `<select>` | Alta, Traslado, Baja. Baja se selecciona automaticamente si unidad destino es "Baja administrativa". |
+| Item | Buscador con dropdown | Muestra resultados filtrados por codigo/nombre. **Validacion**: Si el item ya tiene movimiento pendiente, muestra tag "⚠ Pendiente" al lado. Si el item esta dado de baja (estado="baja"), bloquea la seleccion. |
+| Unidad destino | `<select>` | Solo si tipo = traslado. Si selecciona "Baja administrativa", cambia tipo a "baja" y deshabilita item (busca automaticamente). |
+| Motivo | `<textarea>` | Requerido. Placeholder: "Describa el motivo de la solicitud..." |
+| Imagen evidencia | Upload | Opcional. Boton de camara para upload. |
+
+**Logica de proteccion contra duplicados:**
+- Al buscar items, se filtran los que tienen movimiento pendiente
+- En los resultados, los items con pendiente muestran tag visual "⚠ Pendiente"
+- Al seleccionar un item con pendiente, se muestra un aviso amarillo con tipo de movimiento y solicitante
+- Si el item ya tiene movimiento pendiente, el boton "Solicitar" se deshabilita
 
 **Botones:** Cancelar, Solicitar.
+
+**API calls:**
+1. `GET /api/movimientos?estado=pendiente&user_id={userId}` (al abrir modal)
+2. `GET /api/items?search={query}&categoria_id={catId}&page=1&per_page=20` (busqueda)
+3. `POST /api/movimientos` con `{ item_id, unidad_destino_id, tipo, descripcion, imagen_evidencia, usuario_id }` (al solicitar)
+   - Server revalida que no exista movimiento pendiente para el item (validacion doble)
+   - Retorna 422 si ya existe un pendiente
 
 ### 8.4 Modal Rechazar
 
@@ -482,9 +550,61 @@ Contador: "{N} alertas"
 
 | Boton | Formato | Filename |
 |-------|---------|----------|
+| Formato Oficial | `.xlsx` (10 hojas, formato institucional ISeP) | `inventario-YYYY-MM-DD.xlsx` |
 | Excel | `.xlsx` (multi-hoja por categoria) | `inventario-YYYY-MM-DD.xlsx` |
 | CSV | `.csv` (UTF-8 BOM, delimitador ;) | `inventario-YYYY-MM-DD.csv` |
 | PDF | `.pdf` (A4 landscape, autoTable) | `inventario-YYYY-MM-DD.pdf` |
+
+### 10.2 Formato Oficial (exportarFormatoOficial.js)
+
+Genera archivo `.xlsx` con 10 hojas siguiendo el formato institucional del ISeP.
+
+**Estructura por hoja (4 filas de encabezado + datos):**
+- Fila 1: Titulo de la hoja (merged, estilo bold 16pt)
+- Fila 2: "DEPENDENCIA: Division Secretaria General, sede Rosario."
+- Fila 3: "DIRECCION / UNIDAD REGIONAL: I.Se.P."
+- Fila 4: Encabezados de columnas (fondo azul #1F4E79, texto blanco bold, auto-filter)
+
+**Hoja: A1 - Amoblamiento y Utiles**
+
+| Columna | Fuente |
+|---------|--------|
+| Codigo del item | `item.codigo_unico` |
+| Elemento | `item.tipo_item.nombre` |
+| Detalle del elemento | `item.valores_dinamicos.campo_1` |
+| Cantidad | `item.cantidad` |
+| Estado de conservacion | `item.estado_conservacion` |
+| Marca | `item.valores_dinamicos.campo_2` |
+| Modelo | `item.valores_dinamicos.campo_3` |
+| Nro. Serie | `item.valores_dinamicos.campo_4` |
+| Fecha de alta | `item.fecha_alta` |
+| Unidad de destino | `item.unidad.nombre` |
+| Sede | `item.unidad.sede.nombre` |
+| Estado | `item.estado` |
+| Observaciones | "Activo" o `item.motivo_baja` si estado=baja |
+
+**Hojas: A2, A3, A4, A5, A6** — Mismas columnas, filtradas por `categoria_id` correspondiente (2, 3, 4, 5, 6).
+
+**Hoja: A7 - Altas**
+- Fuente: Items con `estado='activo'` (no movimientos)
+- Columnas: Fecha, Codigo del item, Elemento, Detalle, Cantidad, Estado conservacion, Marca, Modelo, Nro. Serie, Unidad de destino, Sede, Observaciones
+
+**Hoja: A8 - Bajas**
+- Fuente: Items con `estado='baja'`
+- Columnas: Fecha de baja, Codigo del item, Elemento, Detalle, Cantidad, Estado conservacion, Marca, Modelo, Nro. Serie, Unidad de destino, Sede, Motivo de baja, Observaciones
+
+**Hojas: B1 y B2** — Solo encabezados (sin datos).
+
+### 10.3 API Backend
+
+- `GET /api/reportes/items` — Retorna todos los items con eager-loading: `categoria`, `tipoItem`, `unidad`, `unidad.sede`, `categoriaOriginal`, `responsable`, `campoDinamico` (valores), `responsableAsignado`
+- `GET /api/reportes/resumen` — Estadisticas: items activos, items por categoria, por conservacion, por sede, por unidad, por elemento, movimientos por mes
+
+### 10.4 Changelog v1.2 (31 agosto 2026)
+
+- Added Formato Oficial export (10 sheets, institutional ISeP format)
+- Added duplicate movement prevention in Movimientos (step 8.3)
+- Added NuevoElementoWizard 2-step flow (step 7.3)
 
 ### 10.2 Tablas de Resumen
 

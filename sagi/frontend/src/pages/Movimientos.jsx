@@ -32,6 +32,8 @@ export default function Movimientos() {
   const [motivoRechazo, setMotivoRechazo] = useState('')
   const [error, setError] = useState('')
   const [busquedaItem, setBusquedaItem] = useState('')
+  const [movimientosPendientes, setMovimientosPendientes] = useState([])
+  const [itemPendiente, setItemPendiente] = useState(null)
 
   const puedeSolicitar = ['admin', 'jefe', 'carga'].includes(user?.rol?.slug)
   const puedeValidar = ['admin', 'jefe'].includes(user?.rol?.slug)
@@ -60,6 +62,17 @@ export default function Movimientos() {
     api.get('/unidades').then((res) => setUnidades((res.data.unidades || []).filter((u) => u.activa))).catch(() => {})
   }, [])
 
+  useEffect(() => {
+    if (showNuevo) {
+      api.get('/movimientos?estado=pendiente&per_page=100')
+        .then((res) => setMovimientosPendientes(res.data.data || []))
+        .catch(() => setMovimientosPendientes([]))
+    } else {
+      setMovimientosPendientes([])
+      setItemPendiente(null)
+    }
+  }, [showNuevo])
+
   const buscarItems = (termino) => {
     setBusquedaItem(termino)
     if (termino.length < 2) {
@@ -71,9 +84,21 @@ export default function Movimientos() {
       .catch(() => setItems([]))
   }
 
+  const seleccionarItem = (item) => {
+    setItemId(item.id)
+    setBusquedaItem(`${item.codigo_unico} · ${item.tipo_item?.nombre ?? item.categoria?.codigo}`)
+    setItems([])
+    const pendiente = movimientosPendientes.find((m) => m.item_id === item.id)
+    setItemPendiente(pendiente || null)
+  }
+
   const guardar = async (e) => {
     e.preventDefault()
     setError('')
+    if (itemPendiente) {
+      setError(`Este ítem ya tiene un movimiento ${itemPendiente.tipo} pendiente (solicitado por ${itemPendiente.solicitante?.name ?? 'otro usuario'}). Esperá a que se resuelva.`)
+      return
+    }
     try {
       const payload = { item_id: Number(itemId), motivo }
       if (tipo === 'traslado') payload.unidad_destino_id = Number(unidadDestino)
@@ -223,23 +248,30 @@ export default function Movimientos() {
                 />
                 {busquedaItem.length >= 2 && items.length > 0 && (
                   <ul className="item-search-results">
-                    {items.map((i) => (
-                      <li
-                        key={i.id}
-                        className={String(i.id) === String(itemId) ? 'selected' : ''}
-                        onClick={() => {
-                          setItemId(i.id)
-                          setBusquedaItem(`${i.codigo_unico} · ${i.tipo_item?.nombre ?? i.categoria?.codigo}`)
-                          setItems([])
-                        }}
-                      >
-                        {i.codigo_unico} · {i.tipo_item?.nombre ?? i.categoria?.codigo}
-                      </li>
-                    ))}
+                    {items.map((i) => {
+                      const tienePendiente = movimientosPendientes.some((m) => m.item_id === i.id)
+                      return (
+                        <li
+                          key={i.id}
+                          className={`${String(i.id) === String(itemId) ? 'selected' : ''} ${tienePendiente ? 'item-con-pendiente' : ''}`}
+                          onClick={() => seleccionarItem(i)}
+                        >
+                          <span>{i.codigo_unico} · {i.tipo_item?.nombre ?? i.categoria?.codigo}</span>
+                          {tienePendiente && <span className="item-pendiente-tag">⚠ Pendiente</span>}
+                        </li>
+                      )
+                    })}
                   </ul>
                 )}
                 {busquedaItem.length >= 2 && items.length === 0 && (
                   <p className="muted small">No se encontraron ítems</p>
+                )}
+                {itemPendiente && (
+                  <div className="item-pendiente-aviso">
+                    ⚠ Este ítem tiene un movimiento <strong>{itemPendiente.tipo}</strong> pendiente
+                    (solicitado por <strong>{itemPendiente.solicitante?.name ?? 'otro usuario'}</strong>).
+                    No se puede crear otro movimiento hasta que se resuelva.
+                  </div>
                 )}
               </div>
               {tipo === 'traslado' && (

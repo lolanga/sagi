@@ -802,6 +802,40 @@
   color: white;
 }
 
+.item-search-results li.item-con-pendiente {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-pendiente-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.item-search-results li.selected .item-pendiente-tag {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.item-pendiente-aviso {
+  margin-top: 6px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: var(--radius);
+}
+
+[data-theme="dark"] .item-pendiente-aviso {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
 @media (max-width: 768px) {
   .movimiento-flujo {
     flex-direction: column;
