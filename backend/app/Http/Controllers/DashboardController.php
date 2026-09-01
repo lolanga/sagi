@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alerta;
+use App\Models\Auditoria;
 use App\Models\Categoria;
 use App\Models\Item;
 use App\Models\Movimiento;
@@ -39,16 +40,8 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function backup(): JsonResponse
+    public function backup(): \Symfony\Component\HttpFoundation\Response
     {
-        $date = date('Y-m-d_H-i-s');
-        $filename = "backup_sagi_{$date}.sql";
-        $path = storage_path("app/backups/{$filename}");
-
-        if (!is_dir(storage_path('app/backups'))) {
-            mkdir(storage_path('app/backups'), 0755, true);
-        }
-
         $host = config('database.connections.mysql.host');
         $port = config('database.connections.mysql.port');
         $database = config('database.connections.mysql.database');
@@ -56,36 +49,37 @@ class DashboardController extends Controller
         $password = config('database.connections.mysql.password');
 
         $command = sprintf(
-            'mysqldump -h %s -P %s -u %s %s > %s',
+            'mysqldump -h %s -P %s -u %s %s',
             escapeshellarg($host),
             escapeshellarg($port),
             escapeshellarg($username),
-            escapeshellarg($database),
-            escapeshellarg($path)
+            escapeshellarg($database)
         );
 
         if ($password) {
-            $command = sprintf(
-                'mysqldump -h %s -P %s -u %s -p%s %s > %s',
-                escapeshellarg($host),
-                escapeshellarg($port),
-                escapeshellarg($username),
-                escapeshellarg($password),
-                escapeshellarg($database),
-                escapeshellarg($path)
-            );
+            $command .= ' -p' . escapeshellarg($password);
         }
 
-        $result = Process::run($command);
+        $result = \Illuminate\Support\Facades\Process::run($command);
 
         if ($result->successful()) {
-            return response()->json([
-                'message' => 'Backup creado correctamente',
-                'file' => $filename,
-                'size' => filesize($path),
+            $date = date('Y-m-d_H-i-s');
+            $filename = "backup_sagi_{$date}.sql";
+
+            Auditoria::create([
+                'user_id' => request()->user()->id,
+                'accion' => 'backup',
+                'entidad' => 'sistema',
+                'entidad_id' => null,
+                'detalle' => ['archivo' => $filename],
+            ]);
+
+            return response($result->output(), 200, [
+                'Content-Type' => 'application/sql',
+                'Content-Disposition' => "attachment; filename=\"{$filename}\"",
             ]);
         }
 
-        return response()->json(['message' => 'Error al crear backup'], 500);
+        return response()->json(['message' => 'Error al crear backup: ' . $result->errorOutput()], 500);
     }
 }

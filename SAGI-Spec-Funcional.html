@@ -3,35 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAGI - Spec Funcional por Elemento</title>
-<style>
-body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:20px;line-height:1.6;color:#333}
+<title>SAGI - Spec Funcional</title>
+<style>body{font-family:system-ui,-apple-system,sans-serif;max-width:900px;margin:0 auto;padding:20px;line-height:1.6;color:#333}
 table{border-collapse:collapse;width:100%;margin:1em 0}
 th,td{border:1px solid #ddd;padding:8px;text-align:left;font-size:14px}
-th{background:#f4f4f4}
+th{background:#f5f5f5;font-weight:600}
+h1{color:#4a8fd4;border-bottom:2px solid #4a8fd4;padding-bottom:8px}
+h2{color:#2a3040;margin-top:2em}
+h3{color:#555}
 code{background:#f4f4f4;padding:2px 6px;border-radius:3px;font-size:13px}
-pre{background:#f4f4f4;padding:16px;border-radius:6px;overflow-x:auto}
-pre code{background:none;padding:0}
-hr{border:none;border-top:1px solid #ddd;margin:2em 0}
-h1{color:#1a202c;font-size:24px}
-h2{color:#2d3748;font-size:20px;border-bottom:2px solid #e2e8f0;padding-bottom:8px}
-h3{color:#4a5568;font-size:16px}
-h4{color:#4a5568;font-size:14px}
-strong{color:#1a202c}
-</style>
+pre{background:#f4f4f4;padding:12px;border-radius:6px;overflow-x:auto}
+blockquote{border-left:4px solid #4a8fd4;margin:1em 0;padding:0.5em 1em;background:#f9f9f9}</style>
 </head>
 <body>
-
-<h1>SAGI - Spec Funcional por Elemento</h1>
-
-<p>Inventario detallado de cada componente, elemento y comportamiento de la interfaz.</p>
-
-<p>Versión: 1.2 | Fecha: 31 de agosto de 2026</p>
-
 <hr>
-
+<h2>title: &quot;SAGI - Spec Funcional por Elemento&quot;
+subtitle: &quot;Inventario detallado de cada componente, elemento y comportamiento de la interfaz&quot;
+author: &quot;Instituto de Seguridad Publica (ISeP)&quot;
+date: &quot;31 de agosto de 2026&quot;
+version: &quot;1.2&quot;</h2>
+<h1>SAGI - Spec Funcional por Elemento</h1>
+<p>Inventario detallado de cada componente, elemento y comportamiento de la interfaz.</p>
+<p>Versión: 1.2 | Fecha: 31 de agosto de 2026</p>
+<hr>
 <h2>Indice</h2>
-
 <ol>
 <li>Elementos Globales (Layout, Sidebar, Topbar)</li>
 <li>Login</li>
@@ -50,36 +45,93 @@ strong{color:#1a202c}
 <li>Sistema de Temas (Claro/Oscuro)</li>
 <li>Matriz de Permisos por Rol</li>
 </ol>
-
 <hr>
-
 <h2>1. Elementos Globales</h2>
-
 <h3>1.1 Sidebar</h3>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Tipo</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Tipo</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Logo SAGI</td><td>SVG + texto</td><td>Hexagono con gradiente azul-naranja. Texto "SAGI" con gradiente clipped.</td></tr>
-<tr><td>Boton colapsar</td><td><code>&lt;button&gt;</code></td><td>Chevron a la izquierda. Alterna sidebar entre 240px y 60px. Estado persistido en <code>localStorage.sagi_sidebar_collapsed</code>.</td></tr>
-<tr><td>Grupo: Operaciones</td><td>Seccion colapsable</td><td>Contiene Dashboard y Alertas. Header clickeable para expandir/colapsar. Estado en <code>localStorage.sagi_open_groups</code>.</td></tr>
-<tr><td>Grupo: Inventario</td><td>Seccion colapsable</td><td>Contiene Inventario y Movimientos.</td></tr>
-<tr><td>Grupo: Configuracion</td><td>Seccion colapsable</td><td>Contiene Categorias y Sedes y Unidades. Solo admin.</td></tr>
-<tr><td>Grupo: Control</td><td>Seccion colapsable</td><td>Contiene Reportes y Auditoria.</td></tr>
-<tr><td>Nav item: Dashboard</td><td>NavLink</td><td>Icono grid 2x2. Texto "Dashboard". Visible: todos los roles.</td></tr>
-<tr><td>Nav item: Alertas</td><td>NavLink</td><td>Icono campana. Texto "Alertas". Badge rojo con contador de alertas abiertas (&gt;99 muestra "99+"). En sidebar colapsado: punto rojo. Visible: admin, jefe, carga.</td></tr>
-<tr><td>Nav item: Inventario</td><td>NavLink</td><td>Icono cubo 3D. Texto "Inventario". Visible: todos los roles.</td></tr>
-<tr><td>Nav item: Movimientos</td><td>NavLink</td><td>Icono flechas circulares. Texto "Movimientos". Visible: admin, jefe, carga.</td></tr>
-<tr><td>Nav item: Categorias</td><td>NavLink</td><td>Icono lista con puntos. Texto "Categorias". Visible: solo admin.</td></tr>
-<tr><td>Nav item: Sedes y Unidades</td><td>NavLink</td><td>Icono casa. Texto "Sedes y Unidades". Visible: solo admin.</td></tr>
-<tr><td>Nav item: Reportes</td><td>NavLink</td><td>Icono barras verticales. Texto "Reportes". Visible: admin, jefe.</td></tr>
-<tr><td>Nav item: Auditoria</td><td>NavLink</td><td>Icono documento. Texto "Auditoria". Visible: admin, jefe.</td></tr>
-<tr><td>Footer</td><td><code>&lt;div&gt;</code></td><td>Texto: "Departamento Tecnologia, Desarrollo e Innovacion". Oculto en modo colapsado.</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Logo SAGI</td>
+<td>SVG + texto</td>
+<td>Hexagono con gradiente azul-naranja. Texto &quot;SAGI&quot; con gradiente clipped.</td>
+</tr>
+<tr>
+<td>Boton colapsar</td>
+<td><code>&lt;button&gt;</code></td>
+<td>Chevron a la izquierda. Alterna sidebar entre 240px y 60px. Estado persistido en <code>localStorage.sagi_sidebar_collapsed</code>.</td>
+</tr>
+<tr>
+<td>Grupo: Operaciones</td>
+<td>Seccion colapsable</td>
+<td>Contiene Dashboard y Alertas. Header clickeable para expandir/colapsar. Estado en <code>localStorage.sagi_open_groups</code>.</td>
+</tr>
+<tr>
+<td>Grupo: Inventario</td>
+<td>Seccion colapsable</td>
+<td>Contiene Inventario y Movimientos.</td>
+</tr>
+<tr>
+<td>Grupo: Configuracion</td>
+<td>Seccion colapsable</td>
+<td>Contiene Categorias y Sedes y Unidades. Solo admin.</td>
+</tr>
+<tr>
+<td>Grupo: Control</td>
+<td>Seccion colapsable</td>
+<td>Contiene Reportes y Auditoria.</td>
+</tr>
+<tr>
+<td>Nav item: Dashboard</td>
+<td>NavLink</td>
+<td>Icono grid 2x2. Texto &quot;Dashboard&quot;. Visible: todos los roles.</td>
+</tr>
+<tr>
+<td>Nav item: Alertas</td>
+<td>NavLink</td>
+<td>Icono campana. Texto &quot;Alertas&quot;. Badge rojo con contador de alertas abiertas (&gt;99 muestra &quot;99+&quot;). En sidebar colapsado: punto rojo. Visible: admin, jefe, carga.</td>
+</tr>
+<tr>
+<td>Nav item: Inventario</td>
+<td>NavLink</td>
+<td>Icono cubo 3D. Texto &quot;Inventario&quot;. Visible: todos los roles.</td>
+</tr>
+<tr>
+<td>Nav item: Movimientos</td>
+<td>NavLink</td>
+<td>Icono flechas circulares. Texto &quot;Movimientos&quot;. Visible: admin, jefe, carga.</td>
+</tr>
+<tr>
+<td>Nav item: Categorias</td>
+<td>NavLink</td>
+<td>Icono lista con puntos. Texto &quot;Categorias&quot;. Visible: solo admin.</td>
+</tr>
+<tr>
+<td>Nav item: Sedes y Unidades</td>
+<td>NavLink</td>
+<td>Icono casa. Texto &quot;Sedes y Unidades&quot;. Visible: solo admin.</td>
+</tr>
+<tr>
+<td>Nav item: Reportes</td>
+<td>NavLink</td>
+<td>Icono barras verticales. Texto &quot;Reportes&quot;. Visible: admin, jefe.</td>
+</tr>
+<tr>
+<td>Nav item: Auditoria</td>
+<td>NavLink</td>
+<td>Icono documento. Texto &quot;Auditoria&quot;. Visible: admin, jefe.</td>
+</tr>
+<tr>
+<td>Footer</td>
+<td><code>&lt;div&gt;</code></td>
+<td>Texto: &quot;Departamento Tecnologia, Desarrollo e Innovacion&quot;. Oculto en modo colapsado.</td>
+</tr>
+</tbody></table>
 <p><strong>Estilos:</strong></p>
 <ul>
 <li>Background sidebar: <code>#131722</code></li>
@@ -87,617 +139,1093 @@ strong{color:#1a202c}
 <li>Item hover: fondo <code>rgba(255, 255, 255, 0.08)</code>, texto <code>#ffffff</code></li>
 <li>Transicion colapsado: <code>width 0.2s ease</code></li>
 </ul>
-
 <h3>1.2 Topbar</h3>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Tipo</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Tipo</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Boton hamburger</td><td><code>&lt;button&gt;</code></td><td>Solo visible en movil (&lt;900px). Abre sidebar overlay. Icono 3 lineas horizontales.</td></tr>
-<tr><td>Link "Volver"</td><td><code>&lt;Link&gt;</code></td><td>Pills boton naranja con <code>border: 1px solid rgba(245, 124, 0, 0.5)</code>. Aparece cuando la prop <code>back</code> esta definida.</td></tr>
-<tr><td>Titulo pagina</td><td><code>&lt;h1&gt;</code></td><td>Font-size 20px (17px en movil).</td></tr>
-<tr><td>Info usuario</td><td><code>&lt;p class="topbar-user"&gt;</code></td><td>"{nombre} . {rol} . {sede}". Font-size 13px, color muted.</td></tr>
-<tr><td>Area de acciones</td><td><code>&lt;div&gt;</code></td><td>Recibe prop <code>actions</code> de cada pagina. Botones alineados a la derecha.</td></tr>
-<tr><td>Boton tema</td><td><code>&lt;button&gt;</code></td><td>Emoji sol/luna. Alterna entre dark y light. Estado en <code>localStorage.sagi_theme</code>.</td></tr>
-<tr><td>Boton cambiar contrasena</td><td><code>&lt;button&gt;</code></td><td>Emoji llave. Abre modal de cambio de contrasena.</td></tr>
-<tr><td>Boton cerrar sesion</td><td><code>&lt;button&gt;</code></td><td>Texto "Cerrar sesion". Llama <code>logout()</code> del AuthContext.</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Boton hamburger</td>
+<td><code>&lt;button&gt;</code></td>
+<td>Solo visible en movil (&lt;900px). Abre sidebar overlay. Icono 3 lineas horizontales.</td>
+</tr>
+<tr>
+<td>Link &quot;Volver&quot;</td>
+<td><code>&lt;Link&gt;</code></td>
+<td>Pills boton naranja con <code>border: 1px solid rgba(245, 124, 0, 0.5)</code>. Aparece cuando la prop <code>back</code> esta definida.</td>
+</tr>
+<tr>
+<td>Titulo pagina</td>
+<td><code>&lt;h1&gt;</code></td>
+<td>Font-size 20px (17px en movil).</td>
+</tr>
+<tr>
+<td>Info usuario</td>
+<td><code>&lt;p class=&quot;topbar-user&quot;&gt;</code></td>
+<td>&quot;{nombre} . {rol} . {sede}&quot;. Font-size 13px, color muted.</td>
+</tr>
+<tr>
+<td>Area de acciones</td>
+<td><code>&lt;div&gt;</code></td>
+<td>Recibe prop <code>actions</code> de cada pagina. Botones alineados a la derecha.</td>
+</tr>
+<tr>
+<td>Boton tema</td>
+<td><code>&lt;button&gt;</code></td>
+<td>Emoji sol/luna. Alterna entre dark y light. Estado en <code>localStorage.sagi_theme</code>.</td>
+</tr>
+<tr>
+<td>Boton cambiar contrasena</td>
+<td><code>&lt;button&gt;</code></td>
+<td>Emoji llave. Abre modal de cambio de contrasena.</td>
+</tr>
+<tr>
+<td>Boton cerrar sesion</td>
+<td><code>&lt;button&gt;</code></td>
+<td>Texto &quot;Cerrar sesion&quot;. Llama <code>logout()</code> del AuthContext.</td>
+</tr>
+</tbody></table>
 <h3>1.3 Bottom Nav (Movil)</h3>
-
 <p>Visible en pantallas &lt;900px. Barra fija en la parte inferior.</p>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Dashboard</td><td>Icono + texto "Dashboard". Activo en <code>/</code>.</td></tr>
-<tr><td>Alertas</td><td>Icono + texto "Alertas" + badge rojo.</td></tr>
-<tr><td>Inventario</td><td>Icono + texto "Inventario".</td></tr>
-<tr><td>Movimientos</td><td>Icono + texto "Movimientos".</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Dashboard</td>
+<td>Icono + texto &quot;Dashboard&quot;. Activo en <code>/</code>.</td>
+</tr>
+<tr>
+<td>Alertas</td>
+<td>Icono + texto &quot;Alertas&quot; + badge rojo.</td>
+</tr>
+<tr>
+<td>Inventario</td>
+<td>Icono + texto &quot;Inventario&quot;.</td>
+</tr>
+<tr>
+<td>Movimientos</td>
+<td>Icono + texto &quot;Movimientos&quot;.</td>
+</tr>
+</tbody></table>
 <h3>1.4 Modal Cambiar Contrasena</h3>
-
 <table>
 <thead>
-<tr><th>Campo</th><th>Tipo</th><th>Validacion</th></tr>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Validacion</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Contrasena actual</td><td><code>&lt;input type="password"&gt;</code></td><td>Requerido</td></tr>
-<tr><td>Nueva contrasena</td><td><code>&lt;input type="password"&gt;</code></td><td>Requerido, min 6 caracteres</td></tr>
-<tr><td>Confirmar contrasena</td><td><code>&lt;input type="password"&gt;</code></td><td>Requerido, debe coincidir</td></tr>
-</tbody>
-</table>
-
-<p><strong>Botones:</strong> Cancelar, Guardar.</p>
-<p><strong>API:</strong> <code>POST /api/change-password</code></p>
-<p><strong>Comportamiento:</strong> Exito muestra mensaje verde, cierra automaticamente en 2s.</p>
-
+<tbody><tr>
+<td>Contrasena actual</td>
+<td><code>&lt;input type=&quot;password&quot;&gt;</code></td>
+<td>Requerido</td>
+</tr>
+<tr>
+<td>Nueva contrasena</td>
+<td><code>&lt;input type=&quot;password&quot;&gt;</code></td>
+<td>Requerido, min 6 caracteres</td>
+</tr>
+<tr>
+<td>Confirmar contrasena</td>
+<td><code>&lt;input type=&quot;password&quot;&gt;</code></td>
+<td>Requerido, debe coincidir</td>
+</tr>
+</tbody></table>
+<p><strong>Botones:</strong> Cancelar, Guardar.
+<strong>API:</strong> <code>POST /api/change-password</code>
+<strong>Comportamiento:</strong> Exito muestra mensaje verde, cierra automaticamente en 2s.</p>
 <hr>
-
 <h2>2. Login (<code>/login</code>)</h2>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Tipo</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Tipo</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Contenedor auth</td><td><code>&lt;div class="auth-card"&gt;</code></td><td>Tarjeta centrada con borde naranja superior.</td></tr>
-<tr><td>Logo SAGI</td><td>SVG + texto</td><td>Mismo que sidebar.</td></tr>
-<tr><td>Titulo</td><td><code>&lt;h1&gt;</code></td><td>"Sistema de Administracion y Gestion de Inventarios"</td></tr>
-<tr><td>Subtitulo</td><td><code>&lt;p&gt;</code></td><td>"Instituto de Seguridad Publica"</td></tr>
-<tr><td>Campo DNI</td><td><code>&lt;input type="text"&gt;</code></td><td>Label: "DNI". Placeholder: "Ej. 10000001 o admin". Requerido.</td></tr>
-<tr><td>Campo contrasena</td><td><code>&lt;input type="password"&gt;</code></td><td>Label: "Contrasena". Placeholder: "Ej. Admin1234". Requerido.</td></tr>
-<tr><td>Mensaje de error</td><td><code>&lt;p&gt;</code></td><td>Banner rojo. Muestra error de API o "Error al iniciar sesion".</td></tr>
-<tr><td>Boton submit</td><td><code>&lt;button type="submit"&gt;</code></td><td>Texto: "Ingresar". Loading: "Ingresando...". Deshabilitado durante carga.</td></tr>
-<tr><td>Credenciales de prueba</td><td><code>&lt;div&gt;</code></td><td>4 cuentas: admin/Admin1234, jefe/Jefe1234, carga/Carga1234, consulta/Consulta1234.</td></tr>
-</tbody>
-</table>
-
-<p><strong>API:</strong> <code>POST /api/login</code> con <code>{ dni, password }</code>.</p>
-<p><strong>Exito:</strong> Guarda token en <code>localStorage.sagi_token</code>, usuario en <code>localStorage.sagi_user</code>. Redirige a <code>/</code>.</p>
-
+<tbody><tr>
+<td>Contenedor auth</td>
+<td><code>&lt;div class=&quot;auth-card&quot;&gt;</code></td>
+<td>Tarjeta centrada con borde naranja superior.</td>
+</tr>
+<tr>
+<td>Logo SAGI</td>
+<td>SVG + texto</td>
+<td>Mismo que sidebar.</td>
+</tr>
+<tr>
+<td>Titulo</td>
+<td><code>&lt;h1&gt;</code></td>
+<td>&quot;Sistema de Administracion y Gestion de Inventarios&quot;</td>
+</tr>
+<tr>
+<td>Subtitulo</td>
+<td><code>&lt;p&gt;</code></td>
+<td>&quot;Instituto de Seguridad Publica&quot;</td>
+</tr>
+<tr>
+<td>Campo DNI</td>
+<td><code>&lt;input type=&quot;text&quot;&gt;</code></td>
+<td>Label: &quot;DNI&quot;. Placeholder: &quot;Ej. 10000001 o admin&quot;. Requerido.</td>
+</tr>
+<tr>
+<td>Campo contrasena</td>
+<td><code>&lt;input type=&quot;password&quot;&gt;</code></td>
+<td>Label: &quot;Contrasena&quot;. Placeholder: &quot;Ej. Admin1234&quot;. Requerido.</td>
+</tr>
+<tr>
+<td>Mensaje de error</td>
+<td><code>&lt;p&gt;</code></td>
+<td>Banner rojo. Muestra error de API o &quot;Error al iniciar sesion&quot;.</td>
+</tr>
+<tr>
+<td>Boton submit</td>
+<td><code>&lt;button type=&quot;submit&quot;&gt;</code></td>
+<td>Texto: &quot;Ingresar&quot;. Loading: &quot;Ingresando...&quot;. Deshabilitado durante carga.</td>
+</tr>
+<tr>
+<td>Credenciales de prueba</td>
+<td><code>&lt;div&gt;</code></td>
+<td>4 cuentas: admin/Admin1234, jefe/Jefe1234, carga/Carga1234, consulta/Consulta1234.</td>
+</tr>
+</tbody></table>
+<p><strong>API:</strong> <code>POST /api/login</code> con <code>{ dni, password }</code>.
+<strong>Exito:</strong> Guarda token en <code>localStorage.sagi_token</code>, usuario en <code>localStorage.sagi_user</code>. Redirige a <code>/</code>.</p>
 <hr>
-
 <h2>3. Dashboard (<code>/</code>)</h2>
-
 <h3>3.1 Tarjetas de Estadisticas</h3>
-
 <p>Grid de 4 tarjetas (min 220px cada una):</p>
-
 <table>
 <thead>
-<tr><th>Tarjeta</th><th>Icono</th><th>Dato</th><th>Label</th></tr>
+<tr>
+<th>Tarjeta</th>
+<th>Icono</th>
+<th>Dato</th>
+<th>Label</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Total items</td><td>Archivo</td><td><code>stats.total</code></td><td>"Total de items"</td></tr>
-<tr><td>Items activos</td><td>Check circle</td><td><code>stats.activos</code></td><td>"Items activos"</td></tr>
-<tr><td>Movimientos pendientes</td><td>Reloj</td><td><code>stats.movimientos_pendientes</code></td><td>"Movimientos pendientes"</td></tr>
-<tr><td>Alertas activas</td><td>Campana</td><td><code>stats.alertas_activas</code></td><td>"Alertas activas"</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Total items</td>
+<td>Archivo</td>
+<td><code>stats.total</code></td>
+<td>&quot;Total de items&quot;</td>
+</tr>
+<tr>
+<td>Items activos</td>
+<td>Check circle</td>
+<td><code>stats.activos</code></td>
+<td>&quot;Items activos&quot;</td>
+</tr>
+<tr>
+<td>Movimientos pendientes</td>
+<td>Reloj</td>
+<td><code>stats.movimientos_pendientes</code></td>
+<td>&quot;Movimientos pendientes&quot;</td>
+</tr>
+<tr>
+<td>Alertas activas</td>
+<td>Campana</td>
+<td><code>stats.alertas_activas</code></td>
+<td>&quot;Alertas activas&quot;</td>
+</tr>
+</tbody></table>
 <h3>3.2 Graficos</h3>
-
 <table>
 <thead>
-<tr><th>Grafico</th><th>Tipo</th><th>Datos</th></tr>
+<tr>
+<th>Grafico</th>
+<th>Tipo</th>
+<th>Datos</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Items por categoria</td><td>Chart.js <code>&lt;Bar&gt;</code></td><td>Eje X: codigos de categorias. Eje Y: cantidad. Barras azules. Altura: 220px.</td></tr>
-<tr><td>Distribucion por estado</td><td>Chart.js <code>&lt;Doughnut&gt;</code></td><td>Labels: nombres de categorias. 6 colores. Leyenda abajo. Altura: 260px.</td></tr>
-</tbody>
-</table>
-
-<h3>3.3 Tabla "Items activos por categoria"</h3>
-
+<tbody><tr>
+<td>Items por categoria</td>
+<td>Chart.js <code>&lt;Bar&gt;</code></td>
+<td>Eje X: codigos de categorias. Eje Y: cantidad. Barras azules. Altura: 220px.</td>
+</tr>
+<tr>
+<td>Distribucion por estado</td>
+<td>Chart.js <code>&lt;Doughnut&gt;</code></td>
+<td>Labels: nombres de categorias. 6 colores. Leyenda abajo. Altura: 260px.</td>
+</tr>
+</tbody></table>
+<h3>3.3 Tabla &quot;Items activos por categoria&quot;</h3>
 <table>
 <thead>
-<tr><th>Columna</th><th>Contenido</th></tr>
+<tr>
+<th>Columna</th>
+<th>Contenido</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Codigo</td><td><code>cat.codigo</code></td></tr>
-<tr><td>Categoria</td><td><code>cat.nombre</code></td></tr>
-<tr><td>Items</td><td><code>cat.items_count</code></td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Codigo</td>
+<td><code>cat.codigo</code></td>
+</tr>
+<tr>
+<td>Categoria</td>
+<td><code>cat.nombre</code></td>
+</tr>
+<tr>
+<td>Items</td>
+<td><code>cat.items_count</code></td>
+</tr>
+</tbody></table>
 <p><strong>API:</strong> <code>GET /api/dashboard/stats</code></p>
-
 <hr>
-
 <h2>4. Inventario (<code>/inventario</code>)</h2>
-
 <h3>4.1 Barra de Filtros</h3>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Tipo</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Tipo</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Input busqueda</td><td><code>&lt;input&gt;</code></td><td>Placeholder: "Ej. SAGI-000001 o escritorio". Debounced 300ms. Reset pagina a 1.</td></tr>
-<tr><td>Boton limpiar busqueda</td><td><code>&lt;button&gt;</code></td><td>Icono "x". Aparece solo si hay texto. Limpia busqueda y resetea a pagina 1.</td></tr>
-<tr><td>Boton "Filtros"</td><td><code>&lt;button&gt;</code></td><td>Solo visible en movil. Colapsa/expande filtros extra.</td></tr>
-<tr><td>Select categoria</td><td><code>&lt;select&gt;</code></td><td>"Todas las categorias" + categorias no transitorias. Reset pagina a 1 al cambiar.</td></tr>
-<tr><td>Contador resultados</td><td><code>&lt;span&gt;</code></td><td>"{N} items"</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Input busqueda</td>
+<td><code>&lt;input&gt;</code></td>
+<td>Placeholder: &quot;Ej. SAGI-000001 o escritorio&quot;. Debounced 300ms. Reset pagina a 1.</td>
+</tr>
+<tr>
+<td>Boton limpiar busqueda</td>
+<td><code>&lt;button&gt;</code></td>
+<td>Icono &quot;x&quot;. Aparece solo si hay texto. Limpia busqueda y resetea a pagina 1.</td>
+</tr>
+<tr>
+<td>Boton &quot;Filtros&quot;</td>
+<td><code>&lt;button&gt;</code></td>
+<td>Solo visible en movil. Colapsa/expande filtros extra.</td>
+</tr>
+<tr>
+<td>Select categoria</td>
+<td><code>&lt;select&gt;</code></td>
+<td>&quot;Todas las categorias&quot; + categorias no transitorias. Reset pagina a 1 al cambiar.</td>
+</tr>
+<tr>
+<td>Contador resultados</td>
+<td><code>&lt;span&gt;</code></td>
+<td>&quot;{N} items&quot;</td>
+</tr>
+</tbody></table>
 <h3>4.2 Toggle de Columnas (Desktop)</h3>
-
 <p>Barra de pills debajo de filtros:</p>
-
 <table>
 <thead>
-<tr><th>Pill</th><th>Columna que controla</th><th>Obligatoria</th></tr>
+<tr>
+<th>Pill</th>
+<th>Columna que controla</th>
+<th>Obligatoria</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Categoría</td><td>columna categoria</td><td>No</td></tr>
-<tr><td>Detalle</td><td>columna detalle</td><td>No</td></tr>
-<tr><td>Conservación</td><td>columna estado_conservacion</td><td>No</td></tr>
-<tr><td>Cant.</td><td>columna cantidad</td><td>No</td></tr>
-<tr><td>Unidad</td><td>columna unidad</td><td>No</td></tr>
-<tr><td>Responsable</td><td>columna responsable</td><td>No</td></tr>
-</tbody>
-</table>
-
-<p>Columnas siempre visibles: Codigo, Estado, Acciones.</p>
-<p>Estado persistido en <code>localStorage.sagi_hidden_cols</code>.</p>
-
+<tbody><tr>
+<td>Categoría</td>
+<td>columna categoria</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Detalle</td>
+<td>columna detalle</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Conservación</td>
+<td>columna estado_conservacion</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Cant.</td>
+<td>columna cantidad</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Unidad</td>
+<td>columna unidad</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Responsable</td>
+<td>columna responsable</td>
+<td>No</td>
+</tr>
+</tbody></table>
+<p>Columnas siempre visibles: Codigo, Estado, Acciones.
+Estado persistido en <code>localStorage.sagi_hidden_cols</code>.</p>
 <h3>4.3 Tabla Desktop (VirtualTable)</h3>
-
 <p>Flexbox table con header sticky y body con scroll (<code>max-height: 70vh</code>).</p>
-
 <table>
 <thead>
-<tr><th>Columna</th><th>Flex</th><th>Contenido</th><th>Visibilidad</th></tr>
+<tr>
+<th>Columna</th>
+<th>Flex</th>
+<th>Contenido</th>
+<th>Visibilidad</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Codigo</td><td>1.4</td><td><code>item.codigo_unico</code> en <code>&lt;strong&gt;</code></td><td>Siempre</td></tr>
-<tr><td>Categoria</td><td>0.7</td><td><code>item.categoria.codigo</code></td><td>Configurable</td></tr>
-<tr><td>Detalle</td><td>2</td><td><code>formatValores(item)</code>: tipo_item + primeros 2 valores dinamicos</td><td>Configurable</td></tr>
-<tr><td>Estado</td><td>0.6</td><td>Badge color-coded: activo (verde), pendiente (naranja), baja (rojo)</td><td>Siempre</td></tr>
-<tr><td>Conservacion</td><td>0.8</td><td>Badge: Muy bueno (verde), Bueno (azul), Regular (naranja), Malo (rojo)</td><td>Configurable</td></tr>
-<tr><td>Cantidad</td><td>0.4</td><td>Numero</td><td>Configurable</td></tr>
-<tr><td>Unidad</td><td>0.7</td><td><code>item.unidad.nombre</code></td><td>Configurable</td></tr>
-<tr><td>Responsable</td><td>0.9</td><td><code>item.responsable.name</code></td><td>Configurable</td></tr>
-<tr><td>Motivo Baja</td><td>1</td><td>Texto truncado con tooltip. Solo muestra si estado=baja.</td><td>Solo admin/jefe</td></tr>
-<tr><td>Acciones</td><td>1.2</td><td>Ver (siempre), Editar (admin/jefe/carga + no baja), Eliminar (admin/jefe/carga + no baja)</td><td>Siempre</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Codigo</td>
+<td>1.4</td>
+<td><code>item.codigo_unico</code> en <code>&lt;strong&gt;</code></td>
+<td>Siempre</td>
+</tr>
+<tr>
+<td>Categoria</td>
+<td>0.7</td>
+<td><code>item.categoria.codigo</code></td>
+<td>Configurable</td>
+</tr>
+<tr>
+<td>Detalle</td>
+<td>2</td>
+<td><code>formatValores(item)</code>: tipo_item + primeros 2 valores dinamicos</td>
+<td>Configurable</td>
+</tr>
+<tr>
+<td>Estado</td>
+<td>0.6</td>
+<td>Badge color-coded: activo (verde), pendiente (naranja), baja (rojo)</td>
+<td>Siempre</td>
+</tr>
+<tr>
+<td>Conservacion</td>
+<td>0.8</td>
+<td>Badge: Muy bueno (verde), Bueno (azul), Regular (naranja), Malo (rojo)</td>
+<td>Configurable</td>
+</tr>
+<tr>
+<td>Cantidad</td>
+<td>0.4</td>
+<td>Numero</td>
+<td>Configurable</td>
+</tr>
+<tr>
+<td>Unidad</td>
+<td>0.7</td>
+<td><code>item.unidad.nombre</code></td>
+<td>Configurable</td>
+</tr>
+<tr>
+<td>Responsable</td>
+<td>0.9</td>
+<td><code>item.responsable.name</code></td>
+<td>Configurable</td>
+</tr>
+<tr>
+<td>Motivo Baja</td>
+<td>1</td>
+<td>Texto truncado con tooltip. Solo muestra si estado=baja.</td>
+<td>Solo admin/jefe</td>
+</tr>
+<tr>
+<td>Acciones</td>
+<td>1.2</td>
+<td>Ver (siempre), Editar (admin/jefe/carga + no baja), Eliminar (admin/jefe/carga + no baja)</td>
+<td>Siempre</td>
+</tr>
+</tbody></table>
 <p><strong>Fila:</strong> Click abre modal detalle. Items baja: opacity 0.55. Hover: fondo azul claro.</p>
-
 <h3>4.4 Cards Mobile</h3>
-
 <p>Visible en &lt;768px. Grid 1 columna (2 en &gt;=480px):</p>
-
 <table>
 <thead>
-<tr><th>Parte</th><th>Contenido</th></tr>
+<tr>
+<th>Parte</th>
+<th>Contenido</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Header</td><td>Codigo + badge estado</td></tr>
-<tr><td>Body</td><td>Detalle, categoria + unidad, conservacion + cantidad</td></tr>
-<tr><td>Motivo Baja</td><td>Solo visible si estado=baja y usuario=admin/jefe. Texto rojo con borde izquierdo.</td></tr>
-<tr><td>Footer</td><td>Ver, Editar (si aplica), Eliminar (si aplica)</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Header</td>
+<td>Codigo + badge estado</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Detalle, categoria + unidad, conservacion + cantidad</td>
+</tr>
+<tr>
+<td>Motivo Baja</td>
+<td>Solo visible si estado=baja y usuario=admin/jefe. Texto rojo con borde izquierdo.</td>
+</tr>
+<tr>
+<td>Footer</td>
+<td>Ver, Editar (si aplica), Eliminar (si aplica)</td>
+</tr>
+</tbody></table>
 <h3>4.5 Paginacion</h3>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Anterior</td><td>Deshabilitado en pagina 1</td></tr>
-<tr><td>Pagina X de Y</td><td>Texto con <code>aria-live="polite"</code></td></tr>
-<tr><td>Siguiente</td><td>Deshabilitado en ultima pagina</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Anterior</td>
+<td>Deshabilitado en pagina 1</td>
+</tr>
+<tr>
+<td>Pagina X de Y</td>
+<td>Texto con <code>aria-live=&quot;polite&quot;</code></td>
+</tr>
+<tr>
+<td>Siguiente</td>
+<td>Deshabilitado en ultima pagina</td>
+</tr>
+</tbody></table>
 <p><strong>API:</strong> <code>GET /api/items?search=&amp;categoria_id=&amp;page=</code></p>
-
 <hr>
-
 <h2>5. Formulario de Item (<code>ItemForm</code>)</h2>
-
 <h3>5.1 Campos Fijos (siempre visibles)</h3>
-
 <table>
 <thead>
-<tr><th>Campo</th><th>Tipo</th><th>Requisito</th><th>Notas</th></tr>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Requisito</th>
+<th>Notas</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Categoria</td><td><code>&lt;select&gt;</code></td><td>Si</td><td>Filtra categorias transitorias. Deshabilitado en edicion.</td></tr>
-<tr><td>Estado de conservacion</td><td><code>&lt;select&gt;</code></td><td>Si</td><td>Opciones: Muy bueno, Bueno, Regular, Malo</td></tr>
-<tr><td>Elemento</td><td><code>&lt;select&gt;</code></td><td>Condicional</td><td>Solo si la categoria tiene tipos. Carga desde API. Cambio pide confirmacion si hay campos dinamicos con valores.</td></tr>
-<tr><td>Cantidad</td><td><code>&lt;input type="number"&gt;</code></td><td>Si</td><td>min=1, step=any</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Categoria</td>
+<td><code>&lt;select&gt;</code></td>
+<td>Si</td>
+<td>Filtra categorias transitorias. Deshabilitado en edicion.</td>
+</tr>
+<tr>
+<td>Estado de conservacion</td>
+<td><code>&lt;select&gt;</code></td>
+<td>Si</td>
+<td>Opciones: Muy bueno, Bueno, Regular, Malo</td>
+</tr>
+<tr>
+<td>Elemento</td>
+<td><code>&lt;select&gt;</code></td>
+<td>Condicional</td>
+<td>Solo si la categoria tiene tipos. Carga desde API. Cambio pide confirmacion si hay campos dinamicos con valores.</td>
+</tr>
+<tr>
+<td>Cantidad</td>
+<td><code>&lt;input type=&quot;number&quot;&gt;</code></td>
+<td>Si</td>
+<td>min=1, step=any</td>
+</tr>
+</tbody></table>
 <h3>5.2 Campos de Alta (ocultos en edicion)</h3>
-
 <table>
 <thead>
-<tr><th>Campo</th><th>Tipo</th><th>Requisito</th><th>Notas</th></tr>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Requisito</th>
+<th>Notas</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Fecha de alta</td><td><code>&lt;input type="date"&gt;</code></td><td>Si*</td><td>Max = hoy. *O salta si "Fecha desconocida"</td></tr>
-<tr><td>Fecha desconocida</td><td><code>&lt;input type="checkbox"&gt;</code></td><td>No</td><td>Si checked, deshabilita campo fecha</td></tr>
-<tr><td>Unidad de destino</td><td><code>&lt;select&gt;</code></td><td>Si</td><td>Solo unidades activas, muestra nombre de sede</td></tr>
-<tr><td>Motivo del alta</td><td><code>&lt;textarea&gt;</code></td><td>Si</td><td>Placeholder segun tipo de movimiento</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Fecha de alta</td>
+<td><code>&lt;input type=&quot;date&quot;&gt;</code></td>
+<td>Si*</td>
+<td>Max = hoy. *O salta si &quot;Fecha desconocida&quot;</td>
+</tr>
+<tr>
+<td>Fecha desconocida</td>
+<td><code>&lt;input type=&quot;checkbox&quot;&gt;</code></td>
+<td>No</td>
+<td>Si checked, deshabilita campo fecha</td>
+</tr>
+<tr>
+<td>Unidad de destino</td>
+<td><code>&lt;select&gt;</code></td>
+<td>Si</td>
+<td>Solo unidades activas, muestra nombre de sede</td>
+</tr>
+<tr>
+<td>Motivo del alta</td>
+<td><code>&lt;textarea&gt;</code></td>
+<td>Si</td>
+<td>Placeholder segun tipo de movimiento</td>
+</tr>
+</tbody></table>
 <h3>5.3 Campos Dinamicos</h3>
-
 <p>Seccion visible solo si hay categoria + tipo_item seleccionados.</p>
-
 <table>
 <thead>
-<tr><th>Tipo de campo</th><th>Render</th></tr>
+<tr>
+<th>Tipo de campo</th>
+<th>Render</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>texto</td><td><code>&lt;input type="text"&gt;</code></td></tr>
-<tr><td>numero</td><td><code>&lt;input type="number" step="any"&gt;</code></td></tr>
-<tr><td>fecha</td><td><code>&lt;input type="date"&gt;</code></td></tr>
-<tr><td>select</td><td><code>&lt;select&gt;</code> con opciones de <code>campo.opciones</code> (separadas por coma)</td></tr>
-<tr><td>textarea</td><td><code>&lt;textarea&gt;</code> 3 filas</td></tr>
-</tbody>
-</table>
-
-<p><strong>Validacion:</strong> Campos requeridos (segun <code>campo.requerido</code>) se validan antes de enviar.</p>
-<p><strong>Errores inline:</strong> <code>fieldErrors</code> state con mensajes por campo. <code>aria-invalid="true"</code> en campos con error. Mensajes en espanol.</p>
-
+<tbody><tr>
+<td>texto</td>
+<td><code>&lt;input type=&quot;text&quot;&gt;</code></td>
+</tr>
+<tr>
+<td>numero</td>
+<td><code>&lt;input type=&quot;number&quot; step=&quot;any&quot;&gt;</code></td>
+</tr>
+<tr>
+<td>fecha</td>
+<td><code>&lt;input type=&quot;date&quot;&gt;</code></td>
+</tr>
+<tr>
+<td>select</td>
+<td><code>&lt;select&gt;</code> con opciones de <code>campo.opciones</code> (separadas por coma)</td>
+</tr>
+<tr>
+<td>textarea</td>
+<td><code>&lt;textarea&gt;</code> 3 filas</td>
+</tr>
+</tbody></table>
+<p><strong>Validacion:</strong> Campos requeridos (segun <code>campo.requerido</code>) se validan antes de enviar.
+<strong>Errores inline:</strong> <code>fieldErrors</code> state con mensajes por campo. <code>aria-invalid=&quot;true&quot;</code> en campos con error. Mensajes en espanol.</p>
 <h3>5.4 Comportamiento del Formulario</h3>
-
 <table>
 <thead>
-<tr><th>Evento</th><th>Comportamiento</th></tr>
+<tr>
+<th>Evento</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Cambio de categoria</td><td>Carga tipos de elemento + campos dinamicos. AbortController cancela request anterior.</td></tr>
-<tr><td>Cambio de tipo_item</td><td>Pide confirmacion si hay campos dinamicos con valores. Si confirma, limpia valores. AbortController cancela request anterior.</td></tr>
-<tr><td>Submit exitoso</td><td>Llama <code>onSaved()</code>. Muestra toast success.</td></tr>
-<tr><td>Error de API</td><td>Muestra toast error con mensaje descriptivo. Errores de validacion por campo.</td></tr>
-<tr><td>Cancelar</td><td>Llama <code>onCancel()</code>.</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Cambio de categoria</td>
+<td>Carga tipos de elemento + campos dinamicos. AbortController cancela request anterior.</td>
+</tr>
+<tr>
+<td>Cambio de tipo_item</td>
+<td>Pide confirmacion si hay campos dinamicos con valores. Si confirma, limpia valores. AbortController cancela request anterior.</td>
+</tr>
+<tr>
+<td>Submit exitoso</td>
+<td>Llama <code>onSaved()</code>. Muestra toast success.</td>
+</tr>
+<tr>
+<td>Error de API</td>
+<td>Muestra toast error con mensaje descriptivo. Errores de validacion por campo.</td>
+</tr>
+<tr>
+<td>Cancelar</td>
+<td>Llama <code>onCancel()</code>.</td>
+</tr>
+</tbody></table>
 <p><strong>API:</strong> <code>POST /api/items</code> (alta) o <code>PUT /api/items/:id</code> (edicion)</p>
-
 <hr>
-
 <h2>6. Detalle de Item (<code>ItemDetalle</code>)</h2>
-
 <h3>6.1 Seccion: Datos del item</h3>
-
 <table>
 <thead>
-<tr><th>Campo</th><th>Contenido</th></tr>
+<tr>
+<th>Campo</th>
+<th>Contenido</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Codigo</td><td><code>item.codigo_unico</code></td></tr>
-<tr><td>Categoria</td><td><code>item.categoria.codigo</code> + <code>item.categoria.nombre</code></td></tr>
-<tr><td>Elemento</td><td><code>item.tipo_item.nombre</code></td></tr>
-<tr><td>Estado</td><td>Badge color-coded</td></tr>
-<tr><td>Conservacion</td><td>Badge color-coded</td></tr>
-<tr><td>Cantidad</td><td>Numero</td></tr>
-<tr><td>Unidad actual</td><td><code>item.unidad.nombre</code> + sede</td></tr>
-<tr><td>Responsable</td><td><code>item.responsable.name</code></td></tr>
-<tr><td>Fecha de alta</td><td>Formateada DD/MM/YYYY HH:mm o "Desconocida"</td></tr>
-<tr><td>Motivo de baja</td><td>Solo visible si estado=baja y usuario=admin/jefe. Texto rojo con motivo.</td></tr>
-<tr><td>Fecha de baja</td><td>Solo visible si estado=baja y usuario=admin/jefe.</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Codigo</td>
+<td><code>item.codigo_unico</code></td>
+</tr>
+<tr>
+<td>Categoria</td>
+<td><code>item.categoria.codigo</code> + <code>item.categoria.nombre</code></td>
+</tr>
+<tr>
+<td>Elemento</td>
+<td><code>item.tipo_item.nombre</code></td>
+</tr>
+<tr>
+<td>Estado</td>
+<td>Badge color-coded</td>
+</tr>
+<tr>
+<td>Conservacion</td>
+<td>Badge color-coded</td>
+</tr>
+<tr>
+<td>Cantidad</td>
+<td>Numero</td>
+</tr>
+<tr>
+<td>Unidad actual</td>
+<td><code>item.unidad.nombre</code> + sede</td>
+</tr>
+<tr>
+<td>Responsable</td>
+<td><code>item.responsable.name</code></td>
+</tr>
+<tr>
+<td>Fecha de alta</td>
+<td>Formateada DD/MM/YYYY HH:mm o &quot;Desconocida&quot;</td>
+</tr>
+<tr>
+<td>Motivo de baja</td>
+<td>Solo visible si estado=baja y usuario=admin/jefe. Texto rojo con motivo.</td>
+</tr>
+<tr>
+<td>Fecha de baja</td>
+<td>Solo visible si estado=baja y usuario=admin/jefe.</td>
+</tr>
+</tbody></table>
 <h3>6.2 Seccion: Campos del elemento</h3>
-
 <p>Lista de pares clave-valor de <code>item.valores_dinamicos</code>, filtrada por campos activos y que coincidan con el tipo_item.</p>
-
 <h3>6.3 Seccion: Historial de movimientos</h3>
-
 <p>Timeline vertical con scroll (<code>max-height: 400px</code>):</p>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Contenido</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Contenido</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Dot</td><td>Color por estado: aprobado (verde), pendiente (naranja), rechazado (rojo)</td></tr>
-<tr><td>Badge tipo</td><td>alta (verde), traslado (azul), baja (rojo)</td></tr>
-<tr><td>Badge estado</td><td>aprobado/pendiente/rechazado</td></tr>
-<tr><td>Fecha</td><td><code>m.created_at</code> formateada</td></tr>
-<tr><td>Origen -&gt; Destino</td><td>Para traslados. Solo origen para altas/bajas.</td></tr>
-<tr><td>Motivo</td><td>Texto del motivo</td></tr>
-<tr><td>Solicitante</td><td>Nombre</td></tr>
-<tr><td>Validador</td><td>Nombre (si existe)</td></tr>
-<tr><td>Rechazo</td><td>Caja roja con motivo de rechazo (si aplica)</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Dot</td>
+<td>Color por estado: aprobado (verde), pendiente (naranja), rechazado (rojo)</td>
+</tr>
+<tr>
+<td>Badge tipo</td>
+<td>alta (verde), traslado (azul), baja (rojo)</td>
+</tr>
+<tr>
+<td>Badge estado</td>
+<td>aprobado/pendiente/rechazado</td>
+</tr>
+<tr>
+<td>Fecha</td>
+<td><code>m.created_at</code> formateada</td>
+</tr>
+<tr>
+<td>Origen -&gt; Destino</td>
+<td>Para traslados. Solo origen para altas/bajas.</td>
+</tr>
+<tr>
+<td>Motivo</td>
+<td>Texto del motivo</td>
+</tr>
+<tr>
+<td>Solicitante</td>
+<td>Nombre</td>
+</tr>
+<tr>
+<td>Validador</td>
+<td>Nombre (si existe)</td>
+</tr>
+<tr>
+<td>Rechazo</td>
+<td>Caja roja con motivo de rechazo (si aplica)</td>
+</tr>
+</tbody></table>
 <p><strong>API:</strong> <code>GET /api/items/:id</code></p>
-
 <h3>6.4 Boton Reactivar (solo admin/jefe)</h3>
-
-<p>Visible solo si <code>item.estado === 'baja'</code> y usuario es admin o jefe.</p>
-
+<p>Visible solo si <code>item.estado === &#39;baja&#39;</code> y usuario es admin o jefe.</p>
 <table>
 <thead>
-<tr><th>Elemento</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Boton "Reactivar ítem"</td><td>Abre modal de reactivación</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Boton &quot;Reactivar ítem&quot;</td>
+<td>Abre modal de reactivación</td>
+</tr>
+</tbody></table>
 <h4>Modal Reactivar</h4>
-
 <table>
 <thead>
-<tr><th>Campo</th><th>Tipo</th><th>Validacion</th></tr>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Validacion</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Motivo de reactivación</td><td><code>&lt;textarea&gt;</code></td><td>Requerido, max 500 caracteres</td></tr>
-</tbody>
-</table>
-
-<p><strong>Botones:</strong> Cancelar, Reactivar.</p>
-<p><strong>API:</strong> <code>POST /api/items/:id/reactivar</code> con <code>{ motivo_reactivacion }</code>.</p>
-<p><strong>Comportamiento:</strong> Al enviar, cambia estado a "activo", restaura categoría original, limpia motivo_baja/fecha_baja/categoria_original_id, crea movimiento "alta" aprobado, muestra toast success.</p>
-
+<tbody><tr>
+<td>Motivo de reactivación</td>
+<td><code>&lt;textarea&gt;</code></td>
+<td>Requerido, max 500 caracteres</td>
+</tr>
+</tbody></table>
+<p><strong>Botones:</strong> Cancelar, Reactivar.
+<strong>API:</strong> <code>POST /api/items/:id/reactivar</code> con <code>{ motivo_reactivacion }</code>.
+<strong>Comportamiento:</strong> Al enviar, cambia estado a &quot;activo&quot;, restaura categoría original, limpia motivo_baja/fecha_baja/categoria_original_id, crea movimiento &quot;alta&quot; aprobado, muestra toast success.</p>
 <hr>
-
 <h2>7. Categorias (<code>/categorias</code>)</h2>
-
 <h3>7.1 Panel Izquierdo: Lista de categorias</h3>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Botones de categoria</td><td>Muestran codigo + nombre. Activo: fondo highlighted. Categoria transitoria: badge "transitoria".</td></tr>
-<tr><td>Click</td><td>Selecciona categoria y muestra sus campos/detalles en el panel derecho.</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Botones de categoria</td>
+<td>Muestran codigo + nombre. Activo: fondo highlighted. Categoria transitoria: badge &quot;transitoria&quot;.</td>
+</tr>
+<tr>
+<td>Click</td>
+<td>Selecciona categoria y muestra sus campos/detalles en el panel derecho.</td>
+</tr>
+</tbody></table>
 <h3>7.2 Panel Derecho: Detalle de categoria seleccionada</h3>
-
 <h4>7.2.1 Campos dinamicos</h4>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Selector de ambito</td><td><code>&lt;select&gt;</code>: "Campos generales de la categoria" + tipos de elemento. Filtra que campos se muestran.</td></tr>
-<tr><td>Form agregar campo</td><td>Grid 3 columnas: nombre + tipo + boton agregar.</td></tr>
-<tr><td>Tipos de campo</td><td>texto, numero, fecha, select, textarea</td></tr>
-<tr><td>Input opciones</td><td>Solo visible cuando tipo = select. Placeholder: "Ej. Rojo, Azul, Verde"</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Selector de ambito</td>
+<td><code>&lt;select&gt;</code>: &quot;Campos generales de la categoria&quot; + tipos de elemento. Filtra que campos se muestran.</td>
+</tr>
+<tr>
+<td>Form agregar campo</td>
+<td>Grid 3 columnas: nombre + tipo + boton agregar.</td>
+</tr>
+<tr>
+<td>Tipos de campo</td>
+<td>texto, numero, fecha, select, textarea</td>
+</tr>
+<tr>
+<td>Input opciones</td>
+<td>Solo visible cuando tipo = select. Placeholder: &quot;Ej. Rojo, Azul, Verde&quot;</td>
+</tr>
+</tbody></table>
 <p><strong>Tabla de campos:</strong></p>
-
 <table>
 <thead>
-<tr><th>Columna</th><th>Contenido</th></tr>
+<tr>
+<th>Columna</th>
+<th>Contenido</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>#</td><td>Numero de orden</td></tr>
-<tr><td>Campo</td><td><code>campo.nombre</code></td></tr>
-<tr><td>Tipo</td><td><code>campo.tipo</code> + opciones si select</td></tr>
-<tr><td>Requerido</td><td>Si / No</td></tr>
-<tr><td>Activo</td><td>Si / No</td></tr>
-<tr><td>Acciones</td><td>Orden (arriba/abajo), Editar, Activar/Desactivar, Eliminar</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>#</td>
+<td>Numero de orden</td>
+</tr>
+<tr>
+<td>Campo</td>
+<td><code>campo.nombre</code></td>
+</tr>
+<tr>
+<td>Tipo</td>
+<td><code>campo.tipo</code> + opciones si select</td>
+</tr>
+<tr>
+<td>Requerido</td>
+<td>Si / No</td>
+</tr>
+<tr>
+<td>Activo</td>
+<td>Si / No</td>
+</tr>
+<tr>
+<td>Acciones</td>
+<td>Orden (arriba/abajo), Editar, Activar/Desactivar, Eliminar</td>
+</tr>
+</tbody></table>
 <p>Filas inactivas: opacity 0.5.</p>
-
 <h4>7.2.2 Elementos de la categoria</h4>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Boton "+ Nuevo elemento"</td><td>Abre wizard de creacion en 2 pasos</td></tr>
-<tr><td>Tabla de elementos</td><td>Muestra #, nombre, acciones (editar, eliminar, orden)</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Boton &quot;+ Nuevo elemento&quot;</td>
+<td>Abre wizard de creacion en 2 pasos</td>
+</tr>
+<tr>
+<td>Tabla de elementos</td>
+<td>Muestra #, nombre, acciones (editar, eliminar, orden)</td>
+</tr>
+</tbody></table>
 <h3>7.3 Wizard NuevoElementoWizard</h3>
-
 <p>Componente: <code>NuevoElementoWizard.jsx</code></p>
-
 <h4>Paso 1: Introduccion</h4>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Icono</td><td>Emoji de paquete</td></tr>
-<tr><td>Titulo</td><td>"Nuevo elemento en {codigo}"</td></tr>
-<tr><td>Subtitulo</td><td>Indica que se creara un nuevo tipo de elemento en la categoria seleccionada</td></tr>
-<tr><td>Boton "Cancelar"</td><td>Cierra el wizard</td></tr>
-<tr><td>Boton "Comenzar →"</td><td>Avanza al paso 2</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Icono</td>
+<td>Emoji de paquete</td>
+</tr>
+<tr>
+<td>Titulo</td>
+<td>&quot;Nuevo elemento en {codigo}&quot;</td>
+</tr>
+<tr>
+<td>Subtitulo</td>
+<td>Indica que se creara un nuevo tipo de elemento en la categoria seleccionada</td>
+</tr>
+<tr>
+<td>Boton &quot;Cancelar&quot;</td>
+<td>Cierra el wizard</td>
+</tr>
+<tr>
+<td>Boton &quot;Comenzar →&quot;</td>
+<td>Avanza al paso 2</td>
+</tr>
+</tbody></table>
 <h4>Paso 2: Configuracion</h4>
-
 <p>Layout de dos columnas (desktop: lado a lado, mobile: apilado).</p>
-
 <p><strong>Columna izquierda - Formulario:</strong></p>
-
 <table>
 <thead>
-<tr><th>Campo</th><th>Tipo</th><th>Comportamiento</th></tr>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Nombre del elemento *</td><td><code>&lt;input type="text"&gt;</code></td><td>Placeholder: "Ej. Escritorio, Computadora, Teclado". Validacion de duplicados en tiempo real (case-insensitive, normalizado).</td></tr>
-<tr><td>Info campos fijos</td><td><code>&lt;div&gt;</code></td><td>Aviso con lista de campos que ya existen: Categoria, Elemento, Estado de conservacion, Cantidad, Fecha de alta, Unidad de destino</td></tr>
-<tr><td>Campos adicionales</td><td>Lista dinamica</td><td>Cada campo: nombre + tipo + opciones (si select) + requerido + boton eliminar</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Nombre del elemento *</td>
+<td><code>&lt;input type=&quot;text&quot;&gt;</code></td>
+<td>Placeholder: &quot;Ej. Escritorio, Computadora, Teclado&quot;. Validacion de duplicados en tiempo real (case-insensitive, normalizado).</td>
+</tr>
+<tr>
+<td>Info campos fijos</td>
+<td><code>&lt;div&gt;</code></td>
+<td>Aviso con lista de campos que ya existen: Categoria, Elemento, Estado de conservacion, Cantidad, Fecha de alta, Unidad de destino</td>
+</tr>
+<tr>
+<td>Campos adicionales</td>
+<td>Lista dinamica</td>
+<td>Cada campo: nombre + tipo + opciones (si select) + requerido + boton eliminar</td>
+</tr>
+</tbody></table>
 <p><strong>Columna derecha - Vista previa:</strong></p>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Preview card</td><td>Tarjeta con header (codigo + nombre) y body (lista de campos)</td></tr>
-<tr><td>Header</td><td>Badge con codigo de categoria + nombre del elemento (o placeholder si esta vacio)</td></tr>
-<tr><td>Campos fijos</td><td>Se muestran con valores de ejemplo (ej: "Bueno" para estado, fecha actual para fecha alta)</td></tr>
-<tr><td>Campos adicionales</td><td>Se agregan en tiempo real al escribir/eliminar campos. Tipo select muestra primera opcion, fecha muestra "dd/mm/aaaa", numero muestra "0", textarea muestra "Texto..."</td></tr>
-<tr><td>Divider</td><td>Linea punteada separando campos fijos de adicionales</td></tr>
-<tr><td>Campo requerido</td><td>Indicador "*" al lado del nombre</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Preview card</td>
+<td>Tarjeta con header (codigo + nombre) y body (lista de campos)</td>
+</tr>
+<tr>
+<td>Header</td>
+<td>Badge con codigo de categoria + nombre del elemento (o placeholder si esta vacio)</td>
+</tr>
+<tr>
+<td>Campos fijos</td>
+<td>Se muestran con valores de ejemplo (ej: &quot;Bueno&quot; para estado, fecha actual para fecha alta)</td>
+</tr>
+<tr>
+<td>Campos adicionales</td>
+<td>Se agregan en tiempo real al escribir/eliminar campos. Tipo select muestra primera opcion, fecha muestra &quot;dd/mm/aaaa&quot;, numero muestra &quot;0&quot;, textarea muestra &quot;Texto...&quot;</td>
+</tr>
+<tr>
+<td>Divider</td>
+<td>Linea punteada separando campos fijos de adicionales</td>
+</tr>
+<tr>
+<td>Campo requerido</td>
+<td>Indicador &quot;*&quot; al lado del nombre</td>
+</tr>
+</tbody></table>
 <p><strong>Funcionamiento de campos adicionales:</strong></p>
-
 <table>
 <thead>
-<tr><th>Accion</th><th>Resultado</th></tr>
+<tr>
+<th>Accion</th>
+<th>Resultado</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Click "+ Agregar campo"</td><td>Agrega nueva fila con: nombre vacio, tipo "texto", sin opciones, no requerido</td></tr>
-<tr><td>Cambiar nombre</td><td>Se refleja inmediatamente en la vista previa</td></tr>
-<tr><td>Cambiar tipo</td><td>Se actualiza el placeholder en la vista previa</td></tr>
-<tr><td>Cambiar opciones (select)</td><td>La primera opcion se muestra como ejemplo en la vista previa</td></tr>
-<tr><td>Marcar requerido</td><td>Aparece "*" junto al nombre en la vista previa</td></tr>
-<tr><td>Eliminar campo</td><td>Se elimina de la lista y de la vista previa</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Click &quot;+ Agregar campo&quot;</td>
+<td>Agrega nueva fila con: nombre vacio, tipo &quot;texto&quot;, sin opciones, no requerido</td>
+</tr>
+<tr>
+<td>Cambiar nombre</td>
+<td>Se refleja inmediatamente en la vista previa</td>
+</tr>
+<tr>
+<td>Cambiar tipo</td>
+<td>Se actualiza el placeholder en la vista previa</td>
+</tr>
+<tr>
+<td>Cambiar opciones (select)</td>
+<td>La primera opcion se muestra como ejemplo en la vista previa</td>
+</tr>
+<tr>
+<td>Marcar requerido</td>
+<td>Aparece &quot;*&quot; junto al nombre en la vista previa</td>
+</tr>
+<tr>
+<td>Eliminar campo</td>
+<td>Se elimina de la lista y de la vista previa</td>
+</tr>
+</tbody></table>
 <p><strong>API calls al guardar:</strong></p>
 <ol>
 <li><code>POST /categorias/{id}/tipos</code> con <code>{ nombre }</code></li>
 <li>Por cada campo con nombre: <code>POST /categorias/{id}/campos</code> con <code>{ nombre, tipo, requerido, tipo_item_id, orden, opciones? }</code></li>
 </ol>
-
 <h3>7.3 Modales</h3>
-
 <table>
 <thead>
-<tr><th>Modal</th><th>Campos</th></tr>
+<tr>
+<th>Modal</th>
+<th>Campos</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Editar campo</td><td>Nombre, Tipo (select), Opciones (si select), Requerido (checkbox)</td></tr>
-<tr><td>Editar elemento</td><td>Nombre</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Editar campo</td>
+<td>Nombre, Tipo (select), Opciones (si select), Requerido (checkbox)</td>
+</tr>
+<tr>
+<td>Editar elemento</td>
+<td>Nombre</td>
+</tr>
+</tbody></table>
 <p><strong>API:</strong> GET/POST/PUT/DELETE para categorias, campos-dinamicos, tipos-item. Validacion de duplicados client-side.</p>
-
 <hr>
-
 <h2>8. Movimientos (<code>/movimientos</code>)</h2>
-
 <h3>8.1 Filtros</h3>
-
 <table>
 <thead>
-<tr><th>Filtro</th><th>Opciones</th></tr>
+<tr>
+<th>Filtro</th>
+<th>Opciones</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Tipo</td><td>Todos los tipos, Alta, Traslado, Baja</td></tr>
-<tr><td>Estado</td><td>Todos los estados, Pendiente, Aprobado, Rechazado</td></tr>
-</tbody>
-</table>
-
-<p>Contador: "{N} movimientos"</p>
-
+<tbody><tr>
+<td>Tipo</td>
+<td>Todos los tipos, Alta, Traslado, Baja</td>
+</tr>
+<tr>
+<td>Estado</td>
+<td>Todos los estados, Pendiente, Aprobado, Rechazado</td>
+</tr>
+</tbody></table>
+<p>Contador: &quot;{N} movimientos&quot;</p>
 <h3>8.2 Tabla de Movimientos</h3>
-
 <table>
 <thead>
-<tr><th>Columna</th><th>Contenido</th></tr>
+<tr>
+<th>Columna</th>
+<th>Contenido</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Fecha</td><td><code>m.created_at</code> formateada</td></tr>
-<tr><td>Tipo</td><td>Texto: "Traslado" / "Baja" / "Alta"</td></tr>
-<tr><td>Item</td><td><code>m.item.codigo_unico</code> (bold) + <code>m.item.tipo_item.nombre</code></td></tr>
-<tr><td>Origen -&gt; Destino</td><td>Unidad origen -&gt; destino + motivo + motivo_rechazo (si existe)</td></tr>
-<tr><td>Estado</td><td>Badge color-coded</td></tr>
-<tr><td>Solicitante</td><td><code>m.solicitante.name</code> + "validado por {validador}" si existe</td></tr>
-<tr><td>Acciones</td><td>Aprobar + Rechazar (solo si pendiente y puedeValidar)</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Fecha</td>
+<td><code>m.created_at</code> formateada</td>
+</tr>
+<tr>
+<td>Tipo</td>
+<td>Texto: &quot;Traslado&quot; / &quot;Baja&quot; / &quot;Alta&quot;</td>
+</tr>
+<tr>
+<td>Item</td>
+<td><code>m.item.codigo_unico</code> (bold) + <code>m.item.tipo_item.nombre</code></td>
+</tr>
+<tr>
+<td>Origen -&gt; Destino</td>
+<td>Unidad origen -&gt; destino + motivo + motivo_rechazo (si existe)</td>
+</tr>
+<tr>
+<td>Estado</td>
+<td>Badge color-coded</td>
+</tr>
+<tr>
+<td>Solicitante</td>
+<td><code>m.solicitante.name</code> + &quot;validado por {validador}&quot; si existe</td>
+</tr>
+<tr>
+<td>Acciones</td>
+<td>Aprobar + Rechazar (solo si pendiente y puedeValidar)</td>
+</tr>
+</tbody></table>
 <h3>8.3 Modal Nueva Solicitud</h3>
-
 <p>Componente: <code>Movimientos.jsx</code></p>
-
 <p><strong>Al abrir el modal:</strong></p>
 <ol>
 <li>Se cargan los movimientos pendientes del usuario actual (<code>GET /api/movimientos?estado=pendiente&amp;user_id={userId}</code>)</li>
 <li>Se extraen los <code>item_id</code> de los movimientos pendientes</li>
 <li>Se almacenan en <code>itemsConPendientes</code> para validacion</li>
 </ol>
-
 <table>
 <thead>
-<tr><th>Campo</th><th>Tipo</th><th>Notas</th></tr>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Notas</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Tipo</td><td><code>&lt;select&gt;</code></td><td>Alta, Traslado, Baja. Baja se selecciona automaticamente si unidad destino es "Baja administrativa".</td></tr>
-<tr><td>Item</td><td>Buscador con dropdown</td><td>Muestra resultados filtrados por codigo/nombre. <strong>Validacion</strong>: Si el item ya tiene movimiento pendiente, muestra tag "⚠ Pendiente" al lado. Si el item esta dado de baja (estado="baja"), bloquea la seleccion.</td></tr>
-<tr><td>Unidad destino</td><td><code>&lt;select&gt;</code></td><td>Solo si tipo = traslado. Si selecciona "Baja administrativa", cambia tipo a "baja" y deshabilita item (busca automaticamente).</td></tr>
-<tr><td>Motivo</td><td><code>&lt;textarea&gt;</code></td><td>Requerido. Placeholder: "Describa el motivo de la solicitud..."</td></tr>
-<tr><td>Imagen evidencia</td><td>Upload</td><td>Opcional. Boton de camara para upload.</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Tipo</td>
+<td><code>&lt;select&gt;</code></td>
+<td>Alta, Traslado, Baja. Baja se selecciona automaticamente si unidad destino es &quot;Baja administrativa&quot;.</td>
+</tr>
+<tr>
+<td>Item</td>
+<td>Buscador con dropdown</td>
+<td>Muestra resultados filtrados por codigo/nombre. <strong>Validacion</strong>: Si el item ya tiene movimiento pendiente, muestra tag &quot;⚠ Pendiente&quot; al lado. Si el item esta dado de baja (estado=&quot;baja&quot;), bloquea la seleccion.</td>
+</tr>
+<tr>
+<td>Unidad destino</td>
+<td><code>&lt;select&gt;</code></td>
+<td>Solo si tipo = traslado. Si selecciona &quot;Baja administrativa&quot;, cambia tipo a &quot;baja&quot; y deshabilita item (busca automaticamente).</td>
+</tr>
+<tr>
+<td>Motivo</td>
+<td><code>&lt;textarea&gt;</code></td>
+<td>Requerido. Placeholder: &quot;Describa el motivo de la solicitud...&quot;</td>
+</tr>
+<tr>
+<td>Imagen evidencia</td>
+<td>Upload</td>
+<td>Opcional. Boton de camara para upload.</td>
+</tr>
+</tbody></table>
 <p><strong>Logica de proteccion contra duplicados:</strong></p>
 <ul>
 <li>Al buscar items, se filtran los que tienen movimiento pendiente</li>
-<li>En los resultados, los items con pendiente muestran tag visual "⚠ Pendiente"</li>
+<li>En los resultados, los items con pendiente muestran tag visual &quot;⚠ Pendiente&quot;</li>
 <li>Al seleccionar un item con pendiente, se muestra un aviso amarillo con tipo de movimiento y solicitante</li>
-<li>Si el item ya tiene movimiento pendiente, el boton "Solicitar" se deshabilita</li>
+<li>Si el item ya tiene movimiento pendiente, el boton &quot;Solicitar&quot; se deshabilita</li>
 </ul>
-
 <p><strong>Botones:</strong> Cancelar, Solicitar.</p>
-
 <p><strong>API calls:</strong></p>
 <ol>
 <li><code>GET /api/movimientos?estado=pendiente&amp;user_id={userId}</code> (al abrir modal)</li>
 <li><code>GET /api/items?search={query}&amp;categoria_id={catId}&amp;page=1&amp;per_page=20</code> (busqueda)</li>
-<li><code>POST /api/movimientos</code> con <code>{ item_id, unidad_destino_id, tipo, descripcion, imagen_evidencia, usuario_id }</code> (al solicitar)
-<ul>
+<li><code>POST /api/movimientos</code> con <code>{ item_id, unidad_destino_id, tipo, descripcion, imagen_evidencia, usuario_id }</code> (al solicitar)<ul>
 <li>Server revalida que no exista movimiento pendiente para el item (validacion doble)</li>
 <li>Retorna 422 si ya existe un pendiente</li>
 </ul>
 </li>
 </ol>
-
 <h3>8.4 Modal Rechazar</h3>
-
 <table>
 <thead>
-<tr><th>Campo</th><th>Tipo</th></tr>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Motivo del rechazo</td><td><code>&lt;input&gt;</code> requerido</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Motivo del rechazo</td>
+<td><code>&lt;input&gt;</code> requerido</td>
+</tr>
+</tbody></table>
 <p><strong>Botones:</strong> Cancelar, Rechazar.</p>
-
 <p><strong>API:</strong></p>
 <ul>
 <li><code>POST /api/movimientos/traslados</code></li>
@@ -705,392 +1233,613 @@ strong{color:#1a202c}
 <li><code>POST /api/movimientos/:id/aprobar</code></li>
 <li><code>POST /api/movimientos/:id/rechazar</code></li>
 </ul>
-
 <hr>
-
 <h2>9. Alertas (<code>/alertas</code>)</h2>
-
 <h3>9.1 Filtros</h3>
-
 <table>
 <thead>
-<tr><th>Filtro</th><th>Opciones</th><th>Default</th></tr>
+<tr>
+<th>Filtro</th>
+<th>Opciones</th>
+<th>Default</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Estado</td><td>Todas, Abiertas, Cerradas</td><td>Abiertas</td></tr>
-</tbody>
-</table>
-
-<p>Contador: "{N} alertas"</p>
-
+<tbody><tr>
+<td>Estado</td>
+<td>Todas, Abiertas, Cerradas</td>
+<td>Abiertas</td>
+</tr>
+</tbody></table>
+<p>Contador: &quot;{N} alertas&quot;</p>
 <h3>9.2 Tabla de Alertas</h3>
-
 <table>
 <thead>
-<tr><th>Columna</th><th>Contenido</th></tr>
+<tr>
+<th>Columna</th>
+<th>Contenido</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Fecha</td><td><code>a.created_at</code> formateada</td></tr>
-<tr><td>Prioridad</td><td>Badge: critica (rojo), importante (naranja), informativa (azul)</td></tr>
-<tr><td>Mensaje</td><td><code>a.mensaje</code>. Si cerrada: "Cerrada: {fecha}" en texto small muted</td></tr>
-<tr><td>Item</td><td><code>a.item.codigo_unico</code> o "-"</td></tr>
-<tr><td>Estado</td><td>Badge: abierta/cerrada</td></tr>
-<tr><td>Acciones</td><td>"Cerrar" (solo si abierta y puedeGestionar)</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Fecha</td>
+<td><code>a.created_at</code> formateada</td>
+</tr>
+<tr>
+<td>Prioridad</td>
+<td>Badge: critica (rojo), importante (naranja), informativa (azul)</td>
+</tr>
+<tr>
+<td>Mensaje</td>
+<td><code>a.mensaje</code>. Si cerrada: &quot;Cerrada: {fecha}&quot; en texto small muted</td>
+</tr>
+<tr>
+<td>Item</td>
+<td><code>a.item.codigo_unico</code> o &quot;-&quot;</td>
+</tr>
+<tr>
+<td>Estado</td>
+<td>Badge: abierta/cerrada</td>
+</tr>
+<tr>
+<td>Acciones</td>
+<td>&quot;Cerrar&quot; (solo si abierta y puedeGestionar)</td>
+</tr>
+</tbody></table>
 <h3>9.3 Modal Nueva Alerta</h3>
-
 <table>
 <thead>
-<tr><th>Campo</th><th>Tipo</th><th>Notas</th></tr>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+<th>Notas</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Mensaje</td><td><code>&lt;input&gt;</code></td><td>Requerido. Placeholder: "Ej. Mantenimiento programado del equipo"</td></tr>
-<tr><td>Prioridad</td><td><code>&lt;select&gt;</code></td><td>Critica, Importante, Informativa</td></tr>
-<tr><td>Unidad</td><td><code>&lt;select&gt;</code></td><td>Unidades activas con sede</td></tr>
-<tr><td>Item</td><td><code>&lt;select&gt;</code></td><td>Opcional. Default: "Sin item asociado"</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Mensaje</td>
+<td><code>&lt;input&gt;</code></td>
+<td>Requerido. Placeholder: &quot;Ej. Mantenimiento programado del equipo&quot;</td>
+</tr>
+<tr>
+<td>Prioridad</td>
+<td><code>&lt;select&gt;</code></td>
+<td>Critica, Importante, Informativa</td>
+</tr>
+<tr>
+<td>Unidad</td>
+<td><code>&lt;select&gt;</code></td>
+<td>Unidades activas con sede</td>
+</tr>
+<tr>
+<td>Item</td>
+<td><code>&lt;select&gt;</code></td>
+<td>Opcional. Default: &quot;Sin item asociado&quot;</td>
+</tr>
+</tbody></table>
 <p><strong>Botones:</strong> Cancelar, Crear alerta.</p>
-
 <p><strong>API:</strong></p>
 <ul>
 <li><code>GET /api/alertas?estado=</code></li>
 <li><code>POST /api/alertas</code></li>
 <li><code>POST /api/alertas/:id/cerrar</code></li>
 </ul>
-
 <hr>
-
 <h2>10. Reportes (<code>/reportes</code>)</h2>
-
 <h3>10.1 Botones de Exportacion</h3>
-
 <table>
 <thead>
-<tr><th>Boton</th><th>Formato</th><th>Filename</th></tr>
+<tr>
+<th>Boton</th>
+<th>Formato</th>
+<th>Filename</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Formato Oficial</td><td><code>.xlsx</code> (10 hojas, formato institucional ISeP)</td><td><code>inventario-YYYY-MM-DD.xlsx</code></td></tr>
-<tr><td>Excel</td><td><code>.xlsx</code> (multi-hoja por categoria)</td><td><code>inventario-YYYY-MM-DD.xlsx</code></td></tr>
-<tr><td>CSV</td><td><code>.csv</code> (UTF-8 BOM, delimitador ;)</td><td><code>inventario-YYYY-MM-DD.csv</code></td></tr>
-<tr><td>PDF</td><td><code>.pdf</code> (A4 landscape, autoTable)</td><td><code>inventario-YYYY-MM-DD.pdf</code></td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Formato Oficial</td>
+<td><code>.xlsx</code> (10 hojas, formato institucional ISeP)</td>
+<td><code>inventario-YYYY-MM-DD.xlsx</code></td>
+</tr>
+<tr>
+<td>Excel</td>
+<td><code>.xlsx</code> (multi-hoja por categoria)</td>
+<td><code>inventario-YYYY-MM-DD.xlsx</code></td>
+</tr>
+<tr>
+<td>CSV</td>
+<td><code>.csv</code> (UTF-8 BOM, delimitador ;)</td>
+<td><code>inventario-YYYY-MM-DD.csv</code></td>
+</tr>
+<tr>
+<td>PDF</td>
+<td><code>.pdf</code> (A4 landscape, autoTable)</td>
+<td><code>inventario-YYYY-MM-DD.pdf</code></td>
+</tr>
+</tbody></table>
 <h3>10.2 Formato Oficial (exportarFormatoOficial.js)</h3>
-
 <p>Genera archivo <code>.xlsx</code> con 10 hojas siguiendo el formato institucional del ISeP.</p>
-
 <p><strong>Estructura por hoja (4 filas de encabezado + datos):</strong></p>
 <ul>
 <li>Fila 1: Titulo de la hoja (merged, estilo bold 16pt)</li>
-<li>Fila 2: "DEPENDENCIA: Division Secretaria General, sede Rosario."</li>
-<li>Fila 3: "DIRECCION / UNIDAD REGIONAL: I.Se.P."</li>
+<li>Fila 2: &quot;DEPENDENCIA: Division Secretaria General, sede Rosario.&quot;</li>
+<li>Fila 3: &quot;DIRECCION / UNIDAD REGIONAL: I.Se.P.&quot;</li>
 <li>Fila 4: Encabezados de columnas (fondo azul #1F4E79, texto blanco bold, auto-filter)</li>
 </ul>
-
 <p><strong>Hoja: A1 - Amoblamiento y Utiles</strong></p>
-
 <table>
 <thead>
-<tr><th>Columna</th><th>Fuente</th></tr>
+<tr>
+<th>Columna</th>
+<th>Fuente</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Codigo del item</td><td><code>item.codigo_unico</code></td></tr>
-<tr><td>Elemento</td><td><code>item.tipo_item.nombre</code></td></tr>
-<tr><td>Detalle del elemento</td><td><code>item.valores_dinamicos.campo_1</code></td></tr>
-<tr><td>Cantidad</td><td><code>item.cantidad</code></td></tr>
-<tr><td>Estado de conservacion</td><td><code>item.estado_conservacion</code></td></tr>
-<tr><td>Marca</td><td><code>item.valores_dinamicos.campo_2</code></td></tr>
-<tr><td>Modelo</td><td><code>item.valores_dinamicos.campo_3</code></td></tr>
-<tr><td>Nro. Serie</td><td><code>item.valores_dinamicos.campo_4</code></td></tr>
-<tr><td>Fecha de alta</td><td><code>item.fecha_alta</code></td></tr>
-<tr><td>Unidad de destino</td><td><code>item.unidad.nombre</code></td></tr>
-<tr><td>Sede</td><td><code>item.unidad.sede.nombre</code></td></tr>
-<tr><td>Estado</td><td><code>item.estado</code></td></tr>
-<tr><td>Observaciones</td><td>"Activo" o <code>item.motivo_baja</code> si estado=baja</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Codigo del item</td>
+<td><code>item.codigo_unico</code></td>
+</tr>
+<tr>
+<td>Elemento</td>
+<td><code>item.tipo_item.nombre</code></td>
+</tr>
+<tr>
+<td>Detalle del elemento</td>
+<td><code>item.valores_dinamicos.campo_1</code></td>
+</tr>
+<tr>
+<td>Cantidad</td>
+<td><code>item.cantidad</code></td>
+</tr>
+<tr>
+<td>Estado de conservacion</td>
+<td><code>item.estado_conservacion</code></td>
+</tr>
+<tr>
+<td>Marca</td>
+<td><code>item.valores_dinamicos.campo_2</code></td>
+</tr>
+<tr>
+<td>Modelo</td>
+<td><code>item.valores_dinamicos.campo_3</code></td>
+</tr>
+<tr>
+<td>Nro. Serie</td>
+<td><code>item.valores_dinamicos.campo_4</code></td>
+</tr>
+<tr>
+<td>Fecha de alta</td>
+<td><code>item.fecha_alta</code></td>
+</tr>
+<tr>
+<td>Unidad de destino</td>
+<td><code>item.unidad.nombre</code></td>
+</tr>
+<tr>
+<td>Sede</td>
+<td><code>item.unidad.sede.nombre</code></td>
+</tr>
+<tr>
+<td>Estado</td>
+<td><code>item.estado</code></td>
+</tr>
+<tr>
+<td>Observaciones</td>
+<td>&quot;Activo&quot; o <code>item.motivo_baja</code> si estado=baja</td>
+</tr>
+</tbody></table>
 <p><strong>Hojas: A2, A3, A4, A5, A6</strong> — Mismas columnas, filtradas por <code>categoria_id</code> correspondiente (2, 3, 4, 5, 6).</p>
-
 <p><strong>Hoja: A7 - Altas</strong></p>
 <ul>
-<li>Fuente: Items con <code>estado='activo'</code> (no movimientos)</li>
+<li>Fuente: Items con <code>estado=&#39;activo&#39;</code> (no movimientos)</li>
 <li>Columnas: Fecha, Codigo del item, Elemento, Detalle, Cantidad, Estado conservacion, Marca, Modelo, Nro. Serie, Unidad de destino, Sede, Observaciones</li>
 </ul>
-
 <p><strong>Hoja: A8 - Bajas</strong></p>
 <ul>
-<li>Fuente: Items con <code>estado='baja'</code></li>
+<li>Fuente: Items con <code>estado=&#39;baja&#39;</code></li>
 <li>Columnas: Fecha de baja, Codigo del item, Elemento, Detalle, Cantidad, Estado conservacion, Marca, Modelo, Nro. Serie, Unidad de destino, Sede, Motivo de baja, Observaciones</li>
 </ul>
-
 <p><strong>Hojas: B1 y B2</strong> — Solo encabezados (sin datos).</p>
-
 <h3>10.3 API Backend</h3>
-
 <ul>
 <li><code>GET /api/reportes/items</code> — Retorna todos los items con eager-loading: <code>categoria</code>, <code>tipoItem</code>, <code>unidad</code>, <code>unidad.sede</code>, <code>categoriaOriginal</code>, <code>responsable</code>, <code>campoDinamico</code> (valores), <code>responsableAsignado</code></li>
 <li><code>GET /api/reportes/resumen</code> — Estadisticas: items activos, items por categoria, por conservacion, por sede, por unidad, por elemento, movimientos por mes</li>
 </ul>
-
 <h3>10.4 Changelog v1.2 (31 agosto 2026)</h3>
-
 <ul>
 <li>Added Formato Oficial export (10 sheets, institutional ISeP format)</li>
 <li>Added duplicate movement prevention in Movimientos (step 8.3)</li>
 <li>Added NuevoElementoWizard 2-step flow (step 7.3)</li>
 </ul>
-
 <h3>10.2 Tablas de Resumen</h3>
-
 <table>
 <thead>
-<tr><th>Tabla</th><th>Columnas</th></tr>
+<tr>
+<th>Tabla</th>
+<th>Columnas</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Items activos por categoria</td><td>Codigo, Categoria, Items</td></tr>
-<tr><td>Items por estado de conservacion</td><td>Estado, Items</td></tr>
-<tr><td>Items activos por sede</td><td>Sede, Items</td></tr>
-<tr><td>Items activos por unidad de destino</td><td>Unidad, Sede, Items</td></tr>
-<tr><td>Items activos por elemento</td><td>Elemento, Items</td></tr>
-<tr><td>Movimientos por mes (ultimos 6)</td><td>Mes, Tipo, Cantidad</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Items activos por categoria</td>
+<td>Codigo, Categoria, Items</td>
+</tr>
+<tr>
+<td>Items por estado de conservacion</td>
+<td>Estado, Items</td>
+</tr>
+<tr>
+<td>Items activos por sede</td>
+<td>Sede, Items</td>
+</tr>
+<tr>
+<td>Items activos por unidad de destino</td>
+<td>Unidad, Sede, Items</td>
+</tr>
+<tr>
+<td>Items activos por elemento</td>
+<td>Elemento, Items</td>
+</tr>
+<tr>
+<td>Movimientos por mes (ultimos 6)</td>
+<td>Mes, Tipo, Cantidad</td>
+</tr>
+</tbody></table>
 <p><strong>API:</strong> <code>GET /api/reportes/resumen</code>, <code>GET /api/reportes/items</code></p>
-
 <hr>
-
 <h2>11. Auditoria (<code>/auditoria</code>)</h2>
-
 <h3>11.1 Filtros</h3>
-
 <table>
 <thead>
-<tr><th>Filtro</th><th>Opciones</th></tr>
+<tr>
+<th>Filtro</th>
+<th>Opciones</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Entidad</td><td>Todas, auth, item, categoria, tipo_item, campo_dinamico, movimiento</td></tr>
-<tr><td>Accion</td><td>Todas, login, crear, editar, eliminar, mover, solicitar, aprobar, rechazar</td></tr>
-</tbody>
-</table>
-
-<p>Contador: "{N} registros"</p>
-
+<tbody><tr>
+<td>Entidad</td>
+<td>Todas, auth, item, categoria, tipo_item, campo_dinamico, movimiento</td>
+</tr>
+<tr>
+<td>Accion</td>
+<td>Todas, login, crear, editar, eliminar, mover, solicitar, aprobar, rechazar</td>
+</tr>
+</tbody></table>
+<p>Contador: &quot;{N} registros&quot;</p>
 <h3>11.2 Tabla de Auditoria</h3>
-
 <table>
 <thead>
-<tr><th>Columna</th><th>Contenido</th></tr>
+<tr>
+<th>Columna</th>
+<th>Contenido</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Fecha</td><td><code>log.created_at</code> formateada</td></tr>
-<tr><td>Usuario</td><td><code>log.user.name</code></td></tr>
-<tr><td>Accion</td><td>Badge color-coded: login (azul), crear (verde), editar (naranja), eliminar (rojo), mover (gris), solicitar (azul), aprobar (verde), rechazar (rojo)</td></tr>
-<tr><td>Entidad</td><td><code>log.entidad</code></td></tr>
-<tr><td>Detalle</td><td>Pares clave:valor separados por " . "</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Fecha</td>
+<td><code>log.created_at</code> formateada</td>
+</tr>
+<tr>
+<td>Usuario</td>
+<td><code>log.user.name</code></td>
+</tr>
+<tr>
+<td>Accion</td>
+<td>Badge color-coded: login (azul), crear (verde), editar (naranja), eliminar (rojo), mover (gris), solicitar (azul), aprobar (verde), rechazar (rojo)</td>
+</tr>
+<tr>
+<td>Entidad</td>
+<td><code>log.entidad</code></td>
+</tr>
+<tr>
+<td>Detalle</td>
+<td>Pares clave:valor separados por &quot; . &quot;</td>
+</tr>
+</tbody></table>
 <h3>11.3 Exportacion</h3>
-
 <table>
 <thead>
-<tr><th>Boton</th><th>Formato</th><th>Comportamiento</th></tr>
+<tr>
+<th>Boton</th>
+<th>Formato</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Excel</td><td><code>.xlsx</code></td><td>Exporta TODAS las paginas. Hoja "Auditoria". Filename: <code>auditoria-YYYY-MM-DD.xlsx</code></td></tr>
-<tr><td>JSON</td><td><code>.json</code></td><td>Exporta TODAS las paginas. Filename: <code>auditoria-YYYY-MM-DD.json</code></td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Excel</td>
+<td><code>.xlsx</code></td>
+<td>Exporta TODAS las paginas. Hoja &quot;Auditoria&quot;. Filename: <code>auditoria-YYYY-MM-DD.xlsx</code></td>
+</tr>
+<tr>
+<td>JSON</td>
+<td><code>.json</code></td>
+<td>Exporta TODAS las paginas. Filename: <code>auditoria-YYYY-MM-DD.json</code></td>
+</tr>
+</tbody></table>
 <p><strong>API:</strong> <code>GET /api/auditoria?entidad=&amp;accion=&amp;page=</code></p>
-
 <hr>
-
 <h2>12. Sedes y Unidades (<code>/unidades</code>)</h2>
-
 <h3>12.1 Panel Admin (solo admin)</h3>
-
 <p>Dos columnas:</p>
-
 <p><strong>Izquierda: Sedes</strong></p>
-
 <table>
 <thead>
-<tr><th>Elemento</th><th>Comportamiento</th></tr>
+<tr>
+<th>Elemento</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Cards de sede</td><td>Nombre editable (input inline, guarda en blur via PUT). Meta: "IdSede XX . N unidades". Botones: Desactivar/Activar, Eliminar.</td></tr>
-<tr><td>Form nueva sede</td><td>Input nombre + boton "+ Agregar sede"</td></tr>
-<tr><td>Eliminar sede</td><td>Bloqueado si tiene unidades asociadas</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Cards de sede</td>
+<td>Nombre editable (input inline, guarda en blur via PUT). Meta: &quot;IdSede XX . N unidades&quot;. Botones: Desactivar/Activar, Eliminar.</td>
+</tr>
+<tr>
+<td>Form nueva sede</td>
+<td>Input nombre + boton &quot;+ Agregar sede&quot;</td>
+</tr>
+<tr>
+<td>Eliminar sede</td>
+<td>Bloqueado si tiene unidades asociadas</td>
+</tr>
+</tbody></table>
 <p><strong>Derecha: Nueva Unidad</strong></p>
-
 <table>
 <thead>
-<tr><th>Campo</th><th>Tipo</th></tr>
+<tr>
+<th>Campo</th>
+<th>Tipo</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Nombre</td><td><code>&lt;input&gt;</code></td></tr>
-<tr><td>Sede</td><td><code>&lt;select&gt;</code> (solo activas)</td></tr>
-</tbody>
-</table>
-
-<p>Boton: "+ Crear unidad"</p>
-
+<tbody><tr>
+<td>Nombre</td>
+<td><code>&lt;input&gt;</code></td>
+</tr>
+<tr>
+<td>Sede</td>
+<td><code>&lt;select&gt;</code> (solo activas)</td>
+</tr>
+</tbody></table>
+<p>Boton: &quot;+ Crear unidad&quot;</p>
 <h3>12.2 Filtros</h3>
-
 <table>
 <thead>
-<tr><th>Filtro</th><th>Comportamiento</th></tr>
+<tr>
+<th>Filtro</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Busqueda</td><td>Filtra por nombre de unidad o sede</td></tr>
-<tr><td>Ver desactivadas</td><td>Checkbox. Default: no muestra inactivas</td></tr>
-</tbody>
-</table>
-
-<p>Contador: "{N} unidades"</p>
-
+<tbody><tr>
+<td>Busqueda</td>
+<td>Filtra por nombre de unidad o sede</td>
+</tr>
+<tr>
+<td>Ver desactivadas</td>
+<td>Checkbox. Default: no muestra inactivas</td>
+</tr>
+</tbody></table>
+<p>Contador: &quot;{N} unidades&quot;</p>
 <h3>12.3 Grid de Unidades</h3>
-
 <p>Cards en grid auto-fill (min 280px):</p>
-
 <table>
 <thead>
-<tr><th>Parte</th><th>Contenido</th></tr>
+<tr>
+<th>Parte</th>
+<th>Contenido</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Header</td><td>ID badge (2 digitos, fondo azul) + nombre sede</td></tr>
-<tr><td>Body</td><td>Nombre editable (input inline), Sede select (cambia sede en onChange)</td></tr>
-<tr><td>Footer</td><td>Desactivar/Activar, Eliminar (con confirmacion)</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>Header</td>
+<td>ID badge (2 digitos, fondo azul) + nombre sede</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Nombre editable (input inline), Sede select (cambia sede en onChange)</td>
+</tr>
+<tr>
+<td>Footer</td>
+<td>Desactivar/Activar, Eliminar (con confirmacion)</td>
+</tr>
+</tbody></table>
 <p>Inactivas: opacity 0.55.</p>
-
 <p><strong>API:</strong> GET/POST/PUT/DELETE para sedes y unidades.</p>
-
 <hr>
-
 <h2>13. Componentes Reutilizables</h2>
-
 <h3>13.1 Modal</h3>
-
 <table>
 <thead>
-<tr><th>Prop</th><th>Tipo</th><th>Default</th><th>Comportamiento</th></tr>
+<tr>
+<th>Prop</th>
+<th>Tipo</th>
+<th>Default</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>open</td><td>boolean</td><td>-</td><td>Si false, no renderiza nada</td></tr>
-<tr><td>title</td><td>string</td><td>-</td><td>Titulo en header del modal</td></tr>
-<tr><td>onClose</td><td>function</td><td>-</td><td>Callback al cerrar</td></tr>
-<tr><td>children</td><td>ReactNode</td><td>-</td><td>Contenido del modal</td></tr>
-<tr><td>wide</td><td>boolean</td><td>false</td><td>Si true, max-width 760px (default 520px)</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>open</td>
+<td>boolean</td>
+<td>-</td>
+<td>Si false, no renderiza nada</td>
+</tr>
+<tr>
+<td>title</td>
+<td>string</td>
+<td>-</td>
+<td>Titulo en header del modal</td>
+</tr>
+<tr>
+<td>onClose</td>
+<td>function</td>
+<td>-</td>
+<td>Callback al cerrar</td>
+</tr>
+<tr>
+<td>children</td>
+<td>ReactNode</td>
+<td>-</td>
+<td>Contenido del modal</td>
+</tr>
+<tr>
+<td>wide</td>
+<td>boolean</td>
+<td>false</td>
+<td>Si true, max-width 760px (default 520px)</td>
+</tr>
+</tbody></table>
 <p><strong>Comportamiento:</strong> Cierra con Escape, click en overlay, o boton X. Bloquea scroll del body.</p>
-
 <h3>13.2 Pagination</h3>
-
 <table>
 <thead>
-<tr><th>Prop</th><th>Tipo</th><th>Comportamiento</th></tr>
+<tr>
+<th>Prop</th>
+<th>Tipo</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>page</td><td>number</td><td>Pagina actual</td></tr>
-<tr><td>lastPage</td><td>number</td><td>Total de paginas</td></tr>
-<tr><td>onPageChange</td><td>function</td><td>Callback con nuevo numero de pagina</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>page</td>
+<td>number</td>
+<td>Pagina actual</td>
+</tr>
+<tr>
+<td>lastPage</td>
+<td>number</td>
+<td>Total de paginas</td>
+</tr>
+<tr>
+<td>onPageChange</td>
+<td>function</td>
+<td>Callback con nuevo numero de pagina</td>
+</tr>
+</tbody></table>
 <p>Oculta si <code>lastPage &lt;= 1</code>.</p>
-
 <h3>13.3 EmptyState</h3>
-
 <table>
 <thead>
-<tr><th>Prop</th><th>Tipo</th><th>Opciones</th></tr>
+<tr>
+<th>Prop</th>
+<th>Tipo</th>
+<th>Opciones</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>icon</td><td>string</td><td>"search", "inventory", "alert", "box"</td></tr>
-<tr><td>title</td><td>string</td><td>Titulo principal</td></tr>
-<tr><td>description</td><td>string</td><td>Texto descriptivo</td></tr>
-<tr><td>action</td><td>ReactNode</td><td>Slot para boton u otro elemento</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>icon</td>
+<td>string</td>
+<td>&quot;search&quot;, &quot;inventory&quot;, &quot;alert&quot;, &quot;box&quot;</td>
+</tr>
+<tr>
+<td>title</td>
+<td>string</td>
+<td>Titulo principal</td>
+</tr>
+<tr>
+<td>description</td>
+<td>string</td>
+<td>Texto descriptivo</td>
+</tr>
+<tr>
+<td>action</td>
+<td>ReactNode</td>
+<td>Slot para boton u otro elemento</td>
+</tr>
+</tbody></table>
 <h3>13.4 Skeleton</h3>
-
 <table>
 <thead>
-<tr><th>Prop</th><th>Tipo</th><th>Comportamiento</th></tr>
+<tr>
+<th>Prop</th>
+<th>Tipo</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>type</td><td>string</td><td>"table" o "card"</td></tr>
-<tr><td>rows</td><td>number</td><td>Numero de filas placeholder</td></tr>
-<tr><td>cols</td><td>number</td><td>Solo para type="table"</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>type</td>
+<td>string</td>
+<td>&quot;table&quot; o &quot;card&quot;</td>
+</tr>
+<tr>
+<td>rows</td>
+<td>number</td>
+<td>Numero de filas placeholder</td>
+</tr>
+<tr>
+<td>cols</td>
+<td>number</td>
+<td>Solo para type=&quot;table&quot;</td>
+</tr>
+</tbody></table>
 <p>Animacion pulse: opacidad 0.45 -&gt; 0.8 en 1.4s.</p>
-
 <h3>13.5 Aviso (Error Banner)</h3>
-
 <table>
 <thead>
-<tr><th>Prop</th><th>Tipo</th><th>Comportamiento</th></tr>
+<tr>
+<th>Prop</th>
+<th>Tipo</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>mensaje</td><td>string</td><td>Texto a mostrar. Si vacio, no renderiza nada.</td></tr>
-<tr><td>onCerrar</td><td>function</td><td>Callback para cerrar. Se cierra automaticamente en 5 segundos.</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>mensaje</td>
+<td>string</td>
+<td>Texto a mostrar. Si vacio, no renderiza nada.</td>
+</tr>
+<tr>
+<td>onCerrar</td>
+<td>function</td>
+<td>Callback para cerrar. Se cierra automaticamente en 5 segundos.</td>
+</tr>
+</tbody></table>
 <h3>13.6 Image</h3>
-
 <table>
 <thead>
-<tr><th>Prop</th><th>Tipo</th><th>Comportamiento</th></tr>
+<tr>
+<th>Prop</th>
+<th>Tipo</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>src</td><td>string</td><td>URL de imagen</td></tr>
-<tr><td>alt</td><td>string</td><td>Texto alternativo</td></tr>
-<tr><td>loading</td><td>string</td><td>Default: "lazy"</td></tr>
-<tr><td>fallback</td><td>ReactNode</td><td>Contenido a mostrar en error</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>src</td>
+<td>string</td>
+<td>URL de imagen</td>
+</tr>
+<tr>
+<td>alt</td>
+<td>string</td>
+<td>Texto alternativo</td>
+</tr>
+<tr>
+<td>loading</td>
+<td>string</td>
+<td>Default: &quot;lazy&quot;</td>
+</tr>
+<tr>
+<td>fallback</td>
+<td>ReactNode</td>
+<td>Contenido a mostrar en error</td>
+</tr>
+</tbody></table>
 <p>Transicion de opacidad 0 -&gt; 1 al cargar.</p>
-
 <hr>
-
 <h2>14. Sistema de Notificaciones (Toast)</h2>
-
 <h3>API</h3>
-
 <table>
 <thead>
-<tr><th>Metodo</th><th>Parametro</th><th>Comportamiento</th></tr>
+<tr>
+<th>Metodo</th>
+<th>Parametro</th>
+<th>Comportamiento</th>
+</tr>
 </thead>
-<tbody>
-<tr><td><code>toast.success(message)</code></td><td>string</td><td>Toast verde, auto-dismiss 3500ms</td></tr>
-<tr><td><code>toast.error(message)</code></td><td>string</td><td>Toast rojo, auto-dismiss 3500ms</td></tr>
-<tr><td><code>toast.info(message)</code></td><td>string</td><td>Toast azul, auto-dismiss 3500ms</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td><code>toast.success(message)</code></td>
+<td>string</td>
+<td>Toast verde, auto-dismiss 3500ms</td>
+</tr>
+<tr>
+<td><code>toast.error(message)</code></td>
+<td>string</td>
+<td>Toast rojo, auto-dismiss 3500ms</td>
+</tr>
+<tr>
+<td><code>toast.info(message)</code></td>
+<td>string</td>
+<td>Toast azul, auto-dismiss 3500ms</td>
+</tr>
+</tbody></table>
 <h3>Posicionamiento</h3>
-
 <ul>
 <li>Desktop: fijo arriba-derecha</li>
 <li>Mobile: fijo abajo</li>
@@ -1098,79 +1847,255 @@ strong{color:#1a202c}
 <li>Animacion: slide-in desde la derecha (0.3s)</li>
 <li>Stack vertical con gap 8px</li>
 </ul>
-
 <hr>
-
 <h2>15. Sistema de Temas</h2>
-
 <h3>Dark (default)</h3>
-
 <table>
 <thead>
-<tr><th>Variable</th><th>Valor</th></tr>
+<tr>
+<th>Variable</th>
+<th>Valor</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>--color-text</td><td>#e8ecf1</td></tr>
-<tr><td>--color-bg</td><td>#1a1f2b</td></tr>
-<tr><td>--color-white</td><td>#232937</td></tr>
-<tr><td>--color-border</td><td>#3a4150</td></tr>
-<tr><td>--shadow</td><td>0 1px 3px rgba(0,0,0,0.4)</td></tr>
-</tbody>
-</table>
-
+<tbody><tr>
+<td>--color-text</td>
+<td>#e8ecf1</td>
+</tr>
+<tr>
+<td>--color-bg</td>
+<td>#1a1f2b</td>
+</tr>
+<tr>
+<td>--color-white</td>
+<td>#232937</td>
+</tr>
+<tr>
+<td>--color-border</td>
+<td>#3a4150</td>
+</tr>
+<tr>
+<td>--shadow</td>
+<td>0 1px 3px rgba(0,0,0,0.4)</td>
+</tr>
+</tbody></table>
 <h3>Light</h3>
-
 <table>
 <thead>
-<tr><th>Variable</th><th>Valor</th></tr>
+<tr>
+<th>Variable</th>
+<th>Valor</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>--color-text</td><td>#1a202c</td></tr>
-<tr><td>--color-bg</td><td>#f7fafc</td></tr>
-<tr><td>--color-white</td><td>#ffffff</td></tr>
-<tr><td>--color-border</td><td>#e2e8f0</td></tr>
-<tr><td>--shadow</td><td>0 1px 3px rgba(0,0,0,0.1)</td></tr>
-</tbody>
-</table>
-
-<p>Se aplica via <code>data-theme="light"</code> en <code>&lt;html&gt;</code>. Persistido en <code>localStorage.sagi_theme</code>.</p>
-
+<tbody><tr>
+<td>--color-text</td>
+<td>#1a202c</td>
+</tr>
+<tr>
+<td>--color-bg</td>
+<td>#f7fafc</td>
+</tr>
+<tr>
+<td>--color-white</td>
+<td>#ffffff</td>
+</tr>
+<tr>
+<td>--color-border</td>
+<td>#e2e8f0</td>
+</tr>
+<tr>
+<td>--shadow</td>
+<td>0 1px 3px rgba(0,0,0,0.1)</td>
+</tr>
+</tbody></table>
+<p>Se aplica via <code>data-theme=&quot;light&quot;</code> en <code>&lt;html&gt;</code>. Persistido en <code>localStorage.sagi_theme</code>.</p>
 <hr>
-
 <h2>16. Matriz de Permisos por Rol</h2>
-
 <table>
 <thead>
-<tr><th>Funcionalidad</th><th>admin</th><th>jefe</th><th>carga</th><th>consulta</th></tr>
+<tr>
+<th>Funcionalidad</th>
+<th>admin</th>
+<th>jefe</th>
+<th>carga</th>
+<th>consulta</th>
+</tr>
 </thead>
-<tbody>
-<tr><td>Ver Dashboard</td><td>Si</td><td>Si</td><td>Si</td><td>Si</td></tr>
-<tr><td>Ver Inventario</td><td>Si</td><td>Si</td><td>Si</td><td>Si</td></tr>
-<tr><td>Registrar item (alta)</td><td>Si</td><td>Si</td><td>Si</td><td>No</td></tr>
-<tr><td>Editar item</td><td>Si</td><td>Si</td><td>Si</td><td>No</td></tr>
-<tr><td>Eliminar item</td><td>Si</td><td>Si</td><td>Si</td><td>No</td></tr>
-<tr><td>Ver detalle item</td><td>Si</td><td>Si</td><td>Si</td><td>Si</td></tr>
-<tr><td>Ver motivo baja</td><td>Si</td><td>Si</td><td>No</td><td>No</td></tr>
-<tr><td>Reactivar item</td><td>Si</td><td>Si</td><td>No</td><td>No</td></tr>
-<tr><td>Ver Categorias</td><td>Si</td><td>No</td><td>No</td><td>No</td></tr>
-<tr><td>Gestionar Categorias</td><td>Si</td><td>No</td><td>No</td><td>No</td></tr>
-<tr><td>Ver Sedes/Unidades</td><td>Si</td><td>No</td><td>No</td><td>No</td></tr>
-<tr><td>Gestionar Sedes/Unidades</td><td>Si</td><td>No</td><td>No</td><td>No</td></tr>
-<tr><td>Ver Movimientos</td><td>Si</td><td>Si</td><td>Si</td><td>No</td></tr>
-<tr><td>Solicitar movimiento</td><td>Si</td><td>Si</td><td>Si</td><td>No</td></tr>
-<tr><td>Aprobar/Rechazar movimiento</td><td>Si</td><td>Si</td><td>No</td><td>No</td></tr>
-<tr><td>Ver Reportes</td><td>Si</td><td>Si</td><td>No</td><td>No</td></tr>
-<tr><td>Exportar Reportes</td><td>Si</td><td>Si</td><td>No</td><td>No</td></tr>
-<tr><td>Ver Alertas</td><td>Si</td><td>Si</td><td>Si</td><td>No</td></tr>
-<tr><td>Crear alerta</td><td>Si</td><td>Si</td><td>No</td><td>No</td></tr>
-<tr><td>Cerrar alerta</td><td>Si</td><td>Si</td><td>No</td><td>No</td></tr>
-<tr><td>Ver Auditoria</td><td>Si</td><td>Si</td><td>No</td><td>No</td></tr>
-<tr><td>Exportar Auditoria</td><td>Si</td><td>Si</td><td>No</td><td>No</td></tr>
-<tr><td>Cambiar contrasena</td><td>Si</td><td>Si</td><td>Si</td><td>Si</td></tr>
-<tr><td>Cambiar tema</td><td>Si</td><td>Si</td><td>Si</td><td>Si</td></tr>
-<tr><td>Cerrar sesion</td><td>Si</td><td>Si</td><td>Si</td><td>Si</td></tr>
-</tbody>
-</table>
+<tbody><tr>
+<td>Ver Dashboard</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+</tr>
+<tr>
+<td>Ver Inventario</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+</tr>
+<tr>
+<td>Registrar item (alta)</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Editar item</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Eliminar item</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Ver detalle item</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+</tr>
+<tr>
+<td>Ver motivo baja</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Reactivar item</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Ver Categorias</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Gestionar Categorias</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Ver Sedes/Unidades</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Gestionar Sedes/Unidades</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Ver Movimientos</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Solicitar movimiento</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Aprobar/Rechazar movimiento</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Ver Reportes</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Exportar Reportes</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Ver Alertas</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Crear alerta</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Cerrar alerta</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Ver Auditoria</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Exportar Auditoria</td>
+<td>Si</td>
+<td>Si</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Cambiar contrasena</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+</tr>
+<tr>
+<td>Cambiar tema</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+</tr>
+<tr>
+<td>Cerrar sesion</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+<td>Si</td>
+</tr>
+</tbody></table>
 
 </body>
 </html>

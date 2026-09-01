@@ -83,8 +83,8 @@ export default function Layout({ title, actions, children, back }) {
 
   useEffect(() => {
     if (hasAccess(user, ['admin', 'jefe', 'carga'])) {
-      api.get('/alerts?status=abierta')
-        .then((res) => setAlertCount(res.data?.length ?? 0))
+      api.get('/alertas?estado=abierta')
+        .then((res) => setAlertCount(Array.isArray(res.data) ? res.data.length : (res.data?.data?.length ?? res.data?.alertas?.length ?? 0)))
         .catch(() => {})
     }
   }, [user, location.pathname])

@@ -307,9 +307,10 @@ Los movimientos registran los cambios de ubicación o estado de los ítems.
 
 | Tipo | Descripción |
 |------|-------------|
-| Alta | Registro inicial de un ítem |
 | Traslado | Cambio de unidad de destino |
 | Baja | Retiro del inventario |
+
+**Nota:** El alta de ítems se realiza desde **Inventario > Registrar alta**.
 
 ### 7.2 Ver Lista de Movimientos
 
@@ -317,13 +318,13 @@ Haga clic en **"Movimientos"** en el menú lateral.
 
 | Filtro | Opciones |
 |--------|----------|
-| Tipo | Alta, Traslado, Baja |
+| Tipo | Traslado, Baja |
 | Estado | Pendiente, Aprobado, Rechazado |
 
 | Columna | Descripción |
 |---------|-------------|
 | Fecha | Fecha del movimiento |
-| Tipo | Alta, Traslado o Baja |
+| Tipo | Traslado o Baja |
 | Ítem | Código del ítem afectado |
 | Origen → Destino | Unidades involucradas |
 | Estado | Pendiente, Aprobado o Rechazado |
@@ -349,7 +350,7 @@ Haga clic en **"Movimientos"** en el menú lateral.
 4. Ingrese el **motivo**
 5. Haga clic en **"Solicitar"**
 
-**Nota:** La baja tiene prioridad crítica.
+**Nota:** La baja tiene prioridad crítica. La solicitud de baja generará una alerta automáticamente para que un administrador o jefe la revise y apruebe.
 
 ### 7.5 Protección contra movimientos duplicados
 
@@ -747,16 +748,21 @@ Los ítems se muestran 25 por página (configurable: 10/25/50). Use "Anterior" y
 - **Vista previa**: Layout de dos columnas con tarjeta que muestra cómo quedará el elemento mientras se configura
 - **Campos fijos visibles**: Se muestran los campos que ya existen en el formulario de alta
 
-#### Movimientos - Protección contra duplicados
-- **Detección de pendientes**: Al buscar un ítem, se verifican movimientos pendientes
+#### Movimientos
+- **Protección contra duplicados**: Detección de movimientos pendientes por ítem
 - **Tag visual**: Ítems con movimiento pendiente muestran "⚠ Pendiente" en los resultados de búsqueda
-- **Aviso preventivo**: Al seleccionar un ítem con pendiente, se muestra aviso amarillo con detalles
 - **Bloqueo de submit**: No se puede crear un movimiento si ya existe uno pendiente para el mismo ítem
+- **Tipo "Alta" desactivado**: El alta de ítems se realiza desde Inventario, no desde Movimientos
+
+#### Dashboard
+- **Botón Backup**: Los administradores pueden descargar un respaldo de la base de datos en formato SQL
 
 #### Reportes - Formato Oficial
 - **Nueva exportación**: Botón "Formato Oficial" genera archivo .xlsx con 10 hojas (A1-A8, B1-B2)
 - **Encabezados institucionales**: Cada hoja incluye título, dependencia y dirección en las primeras 3 filas
-- **Columnas oficiales**: Encabezados exactos del formato institucional del ISeP
+
+#### Sidebar
+- **Badge de alertas**: Muestra contador de alertas abiertas en el menú lateral
 
 #### Correcciones
 - **Headers en modo claro**: Texto de headers de tablas ahora es legible (color blanco sobre fondo oscuro)

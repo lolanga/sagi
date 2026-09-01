@@ -3,15 +3,18 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearSca
 import { Bar, Doughnut } from 'react-chartjs-2'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import api from '../services/api'
+import { useAuth } from '../context/AuthContext'
 import Layout from '../components/Layout'
 import '../styles/dashboard.css'
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, ChartDataLabels)
 
 export default function Dashboard() {
+  const { user } = useAuth()
   const [stats, setStats] = useState({ total: 0, activos: 0, movimientos_pendientes: 0, alertas_activas: 0 })
   const [porCategoria, setPorCategoria] = useState([])
   const [loading, setLoading] = useState(true)
+  const [backupLoading, setBackupLoading] = useState(false)
 
   useEffect(() => {
     api
@@ -24,8 +27,38 @@ export default function Dashboard() {
       .finally(() => setLoading(false))
   }, [])
 
+  const handleBackup = async () => {
+    setBackupLoading(true)
+    try {
+      const res = await api.get('/dashboard/backup', { responseType: 'blob' })
+      const url = window.URL.createObjectURL(new Blob([res.data]))
+      const link = document.createElement('a')
+      const disposition = res.headers['content-disposition']
+      const filename = disposition ? disposition.split('filename=')[1]?.replace(/"/g, '') : `backup_sagi.sql`
+      link.href = url
+      link.setAttribute('download', filename)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch {
+      alert('Error al crear el backup')
+    } finally {
+      setBackupLoading(false)
+    }
+  }
+
   return (
-    <Layout title="Dashboard">
+    <Layout
+      title="Dashboard"
+      actions={
+        user?.rol?.slug === 'admin' && (
+          <button className="btn btn-secondary" onClick={handleBackup} disabled={backupLoading}>
+            {backupLoading ? 'Generando...' : 'Backup'}
+          </button>
+        )
+      }
+    >
       {loading ? (
         <p className="muted">Cargando...</p>
       ) : (

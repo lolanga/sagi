@@ -1007,6 +1007,13 @@ npm run dev
 - **Tag visual**: Items con movimiento pendiente muestran "⚠ Pendiente" en resultados de búsqueda
 - **Aviso preventivo**: Al seleccionar item con pendiente, muestra aviso amarillo con tipo de movimiento y solicitante
 - **Bloqueo de submit**: Botón "Solicitar" se deshabilita si el item tiene movimiento pendiente
+- **Tipo "Alta" desactivado**: Se removió del formulario de movimientos (el alta se realiza desde Inventario)
+
+#### Dashboard
+- **Botón Backup**: Admin puede descargar respaldo SQL desde el Dashboard (`GET /api/dashboard/backup` retorna archivo descargable)
+
+#### Sidebar
+- **Badge de alertas**: Corregido endpoint `/alertas?estado=abierta` (antes usaba `/alerts` incorrectamente)
 - **Validación server-side**: `POST /api/movimientos` revalida que no exista movimiento pendiente para el item (retorna 422)
 - **Estilos**: `inventario.css` — `.item-con-pendiente`, `.item-pendiente-tag`, `.item-pendiente-aviso` con soporte dark mode
 
