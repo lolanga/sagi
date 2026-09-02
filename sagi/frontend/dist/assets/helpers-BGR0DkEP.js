@@ -1,0 +1,1 @@
+function e(e,t=`Error inesperado`){let n=e.response?.data?.message,r=e.response?.data?.errors;return(r?Object.values(r)[0]?.[0]:null)||n||t}export{e as t};
