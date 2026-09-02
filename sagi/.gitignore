@@ -1,0 +1,24 @@
+# Node / npm
+node_modules/
+npm-debug.log*
+
+# Vite
+frontend/dist/
+frontend/dev.log
+frontend/dev.err.log
+
+# Backend Laravel
+backend/vendor/
+backend/.env
+backend/storage/*.key
+backend/public/build
+backend/.phpunit.result.cache
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.log
