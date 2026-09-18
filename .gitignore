@@ -17,6 +17,8 @@ backend/.phpunit.result.cache
 # Database
 *.sqlite
 storage/app/backups/
+backend/schema.sql
+backend/export_schema.php
 
 # Logs
 *.log
