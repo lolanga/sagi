@@ -284,23 +284,22 @@ const HOJAS = {
       { header: 'FECHA DE BAJA', width: 14 },
       { header: 'Nº EXPEDIENTE O INFORME INTERNO, citar Nº Resolucion o Decreto que Autorizó la Baja', width: 55 },
     ],
-    filas: (items) =>
-      items.map((item, idx) => [
-        idx + 1,
-        item.tipoItem?.nombre ?? '',
-        '',
-        item.valores_dinamicos?.['Número de serie'] ?? item.valores_dinamicos?.Dominio ?? '',
-        [
-          item.valores_dinamicos?.Marca,
-          item.valores_dinamicos?.Modelo,
-          item.valores_dinamicos?.Color,
-        ].filter(Boolean).join(', ') || '',
-        item.estado_conservacion ?? '',
-        item.motivo_baja ?? '',
-        item.unidad?.sede?.nombre ?? '',
-        extraerFecha(item.fecha_baja),
-        item.valores_dinamicos?.['Número de expediente'] ?? '',
-      ]),
+    filas: (items, nombreCampoMap) =>
+      items.map((item, idx) => {
+        const v = resolverValoresDinamicos(item, nombreCampoMap)
+        return [
+          idx + 1,
+          item.tipoItem?.nombre ?? '',
+          v.Tipo ?? '',
+          v['Número de serie'] ?? v.Dominio ?? '',
+          construirDescripcion(item, v),
+          item.estado_conservacion ?? '',
+          item.motivo_baja ?? '',
+          item.unidad?.sede?.nombre ?? '',
+          extraerFecha(item.fecha_baja),
+          v['Número de expediente'] ?? '',
+        ]
+      }),
   },
   B1: {
     titulo: 'B1 - PROPIEDAD PROVINCIAL',
@@ -426,7 +425,7 @@ export async function exportarFormatoOficial(onProgress) {
     if (codigo === 'A7') {
       filas = config.filas(itemsActivos, nombreCampoMap)
     } else if (codigo === 'A8') {
-      filas = config.filas(itemsBaja)
+      filas = config.filas(itemsBaja, nombreCampoMap)
     } else if (codigo === 'B1' || codigo === 'B2') {
       filas = []
     } else {

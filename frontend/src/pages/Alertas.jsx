@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import api from '../services/api'
 import { extractApiError } from '../utils/helpers'
 import Aviso from '../components/Aviso'
@@ -16,6 +17,7 @@ const prioridades = [
 
 export default function Alertas() {
   const { user } = useAuth()
+  const toast = useToast()
   const [alertas, setAlertas] = useState([])
   const [unidades, setUnidades] = useState([])
   const [items, setItems] = useState([])
@@ -62,6 +64,7 @@ export default function Alertas() {
       const payload = { mensaje, prioridad, unidad_id: Number(unidadId) }
       if (itemId) payload.item_id = Number(itemId)
       await api.post('/alertas', payload)
+      toast?.success('Alerta creada')
       setShowNueva(false)
       setMensaje('')
       setPrioridad('importante')
@@ -74,8 +77,10 @@ export default function Alertas() {
   }
 
   const cerrar = async (a) => {
+    if (!window.confirm(`¿Cerrar la alerta "${a.mensaje}"?`)) return
     try {
       await api.post(`/alertas/${a.id}/cerrar`, {})
+      toast?.success('Alerta cerrada')
       cargar()
     } catch (err) {
       setError(extractApiError(err, 'Error al cerrar la alerta'))

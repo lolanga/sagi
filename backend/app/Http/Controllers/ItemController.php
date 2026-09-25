@@ -22,11 +22,12 @@ class ItemController extends Controller
 
 if ($request->filled('search')) {
             $termino = $request->string('search');
-            $query->where(function ($q) use ($termino) {
+            $jsonCast = DB::connection()->getDriverName() === 'pgsql' ? 'TEXT' : 'CHAR';
+            $query->where(function ($q) use ($termino, $jsonCast) {
                 $q->where('codigo_unico', 'like', "%{$termino}%")
                     ->orWhere('estado_conservacion', 'like', "%{$termino}%")
                     ->orWhere('estado', 'like', "%{$termino}%")
-                    ->orWhereRaw("CAST(valores_dinamicos AS CHAR) LIKE ?", ["%{$termino}%"])
+                    ->orWhereRaw("CAST(valores_dinamicos AS {$jsonCast}) LIKE ?", ["%{$termino}%"])
                     ->orWhereHas('categoria', function ($cq) use ($termino) {
                         $cq->where('codigo', 'like', "%{$termino}%")
                             ->orWhere('nombre', 'like', "%{$termino}%");
@@ -94,7 +95,6 @@ if ($request->filled('search')) {
         $categoria = Categoria::findOrFail($validated['categoria_id']);
         $user = $request->user();
 
-        // Validar campos dinámicos requeridos del elemento (o de la categoría)
         $campos = $this->camposActivos($categoria, $validated['tipo_item_id'] ?? null);
         $valores = $validated['valores'] ?? [];
         foreach ($campos->where('requerido', true) as $campo) {
@@ -106,54 +106,70 @@ if ($request->filled('search')) {
             }
         }
 
-        DB::transaction(function () use (&$item, $request, $categoria, $user, $valores, $validated) {
-            $codigo = $this->generarCodigoUnico($categoria->codigo, (int) $validated['unidad_id']);
+        try {
+            DB::transaction(function () use (&$item, $request, $categoria, $user, $valores, $validated) {
+                $codigo = $this->generarCodigoUnico($categoria->codigo, (int) $validated['unidad_id']);
 
-            // El ítem ingresa en A7 (Altas) y se traslada a su categoría real en el alta
-            $item = Item::create([
-                'codigo_unico' => $codigo,
-                'categoria_id' => Categoria::where('codigo', 'A7')->value('id'),
-                'tipo_item_id' => $validated['tipo_item_id'] ?? null,
-                'responsable_id' => $user->id,
-                'unidad_id' => $validated['unidad_id'],
-                'estado_conservacion' => $validated['estado_conservacion'],
-                'cantidad' => $validated['cantidad'],
-                'fecha_alta' => $validated['fecha_alta'] ?? now()->toDateString(),
-                'valores_dinamicos' => $valores,
-                'estado' => 'activo',
-            ]);
+                $item = Item::create([
+                    'codigo_unico' => $codigo,
+                    'categoria_id' => Categoria::where('codigo', 'A7')->value('id'),
+                    'tipo_item_id' => $validated['tipo_item_id'] ?? null,
+                    'responsable_id' => $user->id,
+                    'unidad_id' => $validated['unidad_id'],
+                    'estado_conservacion' => $validated['estado_conservacion'],
+                    'cantidad' => $validated['cantidad'],
+                    'fecha_alta' => $validated['fecha_alta'] ?? now()->toDateString(),
+                    'valores_dinamicos' => $valores,
+                    'estado' => 'activo',
+                ]);
 
-            $alta = Movimiento::create([
-                'item_id' => $item->id,
-                'tipo' => 'alta',
-                'unidad_origen_id' => $validated['unidad_id'],
-                'unidad_destino_id' => null,
-                'motivo' => $validated['motivo_alta'],
-                'estado' => 'aprobado',
-                'solicitante_id' => $user->id,
-                'validador_id' => null,
-                'fecha_validacion' => now(),
-            ]);
+                Movimiento::create([
+                    'item_id' => $item->id,
+                    'tipo' => 'alta',
+                    'unidad_origen_id' => $validated['unidad_id'],
+                    'unidad_destino_id' => null,
+                    'motivo' => $validated['motivo_alta'],
+                    'estado' => 'aprobado',
+                    'solicitante_id' => $user->id,
+                    'validador_id' => null,
+                    'fecha_validacion' => now(),
+                ]);
 
-            // Traslado automático de A7 a la categoría real
-            $item->update(['categoria_id' => $categoria->id]);
+                $item->update(['categoria_id' => $categoria->id]);
 
-            Auditoria::create([
-                'user_id' => $user->id,
-                'accion' => 'crear',
-                'entidad' => 'item',
-                'entidad_id' => $item->id,
-                'detalle' => [
-                    'codigo' => $codigo,
-                    'categoria' => $categoria->codigo,
-                    'unidad' => $item->unidad->nombre ?? '-',
-                ],
-            ]);
-        });
+                Auditoria::create([
+                    'user_id' => $user->id,
+                    'accion' => 'crear',
+                    'entidad' => 'item',
+                    'entidad_id' => $item->id,
+                    'detalle' => [
+                        'codigo' => $codigo,
+                        'categoria' => $categoria->codigo,
+                        'tipo_item' => $item->tipoItem?->nombre ?? '-',
+                        'unidad' => $item->unidad->nombre ?? '-',
+                        'responsable' => $user->name,
+                        'estado_conservacion' => $validated['estado_conservacion'],
+                        'cantidad' => $validated['cantidad'],
+                        'fecha_alta' => $validated['fecha_alta'] ?? now()->toDateString(),
+                        'motivo_alta' => $validated['motivo_alta'],
+                        'valores_dinamicos' => $valores,
+                    ],
+                ]);
+            });
 
-        $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);
+            $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);
 
-        return response()->json(['item' => $item], 201);
+            return response()->json(['item' => $item], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Registro no encontrado'], 404);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al crear el ítem',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function show(Item $item): JsonResponse
@@ -189,42 +205,55 @@ if ($request->filled('search')) {
             unset($datos['valores']);
         }
 
-        $item->update($datos);
-        $item->load(['categoria', 'tipoItem', 'unidad']);
-        $despuesDinamicos = $item->valores_dinamicos ?? [];
+        try {
+            $item = DB::transaction(function () use ($item, $datos, $user, $antesRef, $antesNumRef, $antesDinamicos) {
+                $item->update($datos);
+                $item->load(['categoria', 'tipoItem', 'unidad']);
+                $despuesDinamicos = $item->valores_dinamicos ?? [];
 
-        $antes = array_merge($antesRef, $antesNumRef);
-        $despues = array_merge([
-            'categoria' => $item->categoria->codigo ?? '-',
-            'tipo_item' => $item->tipoItem->nombre ?? '-',
-            'unidad' => $item->unidad->nombre ?? '-',
-        ], $item->only(['estado_conservacion', 'cantidad']));
+                $antes = array_merge($antesRef, $antesNumRef);
+                $despues = array_merge([
+                    'categoria' => $item->categoria->codigo ?? '-',
+                    'tipo_item' => $item->tipoItem->nombre ?? '-',
+                    'unidad' => $item->unidad->nombre ?? '-',
+                ], $item->only(['estado_conservacion', 'cantidad']));
 
-        $todosLosIds = array_unique(array_merge(array_keys($antesDinamicos), array_keys($despuesDinamicos)));
-        if (!empty($todosLosIds)) {
-            $todosCampos = \App\Models\CampoDinamico::whereIn('id', $todosLosIds)->get()->keyBy('id');
-            foreach ($todosLosIds as $campoId) {
-                $av = $antesDinamicos[$campoId] ?? null;
-                $dv = $despuesDinamicos[$campoId] ?? null;
-                if ((string)$av !== (string)$dv) {
-                    $nombreCampo = $todosCampos[$campoId]->nombre ?? "Campo #{$campoId}";
-                    $antes[$nombreCampo] = $av ?? '(vacío)';
-                    $despues[$nombreCampo] = $dv ?? '(vacío)';
+                $todosLosIds = array_unique(array_merge(array_keys($antesDinamicos), array_keys($despuesDinamicos)));
+                if (!empty($todosLosIds)) {
+                    $todosCampos = \App\Models\CampoDinamico::whereIn('id', $todosLosIds)->get()->keyBy('id');
+                    foreach ($todosLosIds as $campoId) {
+                        $av = $antesDinamicos[$campoId] ?? null;
+                        $dv = $despuesDinamicos[$campoId] ?? null;
+                        if ((string)$av !== (string)$dv) {
+                            $nombreCampo = $todosCampos[$campoId]->nombre ?? "Campo #{$campoId}";
+                            $antes[$nombreCampo] = $av ?? '(vacío)';
+                            $despues[$nombreCampo] = $dv ?? '(vacío)';
+                        }
+                    }
                 }
-            }
+
+                Auditoria::create([
+                    'user_id' => $user->id,
+                    'accion' => 'editar',
+                    'entidad' => 'item',
+                    'entidad_id' => $item->id,
+                    'detalle' => ['codigo' => $item->codigo_unico, 'antes' => $antes, 'despues' => $despues],
+                ]);
+
+                $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);
+
+                return $item;
+            });
+
+            return response()->json(['item' => $item]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al editar el ítem',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        Auditoria::create([
-            'user_id' => $user->id,
-            'accion' => 'editar',
-            'entidad' => 'item',
-            'entidad_id' => $item->id,
-            'detalle' => ['codigo' => $item->codigo_unico, 'antes' => $antes, 'despues' => $despues],
-        ]);
-
-        $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);
-
-        return response()->json(['item' => $item]);
     }
 
     public function reactivar(Request $request, Item $item): JsonResponse
@@ -239,74 +268,93 @@ if ($request->filled('search')) {
 
         $user = $request->user();
 
-        DB::transaction(function () use ($item, $user, $validated) {
-            $categoriaOriginalId = $item->categoria_original_id ?? $item->categoria_id;
+        try {
+            DB::transaction(function () use ($item, $user, $validated) {
+                $categoriaOriginalId = $item->categoria_original_id ?? $item->categoria_id;
 
-            $item->update([
-                'estado' => 'activo',
-                'categoria_id' => $categoriaOriginalId,
-                'categoria_original_id' => null,
-                'motivo_baja' => null,
-                'fecha_baja' => null,
-            ]);
+                $item->update([
+                    'estado' => 'activo',
+                    'categoria_id' => $categoriaOriginalId,
+                    'categoria_original_id' => null,
+                    'motivo_baja' => null,
+                    'fecha_baja' => null,
+                ]);
 
-            Movimiento::create([
-                'item_id' => $item->id,
-                'tipo' => 'alta',
-                'unidad_origen_id' => $item->unidad_id,
-                'unidad_destino_id' => null,
-                'motivo' => $validated['motivo_reactivacion'],
-                'estado' => 'aprobado',
-                'solicitante_id' => $user->id,
-                'validador_id' => $user->id,
-                'fecha_validacion' => now(),
-            ]);
-
-            Auditoria::create([
-                'user_id' => $user->id,
-                'accion' => 'reactivar',
-                'entidad' => 'item',
-                'entidad_id' => $item->id,
-                'detalle' => [
-                    'codigo' => $item->codigo_unico,
-                    'categoria' => $item->categoria->codigo ?? '-',
+                Movimiento::create([
+                    'item_id' => $item->id,
+                    'tipo' => 'alta',
+                    'unidad_origen_id' => $item->unidad_id,
+                    'unidad_destino_id' => null,
                     'motivo' => $validated['motivo_reactivacion'],
-                ],
-            ]);
-        });
+                    'estado' => 'aprobado',
+                    'solicitante_id' => $user->id,
+                    'validador_id' => $user->id,
+                    'fecha_validacion' => now(),
+                ]);
 
-        $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);
+                Auditoria::create([
+                    'user_id' => $user->id,
+                    'accion' => 'reactivar',
+                    'entidad' => 'item',
+                    'entidad_id' => $item->id,
+                    'detalle' => [
+                        'codigo' => $item->codigo_unico,
+                        'estado_anterior' => 'baja',
+                        'estado_nuevo' => 'activo',
+                        'categoria_anterior' => $item->categoria?->codigo ?? '-',
+                        'categoria_restaurada' => \App\Models\Categoria::find($categoriaOriginalId)?->codigo ?? '-',
+                        'motivo_baja_anterior' => $item->motivo_baja ?? '-',
+                        'motivo_reactivacion' => $validated['motivo_reactivacion'],
+                    ],
+                ]);
+            });
 
-        return response()->json(['item' => $item]);
+            $item->load(['categoria', 'tipoItem', 'responsable', 'unidad.sede']);
+
+            return response()->json(['item' => $item]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al reactivar el ítem',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function destroy(Request $request, Item $item): JsonResponse
     {
         $user = $request->user();
 
-        DB::transaction(function () use ($item, $user) {
-            Auditoria::create([
-                'user_id' => $user->id,
-                'accion' => 'eliminar',
-                'entidad' => 'item',
-                'entidad_id' => $item->id,
-                'detalle' => [
-                    'codigo' => $item->codigo_unico,
-                    'categoria' => $item->categoria?->codigo,
-                    'estado' => $item->estado,
-                    'unidad' => $item->unidad?->nombre,
-                    'responsable' => $item->responsable?->name,
-                ],
-            ]);
+        try {
+            DB::transaction(function () use ($item, $user) {
+                Auditoria::create([
+                    'user_id' => $user->id,
+                    'accion' => 'eliminar',
+                    'entidad' => 'item',
+                    'entidad_id' => $item->id,
+                    'detalle' => [
+                        'codigo' => $item->codigo_unico,
+                        'categoria' => $item->categoria?->codigo,
+                        'estado' => $item->estado,
+                        'unidad' => $item->unidad?->nombre,
+                        'responsable' => $item->responsable?->name,
+                    ],
+                ]);
 
-            Alerta::where('item_id', $item->id)
-                ->update(['item_id' => null]);
+                Alerta::where('item_id', $item->id)
+                    ->update(['item_id' => null]);
 
-            $item->movimientos()->update(['item_id' => null]);
-            $item->delete();
-        });
+                $item->delete();
+            });
 
-        return response()->json(['message' => 'Ítem eliminado']);
+            return response()->json(['message' => 'Ítem eliminado']);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al eliminar el ítem',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     private function generarCodigoUnico(string $codigoCategoria, int $unidadId): string

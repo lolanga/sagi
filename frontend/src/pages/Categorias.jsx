@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useToast } from '../context/ToastContext'
 import api from '../services/api'
 import Aviso from '../components/Aviso'
 import Layout from '../components/Layout'
@@ -9,6 +10,7 @@ import '../styles/categorias.css'
 const norm = (s) => String(s ?? '').trim().toLowerCase()
 
 export default function Categorias() {
+  const toast = useToast()
   const [categorias, setCategorias] = useState([])
   const [selected, setSelected] = useState(null)
   const [editandoCampo, setEditandoCampo] = useState(null)
@@ -47,6 +49,7 @@ export default function Categorias() {
     if (!window.confirm(`¿Eliminar el elemento "${tipo.nombre}"?`)) return
     try {
       await api.delete(`/tipos-item/${tipo.id}`)
+      toast?.success('Elemento eliminado')
       if (editandoCampo?.id === tipo.id) setEditandoCampo(null)
       cargar()
     } catch (err) {

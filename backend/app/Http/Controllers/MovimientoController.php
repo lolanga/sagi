@@ -32,11 +32,26 @@ class MovimientoController extends Controller
         ]);
     }
 
-    private function cerrarAlertas(Movimiento $m): void
+    private function cerrarAlertas(Movimiento $m, int $userId): void
     {
-        Alerta::where('movimiento_id', $m->id)
+        $alertas = Alerta::where('movimiento_id', $m->id)
             ->where('estado', 'abierta')
-            ->update(['estado' => 'cerrada', 'fecha_cierre' => now()]);
+            ->get();
+
+        foreach ($alertas as $alerta) {
+            $alerta->update(['estado' => 'cerrada', 'fecha_cierre' => now()]);
+
+            Auditoria::create([
+                'user_id' => $userId,
+                'accion' => 'cerrar',
+                'entidad' => 'alerta',
+                'entidad_id' => $alerta->id,
+                'detalle' => [
+                    'item' => $m->item?->codigo_unico ?? '-',
+                    'motivo' => 'Aprobación/rechazo del movimiento #' . $m->id,
+                ],
+            ]);
+        }
     }
     public function index(Request $request): JsonResponse
     {
@@ -79,39 +94,48 @@ class MovimientoController extends Controller
             return response()->json(['message' => 'El área de destino es la misma que el área actual del ítem'], 422);
         }
 
-        $movimiento = DB::transaction(function () use ($item, $validated, $user) {
-            $m = Movimiento::create([
-                'item_id' => $item->id,
-                'tipo' => 'traslado',
-                'unidad_origen_id' => $item->unidad_id,
-                'unidad_destino_id' => $validated['unidad_destino_id'],
-                'motivo' => $validated['motivo'],
-                'estado' => 'pendiente',
-                'solicitante_id' => $user->id,
-            ]);
-
-            Auditoria::create([
-                'user_id' => $user->id,
-                'accion' => 'solicitar',
-                'entidad' => 'movimiento',
-                'entidad_id' => $m->id,
-                'detalle' => [
+        try {
+            $movimiento = DB::transaction(function () use ($item, $validated, $user) {
+                $m = Movimiento::create([
+                    'item_id' => $item->id,
                     'tipo' => 'traslado',
-                    'item' => $item->codigo_unico,
-                    'unidad_origen' => $item->unidad->nombre ?? '-',
-                    'unidad_destino' => \App\Models\Unidad::find($validated['unidad_destino_id'])->nombre ?? '-',
+                    'unidad_origen_id' => $item->unidad_id,
+                    'unidad_destino_id' => $validated['unidad_destino_id'],
                     'motivo' => $validated['motivo'],
-                ],
-            ]);
+                    'estado' => 'pendiente',
+                    'solicitante_id' => $user->id,
+                ]);
 
-            $this->crearAlerta($m, $item);
+                Auditoria::create([
+                    'user_id' => $user->id,
+                    'accion' => 'solicitar',
+                    'entidad' => 'movimiento',
+                    'entidad_id' => $m->id,
+                    'detalle' => [
+                        'tipo' => 'traslado',
+                        'item' => $item->codigo_unico,
+                        'unidad_origen' => $item->unidad->nombre ?? '-',
+                        'unidad_destino' => \App\Models\Unidad::find($validated['unidad_destino_id'])?->nombre ?? '-',
+                        'motivo' => $validated['motivo'],
+                    ],
+                ]);
 
-            return $m;
-        });
+                $this->crearAlerta($m, $item);
 
-        $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
+                return $m;
+            });
 
-        return response()->json(['movimiento' => $movimiento], 201);
+            $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
+
+            return response()->json(['movimiento' => $movimiento], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al crear el traslado',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function storeBaja(Request $request): JsonResponse
@@ -124,38 +148,47 @@ class MovimientoController extends Controller
         $item = Item::findOrFail($validated['item_id']);
         $user = $request->user();
 
-        $movimiento = DB::transaction(function () use ($item, $validated, $user) {
-            $m = Movimiento::create([
-                'item_id' => $item->id,
-                'tipo' => 'baja',
-                'unidad_origen_id' => $item->unidad_id,
-                'unidad_destino_id' => null,
-                'motivo' => $validated['motivo'],
-                'estado' => 'pendiente',
-                'solicitante_id' => $user->id,
-            ]);
-
-            Auditoria::create([
-                'user_id' => $user->id,
-                'accion' => 'solicitar',
-                'entidad' => 'movimiento',
-                'entidad_id' => $m->id,
-                'detalle' => [
+        try {
+            $movimiento = DB::transaction(function () use ($item, $validated, $user) {
+                $m = Movimiento::create([
+                    'item_id' => $item->id,
                     'tipo' => 'baja',
-                    'item' => $item->codigo_unico,
-                    'unidad_origen' => $item->unidad->nombre ?? '-',
+                    'unidad_origen_id' => $item->unidad_id,
+                    'unidad_destino_id' => null,
                     'motivo' => $validated['motivo'],
-                ],
-            ]);
+                    'estado' => 'pendiente',
+                    'solicitante_id' => $user->id,
+                ]);
 
-            $this->crearAlerta($m, $item);
+                Auditoria::create([
+                    'user_id' => $user->id,
+                    'accion' => 'solicitar',
+                    'entidad' => 'movimiento',
+                    'entidad_id' => $m->id,
+                    'detalle' => [
+                        'tipo' => 'baja',
+                        'item' => $item->codigo_unico,
+                        'unidad_origen' => $item->unidad->nombre ?? '-',
+                        'motivo' => $validated['motivo'],
+                    ],
+                ]);
 
-            return $m;
-        });
+                $this->crearAlerta($m, $item);
 
-        $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
+                return $m;
+            });
 
-        return response()->json(['movimiento' => $movimiento], 201);
+            $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
+
+            return response()->json(['movimiento' => $movimiento], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al crear la solicitud de baja',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function aprobar(Request $request, Movimiento $movimiento): JsonResponse
@@ -171,45 +204,60 @@ class MovimientoController extends Controller
             return response()->json(['message' => 'El ítem asociado ya no existe'], 422);
         }
 
-        DB::transaction(function () use ($movimiento, $item, $user) {
-            if ($movimiento->tipo === 'traslado') {
-                $item->update(['unidad_id' => $movimiento->unidad_destino_id]);
-            }
+        try {
+            DB::transaction(function () use ($movimiento, $item, $user) {
+                if ($movimiento->tipo === 'traslado') {
+                    $item->update(['unidad_id' => $movimiento->unidad_destino_id]);
+                }
 
-            if ($movimiento->tipo === 'baja') {
-                $item->update([
-                    'estado' => 'baja',
-                    'categoria_original_id' => $item->categoria_id,
-                    'categoria_id' => Categoria::where('codigo', 'A8')->value('id') ?? $item->categoria_id,
-                    'motivo_baja' => $movimiento->motivo,
-                    'fecha_baja' => now(),
+                if ($movimiento->tipo === 'baja') {
+                    $item->update([
+                        'estado' => 'baja',
+                        'categoria_original_id' => $item->categoria_id,
+                        'categoria_id' => Categoria::where('codigo', 'A8')->value('id') ?? $item->categoria_id,
+                        'motivo_baja' => $movimiento->motivo,
+                        'fecha_baja' => now(),
+                    ]);
+                }
+
+                $movimiento->update([
+                    'estado' => 'aprobado',
+                    'validador_id' => $user->id,
+                    'fecha_validacion' => now(),
                 ]);
-            }
 
-            $movimiento->update([
-                'estado' => 'aprobado',
-                'validador_id' => $user->id,
-                'fecha_validacion' => now(),
-            ]);
+                $this->cerrarAlertas($movimiento, $user->id);
 
-            $this->cerrarAlertas($movimiento);
+                Auditoria::create([
+                    'user_id' => $user->id,
+                    'accion' => 'aprobar',
+                    'entidad' => 'movimiento',
+                    'entidad_id' => $movimiento->id,
+                    'detalle' => array_merge([
+                        'tipo' => $movimiento->tipo,
+                        'item' => $item->codigo_unico,
+                    ], $movimiento->tipo === 'traslado' ? [
+                        'unidad_origen' => $item->getOriginal('unidad_id') ? \App\Models\Unidad::find($item->getOriginal('unidad_id'))?->nombre ?? '-' : '-',
+                        'unidad_destino' => $item->unidad->nombre ?? '-',
+                    ] : [
+                        'estado_anterior' => 'activo',
+                        'estado_nuevo' => $item->estado,
+                        'categoria_anterior' => $item->getOriginal('categoria_id') ? \App\Models\Categoria::find($item->getOriginal('categoria_id'))?->codigo ?? '-' : '-',
+                        'categoria_nueva' => $item->categoria->codigo ?? '-',
+                        'motivo_baja' => $movimiento->motivo,
+                    ]),
+                ]);
+            });
 
-            Auditoria::create([
-                'user_id' => $user->id,
-                'accion' => 'aprobar',
-                'entidad' => 'movimiento',
-                'entidad_id' => $movimiento->id,
-                'detalle' => [
-                    'tipo' => $movimiento->tipo,
-                    'item' => $item->codigo_unico,
-                    'estado_item' => $item->estado,
-                ],
-            ]);
-        });
+            $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
 
-        $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
-
-        return response()->json(['movimiento' => $movimiento]);
+            return response()->json(['movimiento' => $movimiento]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al aprobar el movimiento',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function rechazar(Request $request, Movimiento $movimiento): JsonResponse
@@ -224,29 +272,42 @@ class MovimientoController extends Controller
 
         $user = $request->user();
 
-        $movimiento->update([
-            'estado' => 'rechazado',
-            'validador_id' => $user->id,
-            'fecha_validacion' => now(),
-            'motivo_rechazo' => $validated['motivo_rechazo'],
-        ]);
+        try {
+            $movimiento = DB::transaction(function () use ($movimiento, $user, $validated) {
+                $movimiento->update([
+                    'estado' => 'rechazado',
+                    'validador_id' => $user->id,
+                    'fecha_validacion' => now(),
+                    'motivo_rechazo' => $validated['motivo_rechazo'],
+                ]);
 
-        $this->cerrarAlertas($movimiento);
+                $this->cerrarAlertas($movimiento, $user->id);
 
-        Auditoria::create([
-            'user_id' => $user->id,
-            'accion' => 'rechazar',
-            'entidad' => 'movimiento',
-            'entidad_id' => $movimiento->id,
-            'detalle' => [
-                'tipo' => $movimiento->tipo,
-                'item' => $movimiento->item->codigo_unico,
-                'motivo_rechazo' => $validated['motivo_rechazo'],
-            ],
-        ]);
+                Auditoria::create([
+                    'user_id' => $user->id,
+                    'accion' => 'rechazar',
+                    'entidad' => 'movimiento',
+                    'entidad_id' => $movimiento->id,
+                    'detalle' => [
+                        'tipo' => $movimiento->tipo,
+                        'item' => $movimiento->item?->codigo_unico ?? '-',
+                        'motivo_rechazo' => $validated['motivo_rechazo'],
+                    ],
+                ]);
 
-        $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
+                return $movimiento;
+            });
 
-        return response()->json(['movimiento' => $movimiento]);
+            $movimiento->load(['item.categoria', 'item.tipoItem', 'unidadOrigen', 'unidadDestino', 'solicitante', 'validador']);
+
+            return response()->json(['movimiento' => $movimiento]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al rechazar el movimiento',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

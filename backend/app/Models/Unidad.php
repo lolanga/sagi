@@ -18,4 +18,14 @@ class Unidad extends Model
     {
         return $this->belongsTo(Sede::class);
     }
+
+    public function items()
+    {
+        return $this->hasMany(Item::class);
+    }
+
+    public function alertas()
+    {
+        return $this->hasMany(Alerta::class);
+    }
 }

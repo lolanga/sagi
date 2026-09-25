@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import api from '../services/api'
 import { extractApiError } from '../utils/helpers'
 import Aviso from '../components/Aviso'
@@ -15,6 +16,7 @@ const tiposMovimiento = [
 
 export default function Movimientos() {
   const { user } = useAuth()
+  const toast = useToast()
   const [movimientos, setMovimientos] = useState([])
   const [items, setItems] = useState([])
   const [unidades, setUnidades] = useState([])
@@ -103,6 +105,7 @@ export default function Movimientos() {
       if (tipo === 'traslado') payload.unidad_destino_id = Number(unidadDestino)
       const url = tipo === 'traslado' ? '/movimientos/traslados' : '/movimientos/bajas'
       await api.post(url, payload)
+      toast?.success(tipo === 'traslado' ? 'Solicitud de traslado creada' : 'Solicitud de baja creada')
       setShowNuevo(false)
       setTipo('traslado')
       setItemId('')
@@ -115,8 +118,11 @@ export default function Movimientos() {
   }
 
   const aprobar = async (m) => {
+    const label = m.tipo === 'traslado' ? 'traslado' : 'baja'
+    if (!window.confirm(`¿Aprobar el ${label} del ítem ${m.item?.codigo_unico}?`)) return
     try {
       await api.post(`/movimientos/${m.id}/aprobar`, {})
+      toast?.success(`Movimiento ${label} aprobado correctamente`)
       cargar()
     } catch (err) {
       setError(extractApiError(err, 'Error al aprobar'))
@@ -128,6 +134,7 @@ export default function Movimientos() {
     setError('')
     try {
       await api.post(`/movimientos/${rechazando.id}/rechazar`, { motivo_rechazo: motivoRechazo })
+      toast?.success('Movimiento rechazado')
       setRechazando(null)
       setMotivoRechazo('')
       cargar()

@@ -398,6 +398,7 @@ export default function Inventario() {
           categorias={categorias}
           unidades={unidades}
           onSaved={() => {
+            toast.success('Ítem registrado correctamente')
             setShowAlta(false)
             cargarItems()
           }}
@@ -413,6 +414,7 @@ export default function Inventario() {
             unidades={unidades}
             item={editando}
             onSaved={() => {
+              toast.success('Ítem actualizado correctamente')
               setEditando(null)
               cargarItems()
             }}

@@ -109,6 +109,8 @@ export default function Unidades() {
   }
 
   const toggleSede = async (sede) => {
+    const accion = sede.activa ? 'desactivar' : 'activar'
+    if (!window.confirm(`¿${accion.charAt(0).toUpperCase() + accion.slice(1)} la sede "${sede.nombre}"?`)) return
     try {
       const r = await api.put(`/sedes/${sede.id}`, { activa: !sede.activa })
       setSedes((s) => s.map((x) => (x.id === sede.id ? r.data.sede : x)))
@@ -179,6 +181,8 @@ export default function Unidades() {
   }
 
   const toggleUnidad = async (u) => {
+    const accion = u.activa ? 'desactivar' : 'activar'
+    if (!window.confirm(`¿${accion.charAt(0).toUpperCase() + accion.slice(1)} la unidad "${u.nombre}"?`)) return
     try {
       const r = await api.put(`/unidades/${u.id}`, { activa: !u.activa })
       setUnidades((us) => us.map((x) => (x.id === u.id ? r.data.unidad : x)))
