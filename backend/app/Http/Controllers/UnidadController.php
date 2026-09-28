@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alerta;
 use App\Models\Auditoria;
+use App\Models\Movimiento;
 use App\Models\Unidad;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class UnidadController extends Controller
@@ -109,19 +112,38 @@ class UnidadController extends Controller
 
     public function destroy(Request $request, Unidad $unidad): JsonResponse
     {
-        if ($unidad->items()->count() > 0) {
-            return response()->json(['message' => 'No se puede eliminar una unidad con ítems asociados. Desactívela en su lugar.'], 422);
+        $motivos = [];
+
+        if ($unidad->items()->exists()) {
+            $motivos[] = 'items asociados';
         }
 
-        Auditoria::create([
-            'user_id' => $request->user()->id,
-            'accion' => 'eliminar',
-            'entidad' => 'unidad',
-            'entidad_id' => $unidad->id,
-            'detalle' => ['nombre' => $unidad->nombre],
-        ]);
+        if (Movimiento::where('unidad_origen_id', $unidad->id)
+            ->orWhere('unidad_destino_id', $unidad->id)->exists()) {
+            $motivos[] = 'movimientos registrados';
+        }
 
-        $unidad->delete();
+        if (Alerta::where('unidad_id', $unidad->id)->exists()) {
+            $motivos[] = 'alertas vinculadas';
+        }
+
+        if ($motivos !== []) {
+            return response()->json([
+                'message' => 'No se puede eliminar la unidad porque tiene '.implode(', ', $motivos).'. Desactívela en su lugar.',
+            ], 422);
+        }
+
+        DB::transaction(function () use ($request, $unidad) {
+            Auditoria::create([
+                'user_id' => $request->user()->id,
+                'accion' => 'eliminar',
+                'entidad' => 'unidad',
+                'entidad_id' => $unidad->id,
+                'detalle' => ['nombre' => $unidad->nombre],
+            ]);
+
+            $unidad->delete();
+        });
 
         return response()->json(['message' => 'Unidad eliminada']);
     }

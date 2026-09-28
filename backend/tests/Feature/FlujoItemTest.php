@@ -9,6 +9,7 @@ use App\Models\Item;
 use App\Models\Movimiento;
 use App\Models\Rol;
 use App\Models\Sede;
+use App\Models\TipoItem;
 use App\Models\Unidad;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -51,13 +52,13 @@ class FlujoItemTest extends TestCase
 
         $this->unidadOrigen = Unidad::firstOrCreate(
             ['sede_id' => $sede->id, 'nombre' => 'Deposito Central'],
-            ['activa' => true, 'es_transitoria' => false]
+            ['activa' => true]
         );
 
         $sede2 = Sede::firstOrCreate(['nombre' => 'Sede Rosario'], ['activa' => true]);
         $this->unidadDestino = Unidad::firstOrCreate(
             ['sede_id' => $sede2->id, 'nombre' => 'Deposito Rosario'],
-            ['activa' => true, 'es_transitoria' => false]
+            ['activa' => true]
         );
     }
 
@@ -84,7 +85,8 @@ class FlujoItemTest extends TestCase
         $item = Item::firstOrFail();
 
         $this->assertSame('activo', $item->estado);
-        $this->assertSame($this->categoriaA7->id, $item->categoria_id, 'El alta debe quedar en la categoria transitoria A7.');
+        $this->assertSame($this->categoriaA5->id, $item->categoria_id, 'El alta debe quedar en la categoria real del item (A5), no en A7.');
+        $this->assertStringStartsWith('A5-', $item->codigo_unico, 'El codigo unico debe llevar la categoria real.');
 
         $this->assertDatabaseHas('movimientos', [
             'item_id' => $item->id,
@@ -161,6 +163,97 @@ class FlujoItemTest extends TestCase
         $this->assertSame(4, (int) $item->fresh()->cantidad, 'El cambio debe revertirse si la auditoria falla.');
     }
 
+    public function test_editar_item_permite_cambiar_categoria_y_regenera_el_codigo(): void
+    {
+        $item = $this->crearItemHelper();
+        $codigoAntes = $item->codigo_unico;
+
+        $categoriaA6 = Categoria::where('codigo', 'A6')->firstOrFail();
+        // Un elemento sin campos obligatorios: el foco del test es el cambio de
+        // categoría, no la carga de campos dinámicos.
+        $tipoA6 = TipoItem::where('categoria_id', $categoriaA6->id)
+            ->whereDoesntHave('campos', fn ($q) => $q->where('requerido', true))
+            ->firstOrFail();
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/items/{$item->id}", [
+                'categoria_id' => $categoriaA6->id,
+                'tipo_item_id' => $tipoA6->id,
+                'valores' => [],
+            ])
+            ->assertOk();
+
+        $item->refresh();
+
+        $this->assertSame($categoriaA6->id, $item->categoria_id, 'La categoria debe poder cambiarse en la edicion.');
+        $this->assertSame($tipoA6->id, $item->tipo_item_id);
+        $this->assertStringStartsWith('A6-', $item->codigo_unico, 'El codigo unico debe regenerarse con la categoria nueva.');
+        $this->assertNotSame($codigoAntes, $item->codigo_unico);
+
+        $auditoria = Auditoria::where('accion', 'editar')->where('entidad', 'item')->latest('id')->first();
+
+        $this->assertNotNull($auditoria);
+        $this->assertSame($codigoAntes, $auditoria->detalle['antes']['codigo']);
+        $this->assertSame($item->codigo_unico, $auditoria->detalle['despues']['codigo']);
+        $this->assertSame('A5', $auditoria->detalle['antes']['categoria']);
+        $this->assertSame('A6', $auditoria->detalle['despues']['categoria']);
+    }
+
+    public function test_editar_item_rechaza_elemento_que_no_pertenece_a_la_categoria(): void
+    {
+        $item = $this->crearItemHelper();
+
+        $categoriaA6 = Categoria::where('codigo', 'A6')->firstOrFail();
+        $tipoDeA5 = TipoItem::where('categoria_id', $this->categoriaA5->id)->firstOrFail();
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/items/{$item->id}", [
+                'categoria_id' => $categoriaA6->id,
+                'tipo_item_id' => $tipoDeA5->id,
+                'valores' => [],
+            ])
+            ->assertStatus(422);
+
+        $this->assertSame($this->categoriaA5->id, $item->fresh()->categoria_id, 'La categoria no debe cambiar si el elemento no corresponde.');
+    }
+
+    public function test_editar_item_no_permite_cambiar_de_categoria_sin_elemento(): void
+    {
+        $item = $this->crearItemHelper();
+
+        $categoriaA6 = Categoria::where('codigo', 'A6')->firstOrFail();
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/items/{$item->id}", [
+                'categoria_id' => $categoriaA6->id,
+                'valores' => [],
+            ])
+            ->assertStatus(422);
+
+        $this->assertSame($this->categoriaA5->id, $item->fresh()->categoria_id, 'Debe conservar la categoria original si no se eligio elemento.');
+    }
+
+    public function test_editar_item_no_permite_cambiar_de_categoria_conservando_el_elemento_anterior(): void
+    {
+        $item = $this->crearItemHelper();
+        $tipoA5 = TipoItem::where('categoria_id', $this->categoriaA5->id)->firstOrFail();
+        $item->update(['tipo_item_id' => $tipoA5->id]);
+
+        $categoriaA6 = Categoria::where('codigo', 'A6')->firstOrFail();
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/items/{$item->id}", [
+                'categoria_id' => $categoriaA6->id,
+                'valores' => [],
+            ])
+            ->assertStatus(422);
+
+        $item->refresh();
+
+        $this->assertSame($this->categoriaA5->id, $item->categoria_id, 'No debe cambiar de categoria conservando el elemento de la anterior.');
+        $this->assertSame($tipoA5->id, $item->tipo_item_id);
+    }
+
     public function test_aprobar_traslado_cambia_unidad_y_audita_origen_destino(): void
     {
         $item = $this->crearItemHelper();
@@ -222,7 +315,7 @@ class FlujoItemTest extends TestCase
 
         $this->assertSame('baja', $item->estado);
         $this->assertNotNull($item->fecha_baja);
-        $this->assertNotNull($item->categoria_original_id);
+        $this->assertSame($this->categoriaA5->id, $item->categoria_id, 'La baja no debe mover la categoria real del item a A8.');
     }
 
     public function test_rechazar_movimiento_es_atomico_y_cierra_alertas(): void
@@ -326,6 +419,43 @@ class FlujoItemTest extends TestCase
         $this->assertDatabaseMissing('items', ['id' => $item->id]);
         $this->assertSame(0, Movimiento::where('item_id', $item->id)->count());
         $this->assertDatabaseHas('auditoria', ['accion' => 'eliminar', 'entidad' => 'item']);
+    }
+
+    public function test_eliminar_item_libera_las_alertas_de_sus_movimientos(): void
+    {
+        $item = $this->crearItemHelper();
+
+        $movimiento = Movimiento::create([
+            'item_id' => $item->id,
+            'tipo' => 'traslado',
+            'unidad_origen_id' => $this->unidadOrigen->id,
+            'unidad_destino_id' => $this->unidadDestino->id,
+            'motivo' => 'Reubicacion',
+            'estado' => 'pendiente',
+            'solicitante_id' => $this->jefe->id,
+        ]);
+
+        $alerta = Alerta::create([
+            'item_id' => $item->id,
+            'movimiento_id' => $movimiento->id,
+            'unidad_id' => $this->unidadOrigen->id,
+            'tipo' => 'pendiente_aprobacion',
+            'prioridad' => 'importante',
+            'mensaje' => 'Pendiente',
+            'estado' => 'abierta',
+        ]);
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->deleteJson("/api/items/{$item->id}")
+            ->assertOk();
+
+        $this->assertDatabaseMissing('items', ['id' => $item->id]);
+        $this->assertDatabaseMissing('movimientos', ['id' => $movimiento->id]);
+
+        $alerta->refresh();
+
+        $this->assertNull($alerta->item_id, 'La alerta no debe quedar apuntando a un item borrado.');
+        $this->assertNull($alerta->movimiento_id, 'La alerta no debe quedar apuntando a un movimiento borrado.');
     }
 
     public function test_buscar_por_texto_en_campos_dinamicos_no_falla(): void

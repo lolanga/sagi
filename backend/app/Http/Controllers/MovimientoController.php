@@ -214,17 +214,17 @@ class MovimientoController extends Controller
         try {
             DB::transaction(function () use ($movimiento, $item, $user) {
                 $unidadOrigenIdAntes = $item->unidad_id;
-                $categoriaIdAntes = $item->categoria_id;
 
                 if ($movimiento->tipo === 'traslado') {
                     $item->update(['unidad_id' => $movimiento->unidad_destino_id]);
                 }
 
                 if ($movimiento->tipo === 'baja') {
+                    // La baja se refleja en `estado`. La categoría real del ítem
+                    // no cambia (A7/A8 son de ciclo de vida, no de clasificación).
                     $item->update([
                         'estado' => 'baja',
-                        'categoria_original_id' => $categoriaIdAntes,
-                        'categoria_id' => Categoria::where('codigo', 'A8')->value('id') ?? $item->categoria_id,
+                        'categoria_original_id' => null,
                         'motivo_baja' => $movimiento->motivo,
                         'fecha_baja' => now(),
                     ]);
@@ -252,8 +252,7 @@ class MovimientoController extends Controller
                     ] : [
                         'estado_anterior' => 'activo',
                         'estado_nuevo' => $item->estado,
-                        'categoria_anterior' => Categoria::find($categoriaIdAntes)?->codigo ?? '-',
-                        'categoria_nueva' => Categoria::find($item->categoria_id)?->codigo ?? '-',
+                        'categoria' => Categoria::find($item->categoria_id)?->codigo ?? '-',
                         'motivo_baja' => $movimiento->motivo,
                     ]),
                 ]);

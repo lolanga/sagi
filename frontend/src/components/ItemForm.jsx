@@ -116,6 +116,23 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
     markTouched('tipo_item_id')
   }
 
+  const handleCategoriaChange = (e) => {
+    const nuevaCategoria = e.target.value
+    if (nuevaCategoria === categoriaId) return
+
+    if (Object.keys(valores).some((k) => valores[k])) {
+      const aviso = 'Cambiar la categoría borrará los campos específicos ya completados y pedirá elegir un elemento nuevo. ¿Continuar?'
+      if (!window.confirm(aviso)) return
+    }
+
+    setCategoriaId(nuevaCategoria)
+    setTipoItemId('')
+    setValores({})
+    clearFieldError('categoria_id')
+    clearFieldError('tipo_item_id')
+    markTouched('categoria_id')
+  }
+
   const camposFijos = useMemo(() => {
     return campos.filter((c) => CAMPOS_FIJOS_NUEVOS.includes(c.nombre))
   }, [campos])
@@ -231,14 +248,8 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
             <select
               id="categoria"
               value={categoriaId}
-              onChange={(e) => {
-                setCategoriaId(e.target.value)
-                if (!esEdicion) setTipoItemId('')
-                clearFieldError('categoria_id')
-                markTouched('categoria_id')
-              }}
+              onChange={handleCategoriaChange}
               required
-              disabled={esEdicion}
               aria-invalid={!!fieldErrors.categoria_id}
             >
               <option value="">Seleccionar categoría...</option>
@@ -342,33 +353,37 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
             </div>
           )}
 
-          {!esEdicion && (
-            <div className="field">
-              <label htmlFor="unidad">
-                <span className="field-icon">🏢</span>
-                Unidad de destino *
-              </label>
-              <select
-                id="unidad"
-                value={unidadId}
-                onChange={(e) => {
-                  setUnidadId(e.target.value)
-                  clearFieldError('unidad_id')
-                  markTouched('unidad_id')
-                }}
-                required
-                aria-invalid={!!fieldErrors.unidad_id}
-              >
-                <option value="">Seleccionar unidad...</option>
-                {(unidades || []).map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.nombre} ({u.sede?.nombre ?? ''})
-                  </option>
-                ))}
-              </select>
-              {fieldErrors.unidad_id && <span className="field-error">{fieldErrors.unidad_id}</span>}
-            </div>
-          )}
+          <div className="field">
+            <label htmlFor="unidad">
+              <span className="field-icon">🏢</span>
+              {esEdicion ? 'Unidad actual' : 'Unidad de destino *'}
+            </label>
+            <select
+              id="unidad"
+              value={unidadId}
+              onChange={(e) => {
+                setUnidadId(e.target.value)
+                clearFieldError('unidad_id')
+                markTouched('unidad_id')
+              }}
+              required={!esEdicion}
+              disabled={esEdicion}
+              aria-invalid={!!fieldErrors.unidad_id}
+            >
+              <option value="">Seleccionar unidad...</option>
+              {(unidades || []).map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.nombre} ({u.sede?.nombre ?? ''})
+                </option>
+              ))}
+            </select>
+            {esEdicion && (
+              <span className="campos-adicionales-hint">
+                Para reubicar el ítem usá la pantalla de Traslados: queda aprobado por otra persona y registrado en la auditoría.
+              </span>
+            )}
+            {fieldErrors.unidad_id && <span className="field-error">{fieldErrors.unidad_id}</span>}
+          </div>
 
           {/* Campo Procedencia (fijo para todas las categorías) */}
           {camposFijos.find((c) => c.nombre === 'Procedencia') && (

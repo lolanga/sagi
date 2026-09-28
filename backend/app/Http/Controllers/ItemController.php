@@ -7,6 +7,7 @@ use App\Models\Auditoria;
 use App\Models\Categoria;
 use App\Models\Item;
 use App\Models\Movimiento;
+use App\Models\TipoItem;
 use App\Models\Unidad;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -95,14 +96,6 @@ if ($request->filled('search')) {
         $categoria = Categoria::findOrFail($validated['categoria_id']);
         $user = $request->user();
 
-        $categoriaAltaId = Categoria::where('codigo', 'A7')->value('id');
-
-        if (!$categoriaAltaId) {
-            return response()->json([
-                'message' => "Falta la categoria transitoria A7 (Altas). No se puede crear el ítem.",
-            ], 500);
-        }
-
         $campos = $this->camposActivos($categoria, $validated['tipo_item_id'] ?? null);
         $valores = $validated['valores'] ?? [];
         foreach ($campos->where('requerido', true) as $campo) {
@@ -115,12 +108,12 @@ if ($request->filled('search')) {
         }
 
         try {
-            DB::transaction(function () use (&$item, $request, $categoria, $user, $valores, $validated, $categoriaAltaId) {
+            DB::transaction(function () use (&$item, $request, $categoria, $user, $valores, $validated) {
                 $codigo = $this->generarCodigoUnico($categoria->codigo, (int) $validated['unidad_id']);
 
                 $item = Item::create([
                     'codigo_unico' => $codigo,
-                    'categoria_id' => $categoriaAltaId,
+                    'categoria_id' => $categoria->id,
                     'tipo_item_id' => $validated['tipo_item_id'] ?? null,
                     'responsable_id' => $user->id,
                     'unidad_id' => $validated['unidad_id'],
@@ -151,7 +144,6 @@ if ($request->filled('search')) {
                     'detalle' => [
                         'codigo' => $codigo,
                         'categoria' => $categoria->codigo,
-                        'categoria_registro' => Categoria::find($item->categoria_id)?->codigo ?? '-',
                         'tipo_item' => $item->tipoItem?->nombre ?? '-',
                         'unidad' => $item->unidad->nombre ?? '-',
                         'responsable' => $user->name,
@@ -189,7 +181,7 @@ if ($request->filled('search')) {
     public function update(Request $request, Item $item): JsonResponse
     {
         $validated = $request->validate([
-            'categoria_id' => ['sometimes', Rule::exists('categorias', 'id')->where(fn ($q) => $q->where('es_transitoria', false))],
+            'categoria_id' => ['sometimes', 'integer', Rule::exists('categorias', 'id')->where(fn ($q) => $q->where('es_transitoria', false))],
             'tipo_item_id' => ['nullable', 'integer', Rule::exists('tipos_items', 'id')->where(fn ($q) => $q->where('categoria_id', $request->input('categoria_id', $item->categoria_id)))],
             'estado_conservacion' => ['sometimes', Rule::in(['Muy bueno', 'Bueno', 'Regular', 'Malo'])],
             'cantidad' => 'sometimes|integer|min:1',
@@ -198,6 +190,43 @@ if ($request->filled('search')) {
 
         $user = $request->user();
         $item->load(['categoria', 'tipoItem', 'unidad']);
+
+        $categoriaNuevaId = (int) ($validated['categoria_id'] ?? $item->categoria_id);
+        $tipoNuevoId = array_key_exists('tipo_item_id', $validated)
+            ? $validated['tipo_item_id']
+            : $item->tipo_item_id;
+        $cambiaCategoria = $categoriaNuevaId !== (int) $item->categoria_id;
+        $categoriaNueva = Categoria::findOrFail($categoriaNuevaId);
+
+        // Al cambiar de categoría, el elemento debe ser de la categoría nueva.
+        // Si no se envía, sigue quedando el de la categoría anterior y la regla
+        // `exists` no llega a aplicarse, así que se controla acá.
+        if ($cambiaCategoria) {
+            $tipoValido = $tipoNuevoId && TipoItem::where('id', $tipoNuevoId)
+                ->where('categoria_id', $categoriaNuevaId)
+                ->exists();
+
+            if (!$tipoValido) {
+                return response()->json([
+                    'message' => 'Elegí un elemento de la categoría seleccionada.',
+                    'errors' => ['tipo_item_id' => ['Seleccioná un elemento de la categoría nueva.']],
+                ], 422);
+            }
+        }
+
+        // Los campos obligatorios de la categoría/elemento final deben venir
+        // completos. Si no se enviaron valores, se validan los que ya tiene el ítem.
+        $valoresFinales = $validated['valores'] ?? $item->valores_dinamicos ?? [];
+        foreach ($this->camposActivos($categoriaNueva, $tipoNuevoId ?: null)->where('requerido', true) as $campo) {
+            if (empty($valoresFinales[$campo->id])) {
+                return response()->json([
+                    'message' => "El campo '{$campo->nombre}' es obligatorio",
+                    'errors' => ['valores' => ["El campo '{$campo->nombre}' es obligatorio"]],
+                ], 422);
+            }
+        }
+
+        $codigoAntes = $item->codigo_unico;
         $antesDinamicos = $item->valores_dinamicos ?? [];
         $antesRef = [
             'categoria' => $item->categoria->codigo ?? '-',
@@ -213,8 +242,17 @@ if ($request->filled('search')) {
         }
 
         try {
-            $item = DB::transaction(function () use ($item, $datos, $user, $antesRef, $antesNumRef, $antesDinamicos) {
+            $item = DB::transaction(function () use ($item, $datos, $user, $antesRef, $antesNumRef, $antesDinamicos, $cambiaCategoria, $categoriaNueva, $codigoAntes) {
                 $item->update($datos);
+
+                // El código único lleva la categoría al principio (A5-120-842-…):
+                // si cambió la categoría, se vuelve a generar para no contradecirlo.
+                if ($cambiaCategoria) {
+                    $item->update([
+                        'codigo_unico' => $this->generarCodigoUnico($categoriaNueva->codigo, (int) $item->unidad_id),
+                    ]);
+                }
+
                 $item->load(['categoria', 'tipoItem', 'unidad']);
                 $despuesDinamicos = $item->valores_dinamicos ?? [];
 
@@ -237,6 +275,11 @@ if ($request->filled('search')) {
                             $despues[$nombreCampo] = $dv ?? '(vacío)';
                         }
                     }
+                }
+
+                if ($codigoAntes !== $item->codigo_unico) {
+                    $antes['codigo'] = $codigoAntes;
+                    $despues['codigo'] = $item->codigo_unico;
                 }
 
                 Auditoria::create([
@@ -277,13 +320,12 @@ if ($request->filled('search')) {
 
         try {
             DB::transaction(function () use ($item, $user, $validated) {
-                $categoriaOriginalId = $item->categoria_original_id ?? $item->categoria_id;
-                $categoriaBajaId = $item->categoria_id;
                 $motivoBajaAnterior = $item->motivo_baja;
 
+                // La categoría no se toca: el alta y la baja se reflejan en
+                // `estado`, no en `categoria_id`.
                 $item->update([
                     'estado' => 'activo',
-                    'categoria_id' => $categoriaOriginalId,
                     'categoria_original_id' => null,
                     'motivo_baja' => null,
                     'fecha_baja' => null,
@@ -310,8 +352,7 @@ if ($request->filled('search')) {
                         'codigo' => $item->codigo_unico,
                         'estado_anterior' => 'baja',
                         'estado_nuevo' => 'activo',
-                        'categoria_anterior' => \App\Models\Categoria::find($categoriaBajaId)?->codigo ?? '-',
-                        'categoria_restaurada' => \App\Models\Categoria::find($categoriaOriginalId)?->codigo ?? '-',
+                        'categoria' => Categoria::find($item->categoria_id)?->codigo ?? '-',
                         'motivo_baja_anterior' => $motivoBajaAnterior ?? '-',
                         'motivo_reactivacion' => $validated['motivo_reactivacion'],
                     ],
@@ -351,8 +392,9 @@ if ($request->filled('search')) {
                     ],
                 ]);
 
-                Alerta::where('item_id', $item->id)
-                    ->update(['item_id' => null]);
+                Alerta::where(fn ($q) => $q->where('item_id', $item->id)
+                        ->orWhereIn('movimiento_id', Movimiento::where('item_id', $item->id)->pluck('id')))
+                    ->update(['item_id' => null, 'movimiento_id' => null]);
 
                 $item->delete();
             });
