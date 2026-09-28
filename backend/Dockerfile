@@ -12,12 +12,15 @@ FROM php:8.3-fpm-alpine AS app
 RUN apk add --no-cache \
         nginx \
         supervisor \
-        libzip-dev \
-        libpq-dev \
+        postgresql-client \
+        icu-libs \
+        libzip \
+    && apk add --no-cache --virtual .build-deps \
         icu-dev \
         oniguruma-dev \
-        postgresql-client \
-        && docker-php-ext-install -j"$(nproc)" \
+        libzip-dev \
+        libpq-dev \
+    && docker-php-ext-install -j"$(nproc)" \
             pdo_pgsql \
             pdo_mysql \
             zip \
@@ -25,7 +28,7 @@ RUN apk add --no-cache \
             mbstring \
             bcmath \
             opcache \
-        && apk del libzip-dev libpq-dev icu-dev oniguruma-dev
+    && apk del .build-deps
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 

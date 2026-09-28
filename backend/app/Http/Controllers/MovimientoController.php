@@ -7,6 +7,7 @@ use App\Models\Auditoria;
 use App\Models\Categoria;
 use App\Models\Item;
 use App\Models\Movimiento;
+use App\Models\Unidad;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -204,8 +205,17 @@ class MovimientoController extends Controller
             return response()->json(['message' => 'El ítem asociado ya no existe'], 422);
         }
 
+        if ($movimiento->solicitante_id === $user->id) {
+            return response()->json([
+                'message' => 'No podés aprobar un movimiento que vos mismo solicitaste',
+            ], 403);
+        }
+
         try {
             DB::transaction(function () use ($movimiento, $item, $user) {
+                $unidadOrigenIdAntes = $item->unidad_id;
+                $categoriaIdAntes = $item->categoria_id;
+
                 if ($movimiento->tipo === 'traslado') {
                     $item->update(['unidad_id' => $movimiento->unidad_destino_id]);
                 }
@@ -213,7 +223,7 @@ class MovimientoController extends Controller
                 if ($movimiento->tipo === 'baja') {
                     $item->update([
                         'estado' => 'baja',
-                        'categoria_original_id' => $item->categoria_id,
+                        'categoria_original_id' => $categoriaIdAntes,
                         'categoria_id' => Categoria::where('codigo', 'A8')->value('id') ?? $item->categoria_id,
                         'motivo_baja' => $movimiento->motivo,
                         'fecha_baja' => now(),
@@ -237,13 +247,13 @@ class MovimientoController extends Controller
                         'tipo' => $movimiento->tipo,
                         'item' => $item->codigo_unico,
                     ], $movimiento->tipo === 'traslado' ? [
-                        'unidad_origen' => $item->getOriginal('unidad_id') ? \App\Models\Unidad::find($item->getOriginal('unidad_id'))?->nombre ?? '-' : '-',
-                        'unidad_destino' => $item->unidad->nombre ?? '-',
+                        'unidad_origen' => Unidad::find($unidadOrigenIdAntes)?->nombre ?? '-',
+                        'unidad_destino' => Unidad::find($movimiento->unidad_destino_id)?->nombre ?? '-',
                     ] : [
                         'estado_anterior' => 'activo',
                         'estado_nuevo' => $item->estado,
-                        'categoria_anterior' => $item->getOriginal('categoria_id') ? \App\Models\Categoria::find($item->getOriginal('categoria_id'))?->codigo ?? '-' : '-',
-                        'categoria_nueva' => $item->categoria->codigo ?? '-',
+                        'categoria_anterior' => Categoria::find($categoriaIdAntes)?->codigo ?? '-',
+                        'categoria_nueva' => Categoria::find($item->categoria_id)?->codigo ?? '-',
                         'motivo_baja' => $movimiento->motivo,
                     ]),
                 ]);
@@ -269,6 +279,12 @@ class MovimientoController extends Controller
         $validated = $request->validate([
             'motivo_rechazo' => 'required|string',
         ]);
+
+        if ($movimiento->solicitante_id === $request->user()->id) {
+            return response()->json([
+                'message' => 'No podés rechazar un movimiento que vos mismo solicitaste',
+            ], 403);
+        }
 
         $user = $request->user();
 

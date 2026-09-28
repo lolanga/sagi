@@ -51,13 +51,20 @@ class ReporteController extends Controller
             ->limit(20)
             ->get();
 
+        // strftime() es exclusivo de SQLite. El equivalente portable es el cast de la fecha.
+        $expresionMes = match (DB::connection()->getDriverName()) {
+            'sqlite' => "strftime('%Y-%m', created_at)",
+            'pgsql' => "to_char(created_at, 'YYYY-MM')",
+            default => "DATE_FORMAT(created_at, '%Y-%m')",
+        };
+
         $movimientosMes = Movimiento::select(
-            DB::raw("strftime('%Y-%m', created_at) as mes"),
+            DB::raw("{$expresionMes} as mes"),
             'tipo',
             DB::raw('COUNT(*) as total')
         )
             ->where('created_at', '>=', now()->subMonths(6))
-            ->groupBy(DB::raw("strftime('%Y-%m', created_at)"), 'tipo')
+            ->groupBy(DB::raw($expresionMes), 'tipo')
             ->orderBy('mes')
             ->get();
 

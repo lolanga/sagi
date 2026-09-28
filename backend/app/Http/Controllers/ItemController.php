@@ -95,6 +95,14 @@ if ($request->filled('search')) {
         $categoria = Categoria::findOrFail($validated['categoria_id']);
         $user = $request->user();
 
+        $categoriaAltaId = Categoria::where('codigo', 'A7')->value('id');
+
+        if (!$categoriaAltaId) {
+            return response()->json([
+                'message' => "Falta la categoria transitoria A7 (Altas). No se puede crear el ítem.",
+            ], 500);
+        }
+
         $campos = $this->camposActivos($categoria, $validated['tipo_item_id'] ?? null);
         $valores = $validated['valores'] ?? [];
         foreach ($campos->where('requerido', true) as $campo) {
@@ -107,12 +115,12 @@ if ($request->filled('search')) {
         }
 
         try {
-            DB::transaction(function () use (&$item, $request, $categoria, $user, $valores, $validated) {
+            DB::transaction(function () use (&$item, $request, $categoria, $user, $valores, $validated, $categoriaAltaId) {
                 $codigo = $this->generarCodigoUnico($categoria->codigo, (int) $validated['unidad_id']);
 
                 $item = Item::create([
                     'codigo_unico' => $codigo,
-                    'categoria_id' => Categoria::where('codigo', 'A7')->value('id'),
+                    'categoria_id' => $categoriaAltaId,
                     'tipo_item_id' => $validated['tipo_item_id'] ?? null,
                     'responsable_id' => $user->id,
                     'unidad_id' => $validated['unidad_id'],
@@ -135,8 +143,6 @@ if ($request->filled('search')) {
                     'fecha_validacion' => now(),
                 ]);
 
-                $item->update(['categoria_id' => $categoria->id]);
-
                 Auditoria::create([
                     'user_id' => $user->id,
                     'accion' => 'crear',
@@ -145,6 +151,7 @@ if ($request->filled('search')) {
                     'detalle' => [
                         'codigo' => $codigo,
                         'categoria' => $categoria->codigo,
+                        'categoria_registro' => Categoria::find($item->categoria_id)?->codigo ?? '-',
                         'tipo_item' => $item->tipoItem?->nombre ?? '-',
                         'unidad' => $item->unidad->nombre ?? '-',
                         'responsable' => $user->name,
@@ -271,6 +278,8 @@ if ($request->filled('search')) {
         try {
             DB::transaction(function () use ($item, $user, $validated) {
                 $categoriaOriginalId = $item->categoria_original_id ?? $item->categoria_id;
+                $categoriaBajaId = $item->categoria_id;
+                $motivoBajaAnterior = $item->motivo_baja;
 
                 $item->update([
                     'estado' => 'activo',
@@ -301,9 +310,9 @@ if ($request->filled('search')) {
                         'codigo' => $item->codigo_unico,
                         'estado_anterior' => 'baja',
                         'estado_nuevo' => 'activo',
-                        'categoria_anterior' => $item->categoria?->codigo ?? '-',
+                        'categoria_anterior' => \App\Models\Categoria::find($categoriaBajaId)?->codigo ?? '-',
                         'categoria_restaurada' => \App\Models\Categoria::find($categoriaOriginalId)?->codigo ?? '-',
-                        'motivo_baja_anterior' => $item->motivo_baja ?? '-',
+                        'motivo_baja_anterior' => $motivoBajaAnterior ?? '-',
                         'motivo_reactivacion' => $validated['motivo_reactivacion'],
                     ],
                 ]);
