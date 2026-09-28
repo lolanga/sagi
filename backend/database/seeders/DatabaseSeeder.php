@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->seedCategorias();
         $this->call(EstructuraCategoriasSeeder::class);
         $this->seedUsuarios();
+        $this->call(DemoItemsSeeder::class);
     }
 
     private function seedRoles(): void

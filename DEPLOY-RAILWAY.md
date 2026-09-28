@@ -100,6 +100,9 @@ railway up --detach
   Para el primer acceso real hay que definir `APP_ADMIN_USERNAME`, `APP_ADMIN_DNI`
   y `APP_ADMIN_PASSWORD` antes de correr el seed; se crea un unico administrador.
   Luego se cambia la clave desde la aplicacion.
+- **Items de ejemplo:** `APP_SEED_DEMO_ITEMS` (en `false` por defecto) carga 20
+  items repartidos en A1-A6, con sus movimientos de alta y su auditoria. Es idempotente:
+  si ya hay items de demo no vuelve a crear. Solo para entornos de prueba.
 - **Respaldo:** `DashboardController::backup()` detecta el motor activo y usa
   `pg_dump` en PostgreSQL o `mysqldump` en MySQL. En Railway el disco es efimero,
   asi que el archivo se genera en memoria y se descarga; para copias periodicas
