@@ -144,6 +144,12 @@ class DatabaseSeeder extends Seeder
 
     private function seedUsuarios(): void
     {
+        if (!filter_var(env('APP_SEED_DEMO_USERS', false), FILTER_VALIDATE_BOOL)) {
+            $this->seedAdminInicial();
+
+            return;
+        }
+
         $usuarios = [
             [
                 'name' => 'Admin Sistema',
@@ -208,5 +214,39 @@ class DatabaseSeeder extends Seeder
                 ]
             );
         }
+    }
+
+    private function seedAdminInicial(): void
+    {
+        if (User::count() > 0) {
+            return;
+        }
+
+        $clave = env('APP_ADMIN_PASSWORD');
+        $dni = env('APP_ADMIN_DNI');
+        $usuario = env('APP_ADMIN_USERNAME');
+
+        if (empty($clave) || empty($dni) || empty($usuario)) {
+            $this->command?->warn(
+                'Sin usuarios de prueba y sin APP_ADMIN_PASSWORD/APP_ADMIN_DNI/APP_ADMIN_USERNAME: no se creo ningun usuario.'
+            );
+
+            return;
+        }
+
+        $rol = Rol::where('slug', 'admin')->firstOrFail();
+        $sede = Sede::orderBy('id')->first();
+
+        User::create([
+            'name' => env('APP_ADMIN_NAME', 'Administrador'),
+            'email' => env('APP_ADMIN_EMAIL', 'admin@sagi.local'),
+            'dni' => $dni,
+            'username' => $usuario,
+            'password' => $clave,
+            'rol_id' => $rol->id,
+            'sede_id' => $sede->id,
+        ]);
+
+        $this->command?->info("Usuario administrador inicial creado: {$usuario}");
     }
 }

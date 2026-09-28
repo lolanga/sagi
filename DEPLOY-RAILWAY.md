@@ -65,6 +65,10 @@ C:\xampp\php\php.exe artisan key:generate --show
 
 ### 4. Seed (solo la primera vez, en una terminal de Railway)
 
+Antes de correr el seed, definir `APP_ADMIN_USERNAME`, `APP_ADMIN_DNI` y
+`APP_ADMIN_PASSWORD` (dejar `APP_SEED_DEMO_USERS=false` para no crear los
+usuarios de prueba).
+
 ```
 php artisan db:seed --force
 ```
@@ -87,8 +91,27 @@ railway up --detach
 - Las migraciones corren solas en cada deploy (`migrate --force` en el entrypoint).
 - El Dockerfile corre `composer install --no-dev`, asi que `php artisan tinker`
   no esta disponible en produccion.
-- `DashboardController::backup()` usa `mysqldump`, que **no existe** en la imagen
-  Alpine. En Railway ese endpoint va a fallar. Para backups usar
-  `pg_dump` o el backup automatico de Railway.
+- **Conexion a la base:** si el plugin Postgres de Railway genera `DATABASE_URL`,
+  el `entrypoint.sh` la expande a `DB_HOST`, `DB_PORT`, `DB_DATABASE`,
+  `DB_USERNAME` y `DB_PASSWORD` antes de migrar. Si las variables `DB_*` ya estan
+  cargadas manualmente, se respetan tal cual.
+- **Usuarios de prueba:** `APP_SEED_DEMO_USERS` viene en `false` en `.env.example`,
+  por lo que `db:seed` **no** crea `admin/Admin1234`, `jefe/Jefe1234`, etc.
+  Para el primer acceso real hay que definir `APP_ADMIN_USERNAME`, `APP_ADMIN_DNI`
+  y `APP_ADMIN_PASSWORD` antes de correr el seed; se crea un unico administrador.
+  Luego se cambia la clave desde la aplicacion.
+- **Respaldo:** `DashboardController::backup()` detecta el motor activo y usa
+  `pg_dump` en PostgreSQL o `mysqldump` en MySQL. En Railway el disco es efimero,
+  asi que el archivo se genera en memoria y se descarga; para copias periodicas
+  conviene el backup automatico de Railway.
 - Si el trafico crece, agregar el plugin Redis y mover `CACHE_STORE` / `QUEUE_CONNECTION`
   a `redis`.
+
+## Pendientes antes de publicar
+
+- [ ] Integrar el login real del ISeP en `AuthController` (hoy valida contra los
+      usuarios locales de SAGI con hash; no hay verificacion contra el servidor
+      institucional).
+- [ ] Paginar `/api/reportes/items`: hoy devuelve todos los items sin limite.
+- [ ] Revisar indices para la busqueda sobre `valores_dinamicos` (JSONB).
+- [ ] Definir expiracion de tokens en `config/sanctum.php` (hoy es `null`).
