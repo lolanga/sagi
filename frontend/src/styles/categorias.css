@@ -534,7 +534,7 @@
   gap: 10px;
   padding: 12px 14px;
   background: var(--color-secondary);
-  color: var(--color-white);
+  color: var(--color-on-secondary);
 }
 
 .preview-badge {

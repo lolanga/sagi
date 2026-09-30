@@ -7,6 +7,7 @@ import Aviso from '../components/Aviso'
 import EmptyState from '../components/EmptyState'
 import Modal from '../components/Modal'
 import Layout from '../components/Layout'
+import '../styles/form.css'
 import '../styles/inventario.css'
 
 const prioridades = [
