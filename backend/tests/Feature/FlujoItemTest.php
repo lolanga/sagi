@@ -28,6 +28,8 @@ class FlujoItemTest extends TestCase
 
     private Categoria $categoriaA7;
 
+    private TipoItem $tipoA5;
+
     private Unidad $unidadOrigen;
 
     private Unidad $unidadDestino;
@@ -50,6 +52,12 @@ class FlujoItemTest extends TestCase
         $this->categoriaA5 = Categoria::where('codigo', 'A5')->firstOrFail();
         $this->categoriaA7 = Categoria::where('codigo', 'A7')->firstOrFail();
 
+        // Un elemento de A5 sin campos obligatorios, para que los tests que
+        // solo prueban el flujo no tengan que cargar campos dinamicos.
+        $this->tipoA5 = TipoItem::where('categoria_id', $this->categoriaA5->id)
+            ->whereDoesntHave('campos', fn ($q) => $q->where('requerido', true))
+            ->firstOrFail();
+
         $this->unidadOrigen = Unidad::firstOrCreate(
             ['sede_id' => $sede->id, 'nombre' => 'Deposito Central'],
             ['activa' => true]
@@ -66,6 +74,7 @@ class FlujoItemTest extends TestCase
     {
         return array_merge([
             'categoria_id' => $this->categoriaA5->id,
+            'tipo_item_id' => $this->tipoA5->id,
             'estado_conservacion' => 'Bueno',
             'cantidad' => 3,
             'unidad_id' => $this->unidadOrigen->id,
@@ -117,6 +126,7 @@ class FlujoItemTest extends TestCase
         $item = Item::create([
             'codigo_unico' => 'A5-00001-TEST',
             'categoria_id' => $this->categoriaA5->id,
+            'tipo_item_id' => $this->tipoA5->id,
             'responsable_id' => $this->admin->id,
             'unidad_id' => $this->unidadOrigen->id,
             'estado_conservacion' => 'Bueno',
@@ -146,6 +156,7 @@ class FlujoItemTest extends TestCase
         $item = Item::create([
             'codigo_unico' => 'A5-00002-TEST',
             'categoria_id' => $this->categoriaA5->id,
+            'tipo_item_id' => $this->tipoA5->id,
             'responsable_id' => $this->admin->id,
             'unidad_id' => $this->unidadOrigen->id,
             'estado_conservacion' => 'Bueno',
@@ -467,6 +478,40 @@ class FlujoItemTest extends TestCase
             ->assertOk();
     }
 
+    public function test_alta_sin_elemento_se_rechaza(): void
+    {
+        $this->actingAs($this->admin, 'sanctum')
+            ->postJson('/api/items', $this->payload(['tipo_item_id' => null]))
+            ->assertStatus(422)
+            ->assertJsonPath('errors.tipo_item_id.0', 'Seleccioná un elemento para esta categoría');
+
+        $this->assertSame(0, Item::count(), 'No debe crearse un item sin elemento.');
+        $this->assertSame(0, Movimiento::count());
+    }
+
+    public function test_editar_item_sin_elemento_se_rechaza(): void
+    {
+        $item = $this->crearItemHelper();
+        $item->update(['tipo_item_id' => null]);
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/items/{$item->id}", ['cantidad' => 5])
+            ->assertStatus(422)
+            ->assertJsonPath('errors.tipo_item_id.0', 'Seleccioná un elemento para esta categoría');
+
+        $this->assertSame(1, (int) $item->fresh()->cantidad, 'La edicion no debe aplicarse sin elemento.');
+    }
+
+    public function test_la_busqueda_de_item_no_distingue_mayusculas(): void
+    {
+        $item = $this->crearItemHelper();
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->getJson('/api/items?search='.urlencode(mb_strtoupper($item->tipoItem->nombre)))
+            ->assertOk()
+            ->assertJsonFragment(['id' => $item->id]);
+    }
+
     public function test_usuario_de_carga_no_puede_aprobar_movimientos(): void
     {
         $rolCarga = Rol::firstOrCreate(['slug' => 'carga'], ['nombre' => 'Personal de carga']);
@@ -528,6 +573,7 @@ class FlujoItemTest extends TestCase
         return Item::create([
             'codigo_unico' => 'A5-'.str_pad((string) (Item::count() + 1), 5, '0', STR_PAD_LEFT).'-TEST',
             'categoria_id' => $this->categoriaA5->id,
+            'tipo_item_id' => $this->tipoA5->id,
             'responsable_id' => $this->admin->id,
             'unidad_id' => $this->unidadOrigen->id,
             'estado_conservacion' => 'Bueno',

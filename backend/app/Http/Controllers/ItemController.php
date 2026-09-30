@@ -16,6 +16,29 @@ use Illuminate\Validation\Rule;
 
 class ItemController extends Controller
 {
+    /**
+     * Campos cuyo valor se guarda siempre en mayusculas (unidades de medida,
+     * calibres de armamento y patentes).
+     */
+    private const CAMPOS_MAYUSCULAS = [
+        'Calibre (MM)',
+        'Medidas',
+        'Capacidad (BTU)',
+        'Capacidad (L)',
+        'Capacidad (RPM)',
+        'Capacidad (W)',
+        'Capacidad (VA)',
+        'Potencia (W)',
+        'Tamaño (pulgadas)',
+        'Dominio',
+        'Año',
+    ];
+
+    /**
+     * Limite de los campos de texto largo (textarea), p. ej. Observaciones.
+     */
+    private const LIMITE_TEXTO_LARGO = 150;
+
     public function index(Request $request): JsonResponse
     {
         $query = Item::with(['categoria', 'tipoItem', 'responsable', 'unidad.sede'])
@@ -23,24 +46,27 @@ class ItemController extends Controller
 
 if ($request->filled('search')) {
             $termino = $request->string('search');
-            $jsonCast = DB::connection()->getDriverName() === 'pgsql' ? 'TEXT' : 'CHAR';
-            $query->where(function ($q) use ($termino, $jsonCast) {
-                $q->where('codigo_unico', 'like', "%{$termino}%")
-                    ->orWhere('estado_conservacion', 'like', "%{$termino}%")
-                    ->orWhere('estado', 'like', "%{$termino}%")
-                    ->orWhereRaw("CAST(valores_dinamicos AS {$jsonCast}) LIKE ?", ["%{$termino}%"])
-                    ->orWhereHas('categoria', function ($cq) use ($termino) {
-                        $cq->where('codigo', 'like', "%{$termino}%")
-                            ->orWhere('nombre', 'like', "%{$termino}%");
+            $driver = DB::connection()->getDriverName();
+            $jsonCast = $driver === 'pgsql' ? 'TEXT' : 'CHAR';
+            // En PostgreSQL LIKE distingue mayusculas; ILIKE las ignora.
+            $like = $driver === 'pgsql' ? 'ILIKE' : 'LIKE';
+            $query->where(function ($q) use ($termino, $jsonCast, $like) {
+                $q->where('codigo_unico', $like, "%{$termino}%")
+                    ->orWhere('estado_conservacion', $like, "%{$termino}%")
+                    ->orWhere('estado', $like, "%{$termino}%")
+                    ->orWhereRaw("CAST(valores_dinamicos AS {$jsonCast}) {$like} ?", ["%{$termino}%"])
+                    ->orWhereHas('categoria', function ($cq) use ($termino, $like) {
+                        $cq->where('codigo', $like, "%{$termino}%")
+                            ->orWhere('nombre', $like, "%{$termino}%");
                     })
-                    ->orWhereHas('tipoItem', function ($tq) use ($termino) {
-                        $tq->where('nombre', 'like', "%{$termino}%");
+                    ->orWhereHas('tipoItem', function ($tq) use ($termino, $like) {
+                        $tq->where('nombre', $like, "%{$termino}%");
                     })
-                    ->orWhereHas('unidad', function ($uq) use ($termino) {
-                        $uq->where('nombre', 'like', "%{$termino}%");
+                    ->orWhereHas('unidad', function ($uq) use ($termino, $like) {
+                        $uq->where('nombre', $like, "%{$termino}%");
                     })
-                    ->orWhereHas('responsable', function ($rq) use ($termino) {
-                        $rq->where('name', 'like', "%{$termino}%");
+                    ->orWhereHas('responsable', function ($rq) use ($termino, $like) {
+                        $rq->where('name', $like, "%{$termino}%");
                     });
             });
         }
@@ -80,6 +106,58 @@ if ($request->filled('search')) {
         return $query->orderBy('orden')->get();
     }
 
+    /**
+     * Aplica las reglas de formato sobre los valores dinamicos: limite de
+     * caracteres en campos de texto largo y mayusculas en campos de medida.
+     * Devuelve null si todo esta bien o la respuesta 422 si hay un exceso.
+     */
+    private function validarValores($campos, array &$valores): ?JsonResponse
+    {
+        foreach ($campos as $campo) {
+            $valor = $valores[$campo->id] ?? null;
+
+            if ($valor === null || $valor === '') {
+                continue;
+            }
+
+            $valor = (string) $valor;
+
+            if ($campo->tipo === 'textarea' && mb_strlen($valor) > self::LIMITE_TEXTO_LARGO) {
+                $mensaje = "El campo '{$campo->nombre}' admite hasta ".self::LIMITE_TEXTO_LARGO.' caracteres';
+
+                return response()->json([
+                    'message' => $mensaje,
+                    'errors' => ['valores' => [$mensaje]],
+                ], 422);
+            }
+
+            if (in_array($campo->nombre, self::CAMPOS_MAYUSCULAS, true)) {
+                $valores[$campo->id] = mb_strtoupper($valor);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Si la categoria tiene elementos, el alta o la edicion deben indicar
+     * cual de ellos es el item. Sin elemento no existen campos que validar:
+     * se saltarian las reglas de obligatorios, mayusculas y largo maximo.
+     */
+    private function exigirElemento(Categoria $categoria, ?int $tipoItemId): ?JsonResponse
+    {
+        if ($tipoItemId !== null || ! $categoria->tiposItems()->exists()) {
+            return null;
+        }
+
+        $mensaje = 'Seleccioná un elemento para esta categoría';
+
+        return response()->json([
+            'message' => $mensaje,
+            'errors' => ['tipo_item_id' => [$mensaje]],
+        ], 422);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -96,6 +174,10 @@ if ($request->filled('search')) {
         $categoria = Categoria::findOrFail($validated['categoria_id']);
         $user = $request->user();
 
+        if ($error = $this->exigirElemento($categoria, $validated['tipo_item_id'] ?? null)) {
+            return $error;
+        }
+
         $campos = $this->camposActivos($categoria, $validated['tipo_item_id'] ?? null);
         $valores = $validated['valores'] ?? [];
         foreach ($campos->where('requerido', true) as $campo) {
@@ -105,6 +187,10 @@ if ($request->filled('search')) {
                     'errors' => ['valores' => ["El campo '{$campo->nombre}' es obligatorio"]],
                 ], 422);
             }
+        }
+
+        if ($error = $this->validarValores($campos, $valores)) {
+            return $error;
         }
 
         try {
@@ -214,16 +300,28 @@ if ($request->filled('search')) {
             }
         }
 
+        if ($error = $this->exigirElemento($categoriaNueva, $tipoNuevoId)) {
+            return $error;
+        }
+
         // Los campos obligatorios de la categoría/elemento final deben venir
         // completos. Si no se enviaron valores, se validan los que ya tiene el ítem.
+        $camposFinales = $this->camposActivos($categoriaNueva, $tipoNuevoId ?: null);
         $valoresFinales = $validated['valores'] ?? $item->valores_dinamicos ?? [];
-        foreach ($this->camposActivos($categoriaNueva, $tipoNuevoId ?: null)->where('requerido', true) as $campo) {
+        foreach ($camposFinales->where('requerido', true) as $campo) {
             if (empty($valoresFinales[$campo->id])) {
                 return response()->json([
                     'message' => "El campo '{$campo->nombre}' es obligatorio",
                     'errors' => ['valores' => ["El campo '{$campo->nombre}' es obligatorio"]],
                 ], 422);
             }
+        }
+
+        if (array_key_exists('valores', $validated)) {
+            if ($error = $this->validarValores($camposFinales, $valoresFinales)) {
+                return $error;
+            }
+            $validated['valores'] = $valoresFinales;
         }
 
         $codigoAntes = $item->codigo_unico;

@@ -6,13 +6,14 @@ use App\Models\Auditoria;
 use App\Models\Sede;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class SedeController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(['sedes' => Sede::with('unidades')->orderBy('nombre')->get()]);
+        return response()->json(['sedes' => Sede::with('unidades')->withCount('usuarios')->orderBy('nombre')->get()]);
     }
 
     public function store(Request $request): JsonResponse
@@ -88,21 +89,33 @@ class SedeController extends Controller
 
     public function destroy(Request $request, Sede $sede): JsonResponse
     {
-        if ($sede->unidades()->count() > 0) {
+        $motivos = [];
+
+        if ($sede->unidades()->exists()) {
+            $motivos[] = 'unidades de destino asociadas';
+        }
+
+        if ($sede->usuarios()->exists()) {
+            $motivos[] = 'usuarios asignados';
+        }
+
+        if ($motivos !== []) {
             return response()->json([
-                'message' => 'No se puede eliminar la sede porque tiene unidades de destino asociadas.',
+                'message' => 'No se puede eliminar la sede porque tiene '.implode(', ', $motivos).'. Desactívela en su lugar.',
             ], 422);
         }
 
-        Auditoria::create([
-            'user_id' => $request->user()->id,
-            'accion' => 'eliminar',
-            'entidad' => 'sede',
-            'entidad_id' => $sede->id,
-            'detalle' => ['nombre' => $sede->nombre],
-        ]);
+        DB::transaction(function () use ($request, $sede) {
+            Auditoria::create([
+                'user_id' => $request->user()->id,
+                'accion' => 'eliminar',
+                'entidad' => 'sede',
+                'entidad_id' => $sede->id,
+                'detalle' => ['nombre' => $sede->nombre],
+            ]);
 
-        $sede->delete();
+            $sede->delete();
+        });
 
         return response()->json(['message' => 'Sede eliminada']);
     }

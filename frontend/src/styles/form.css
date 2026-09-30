@@ -35,9 +35,15 @@
   gap: 5px;
 }
 
-.field-full {
-  grid-column: 1 / -1;
-}
+  .field-full {
+    grid-column: 1 / -1;
+  }
+
+  .confirm-text {
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
 
 .field label {
   font-size: 13px;

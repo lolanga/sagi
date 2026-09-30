@@ -30,9 +30,11 @@ export default function Movimientos() {
   const [unidadDestino, setUnidadDestino] = useState('')
   const [motivo, setMotivo] = useState('')
   const [rechazando, setRechazando] = useState(null)
+  const [aprobando, setAprobando] = useState(null)
   const [motivoRechazo, setMotivoRechazo] = useState('')
   const [error, setError] = useState('')
   const [busquedaItem, setBusquedaItem] = useState('')
+  const [itemOrigen, setItemOrigen] = useState(null)
   const [movimientosPendientes, setMovimientosPendientes] = useState([])
   const [itemPendiente, setItemPendiente] = useState(null)
 
@@ -76,6 +78,7 @@ export default function Movimientos() {
 
   const buscarItems = (termino) => {
     setBusquedaItem(termino)
+    setItemOrigen(null)
     if (termino.length < 2) {
       setItems([])
       return
@@ -87,6 +90,7 @@ export default function Movimientos() {
 
   const seleccionarItem = (item) => {
     setItemId(item.id)
+    setItemOrigen(item)
     setBusquedaItem(`${item.codigo_unico} · ${item.tipo_item?.nombre ?? item.categoria?.codigo}`)
     setItems([])
     const pendiente = movimientosPendientes.find((m) => m.item_id === item.id)
@@ -109,6 +113,7 @@ export default function Movimientos() {
       setShowNuevo(false)
       setTipo('traslado')
       setItemId('')
+      setItemOrigen(null)
       setUnidadDestino('')
       setMotivo('')
       cargar()
@@ -117,12 +122,14 @@ export default function Movimientos() {
     }
   }
 
-  const aprobar = async (m) => {
-    const label = m.tipo === 'traslado' ? 'traslado' : 'baja'
-    if (!window.confirm(`¿Aprobar el ${label} del ítem ${m.item?.codigo_unico}?`)) return
+  const confirmarAprobacion = async (e) => {
+    e.preventDefault()
+    setError('')
+    const label = aprobando.tipo === 'traslado' ? 'traslado' : 'baja'
     try {
-      await api.post(`/movimientos/${m.id}/aprobar`, {})
+      await api.post(`/movimientos/${aprobando.id}/aprobar`, {})
       toast?.success(`Movimiento ${label} aprobado correctamente`)
+      setAprobando(null)
       cargar()
     } catch (err) {
       setError(extractApiError(err, 'Error al aprobar'))
@@ -211,7 +218,7 @@ export default function Movimientos() {
                 <td data-label="Acciones">
                   {puedeValidar && m.estado === 'pendiente' && (
                     <div className="row-actions">
-                      <button className="btn-link" onClick={() => aprobar(m)}>Aprobar</button>
+                      <button className="btn-link" onClick={() => { setError(''); setAprobando(m) }}>Aprobar</button>
                       <button className="btn-link btn-link-danger" onClick={() => { setRechazando(m); setMotivoRechazo('') }}>Rechazar</button>
                     </div>
                   )}
@@ -223,7 +230,7 @@ export default function Movimientos() {
         </div>
       )}
 
-      <Modal open={showNuevo} title="Nueva solicitud de movimiento" onClose={() => { setShowNuevo(false); setBusquedaItem(''); setItems([]); setItemId('') }} wide>
+      <Modal open={showNuevo} title="Nueva solicitud de movimiento" onClose={() => { setShowNuevo(false); setBusquedaItem(''); setItems([]); setItemId(''); setItemOrigen(null); setItemPendiente(null) }} wide>
         <form onSubmit={guardar} className="item-form">
           <fieldset className="form-fieldset">
             <legend>Datos del movimiento</legend>
@@ -249,7 +256,7 @@ export default function Movimientos() {
                   type="text"
                   value={busquedaItem}
                   onChange={(e) => buscarItems(e.target.value)}
-                  placeholder="Buscar por código o nombre..."
+                  placeholder="Ej. A1-116-792-000001 o Escritorio"
                   required
                 />
                 {busquedaItem.length >= 2 && items.length > 0 && (
@@ -311,9 +318,11 @@ export default function Movimientos() {
             </div>
           </fieldset>
 
-          {itemId && tipo === 'traslado' && (() => {
-            const itemSeleccionado = items.find((i) => String(i.id) === String(itemId))
-            const unidadOrigen = itemSeleccionado?.unidad?.nombre ?? 'Unidad actual del ítem'
+          {itemId && itemOrigen && (() => {
+            const sedeOrigen = itemOrigen.unidad?.sede?.nombre
+            const origen = itemOrigen.unidad
+              ? `${itemOrigen.unidad.nombre}${sedeOrigen ? ` (${sedeOrigen})` : ''}`
+              : 'Sin unidad asignada'
             const unidadDestinoSeleccionada = unidades.find((u) => String(u.id) === String(unidadDestino))
             const destino = unidadDestinoSeleccionada
               ? `${unidadDestinoSeleccionada.nombre} (${unidadDestinoSeleccionada.sede?.nombre ?? ''})`
@@ -322,13 +331,17 @@ export default function Movimientos() {
               <div className="movimiento-flujo">
                 <div className="movimiento-flujo-item">
                   <span className="movimiento-flujo-label">Origen</span>
-                  <span className="movimiento-flujo-valor">{unidadOrigen}</span>
+                  <span className="movimiento-flujo-valor">{origen}</span>
                 </div>
-                <span className="movimiento-flujo-arrow">→</span>
-                <div className="movimiento-flujo-item">
-                  <span className="movimiento-flujo-label">Destino</span>
-                  <span className="movimiento-flujo-valor">{destino}</span>
-                </div>
+                {tipo === 'traslado' && (
+                  <>
+                    <span className="movimiento-flujo-arrow">→</span>
+                    <div className="movimiento-flujo-item">
+                      <span className="movimiento-flujo-label">Destino</span>
+                      <span className="movimiento-flujo-valor">{destino}</span>
+                    </div>
+                  </>
+                )}
               </div>
             )
           })()}
@@ -359,6 +372,20 @@ export default function Movimientos() {
           <div className="form-actions">
             <button type="button" className="btn btn-secondary" onClick={() => setRechazando(null)}>Cancelar</button>
             <button type="submit" className="btn btn-danger">Rechazar</button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal open={Boolean(aprobando)} title={`Aprobar movimiento — ${aprobando?.item?.codigo_unico ?? ''}`} onClose={() => setAprobando(null)}>
+        <form onSubmit={confirmarAprobacion} className="item-form">
+          <p className="confirm-text">
+            ¿Aprobar el <strong>{aprobando?.tipo === 'traslado' ? 'traslado' : 'baja'}</strong> del ítem{' '}
+            <strong>{aprobando?.item?.codigo_unico}</strong>?
+          </p>
+          <Aviso mensaje={error} onCerrar={() => setError('')} />
+          <div className="form-actions">
+            <button type="button" className="btn btn-secondary" onClick={() => setAprobando(null)}>Cancelar</button>
+            <button type="submit" className="btn btn-primary">Aprobar</button>
           </div>
         </form>
       </Modal>

@@ -4,7 +4,6 @@
 
 .virtual-table-wrapper {
   width: 100%;
-  max-width: 1200px;
   margin: 0 auto;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -26,9 +25,6 @@
   gap: 6px;
   margin-bottom: 10px;
   flex-wrap: wrap;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .col-toggle-label {
@@ -73,7 +69,7 @@
   padding: 8px 8px;
   font-weight: 600;
   font-size: 12px;
-  color: var(--color-white);
+  color: var(--color-on-secondary);
   text-align: left;
   white-space: nowrap;
   min-width: 0;

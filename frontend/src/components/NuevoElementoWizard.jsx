@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import api from '../services/api'
 import Aviso from './Aviso'
+import '../styles/form.css'
 
 const tiposCampo = ['texto', 'numero', 'fecha', 'select', 'textarea']
 const norm = (s) => String(s ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')

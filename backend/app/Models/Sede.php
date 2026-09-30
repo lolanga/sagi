@@ -16,4 +16,9 @@ class Sede extends Model
     {
         return $this->hasMany(Unidad::class);
     }
+
+    public function usuarios()
+    {
+        return $this->hasMany(User::class);
+    }
 }

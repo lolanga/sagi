@@ -235,7 +235,7 @@ export default function Inventario() {
             <input
               className="search-input"
               type="text"
-              placeholder="Ej. SAGI-000001 o escritorio"
+              placeholder="Ej. A1-116-792-000001 o Escritorio"
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value)

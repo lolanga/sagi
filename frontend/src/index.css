@@ -13,6 +13,8 @@
   --color-bg: #1a1f2b;
   --color-white: #232937;
   --color-card: #2a3040;
+  /* Texto que va encima de un fondo --color-secondary (encabezados, badges). */
+  --color-on-secondary: #e8ecf1;
   --radius: 8px;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
@@ -25,6 +27,8 @@
   --color-bg: #f7fafc;
   --color-white: #ffffff;
   --color-card: #ffffff;
+  /* --color-secondary no se redefine en el tema claro: sigue siendo oscuro. */
+  --color-on-secondary: #ffffff;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 

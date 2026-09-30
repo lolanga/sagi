@@ -409,9 +409,14 @@ export default function Unidades() {
               Esta sede tiene {sedeEliminar.unidades.length} unidad{(sedeEliminar.unidades.length) !== 1 ? 'es' : ''} asociada{(sedeEliminar.unidades.length) !== 1 ? 's' : ''}. No se puede eliminar.
             </p>
           )}
+          {(sedeEliminar?.usuarios_count ?? 0) > 0 && (
+            <p className="modal-confirm-warning">
+              Esta sede tiene {sedeEliminar.usuarios_count} usuario{(sedeEliminar.usuarios_count) !== 1 ? 's' : ''} asignado{(sedeEliminar.usuarios_count) !== 1 ? 's' : ''}. No se puede eliminar.
+            </p>
+          )}
           <div className="form-actions-modal">
             <button type="button" className="btn btn-secondary" onClick={() => setSedeEliminar(null)}>Cancelar</button>
-            {(sedeEliminar?.unidades?.length ?? 0) === 0 && (
+            {(sedeEliminar?.unidades?.length ?? 0) === 0 && (sedeEliminar?.usuarios_count ?? 0) === 0 && (
               <button type="button" className="btn btn-danger" onClick={confirmEliminarSede} disabled={savingSede}>{savingSede ? 'Eliminando...' : 'Eliminar'}</button>
             )}
           </div>

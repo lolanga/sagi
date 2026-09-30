@@ -10,6 +10,23 @@ const CAMPOS_FIJOS_NUEVOS = ['Marca', 'Modelo', 'Procedencia']
 const CAMPOS_OCULTOS = ['Numero de serie']
 
 const MAX_MOTIVO = 500
+const MAX_OBSERVACIONES = 150
+
+// Campos que se guardan siempre en mayusculas (unidades de medida, calibres,
+// patentes). Debe mantenerse sincronizado con CAMPOS_MAYUSCULAS de ItemController.
+const CAMPOS_MAYUSCULAS = [
+  'Calibre (MM)',
+  'Medidas',
+  'Capacidad (BTU)',
+  'Capacidad (L)',
+  'Capacidad (RPM)',
+  'Capacidad (W)',
+  'Capacidad (VA)',
+  'Potencia (W)',
+  'Tamaño (pulgadas)',
+  'Dominio',
+  'Año',
+]
 
 export default function ItemForm({ categorias, unidades, item, onSaved, onCancel }) {
   const [categoriaId, setCategoriaId] = useState(item?.categoria_id ?? '')
@@ -520,17 +537,23 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
                   const key = String(campo.id)
                   const value = valores[key] ?? ''
                   const fieldKey = `campo_${campo.id}`
+                  const esMayuscula = CAMPOS_MAYUSCULAS.includes(campo.nombre)
+                  const esTextoLargo = campo.tipo === 'textarea'
                   const base = {
                     id: `campo-${campo.id}`,
                     required: campo.requerido,
                     value,
                     placeholder: campo.placeholder || '',
                     onChange: (e) => {
-                      setValores((v) => ({ ...v, [key]: e.target.value }))
+                      let nuevo = e.target.value
+                      if (esMayuscula) nuevo = nuevo.toUpperCase()
+                      if (esTextoLargo && nuevo.length > MAX_OBSERVACIONES) nuevo = nuevo.slice(0, MAX_OBSERVACIONES)
+                      setValores((v) => ({ ...v, [key]: nuevo }))
                       clearFieldError(fieldKey)
                     },
                     'aria-invalid': !!fieldErrors[fieldKey],
                   }
+                  if (esMayuscula) base.style = { textTransform: 'uppercase' }
 
                   let input
                   if (campo.tipo === 'textarea') {
@@ -560,6 +583,13 @@ export default function ItemForm({ categorias, unidades, item, onSaved, onCancel
                     <div className="field" key={campo.id}>
                       <label htmlFor={base.id}>{campo.nombre}{campo.requerido && ' *'}</label>
                       {input}
+                      {esTextoLargo && (
+                        <div className="char-counter">
+                          <span className={String(value).length >= MAX_OBSERVACIONES ? 'char-counter--limit' : ''}>
+                            {String(value).length}/{MAX_OBSERVACIONES}
+                          </span>
+                        </div>
+                      )}
                       {fieldErrors[fieldKey] && <span className="field-error">{fieldErrors[fieldKey]}</span>}
                     </div>
                   )
