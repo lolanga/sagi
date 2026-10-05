@@ -1,0 +1,84 @@
+# SAGI - entorno local con Docker
+#
+#   Levantar todo:        docker compose up -d
+#   Cambiaste el codigo:   docker compose up -d --build app
+#   Ver logs:              docker compose logs -f app
+#   Parar todo:            docker compose down        (los datos quedan guardados)
+#   Borrar TODO (datos):   docker compose down -v     <-- borra la base, ojo
+#
+# Requiere Docker Desktop en marcha.
+# La APP_KEY se lee del archivo .env de la raiz (no se commitea, ver .gitignore).
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: sagi-app:latest
+    container_name: sagi-app
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_KEY: ${APP_KEY:?Falta APP_KEY en el archivo .env}
+      APP_URL: http://localhost:8080
+      APP_LOCALE: es
+      APP_FALLBACK_LOCALE: es
+      DB_CONNECTION: pgsql
+      DB_HOST: sagi-postgres
+      DB_PORT: "5432"
+      DB_DATABASE: sagi_test
+      DB_USERNAME: sagi
+      DB_PASSWORD: sagi_secret_test
+      LOG_LEVEL: error
+      LOG_STACK: daily
+    volumes:
+      # Los respaldos que genera la app no se pierden al recrear el contenedor.
+      - backups:/var/www/html/storage/app/backups
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      # 127.0.0.1 y no localhost: nginx solo escucha IPv4 y dentro del
+      # contenedor localhost resuelve primero a ::1.
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:80/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    networks:
+      - sagi-net
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: sagi-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: sagi_test
+      POSTGRES_USER: sagi
+      POSTGRES_PASSWORD: sagi_secret_test
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sagi -d sagi_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    networks:
+      - sagi-net
+    restart: unless-stopped
+
+networks:
+  sagi-net:
+    name: sagi-net
+    driver: bridge
+
+volumes:
+  pgdata:
+    name: sagi-pgdata
+  backups:
+    name: sagi-backups

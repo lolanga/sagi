@@ -2,6 +2,9 @@
 node_modules/
 npm-debug.log*
 
+# Docker Compose (contiene APP_KEY)
+/.env
+
 # Vite
 frontend/dist/
 frontend/dev.log

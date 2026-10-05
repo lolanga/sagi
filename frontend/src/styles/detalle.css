@@ -135,7 +135,7 @@
 }
 
 .timeline-rechazo {
-  color: var(--color-danger, #ef5350);
+  color: var(--color-danger-text, #ef5350);
   font-size: 12px !important;
   background-color: rgba(239, 83, 80, 0.1);
   padding: 6px 8px;
@@ -170,7 +170,7 @@
 
 .badge-audit {
   background-color: rgba(41, 182, 246, 0.15);
-  color: var(--color-info, #29b6f6);
+  color: var(--color-badge-info-text, #29b6f6);
 }
 
 .timeline-cambios {
@@ -198,12 +198,12 @@
 }
 
 .val-antes {
-  color: var(--color-danger, #ef5350);
+  color: var(--color-danger-text, #ef5350);
   font-weight: 500;
 }
 
 .val-despues {
-  color: var(--color-success, #4caf50);
+  color: var(--color-success-text, #4caf50);
   font-weight: 500;
 }
 

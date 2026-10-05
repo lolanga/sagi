@@ -15,6 +15,33 @@
   --color-card: #2a3040;
   /* Texto que va encima de un fondo --color-secondary (encabezados, badges). */
   --color-on-secondary: #e8ecf1;
+  /* Fondo de superficies rellenas (botones primarios, chips). Es más oscuro
+     que --color-primary para que el texto blanco alcance 4.5:1 (WCAG AA):
+     blanco sobre #4a8fd4 solo llega a 3.4:1. */
+  --color-primary-fill: #3374b8;
+  --color-primary-fill-hover: #2b609a;
+  /* Texto que va encima de un fondo --color-primary-fill. */
+  --color-on-primary: #ffffff;
+  /* Texto/enlaces azules sobre fondos oscuros. El --color-primary a secas no
+     llega a 4.5:1 sobre las tarjetas (#2a3040). */
+  --color-primary-text: #5da3e0;
+  /* Texto de badges: el fondo es --color-card teñido al 18%, así que pide
+     un azul más claro que el de los enlaces para llegar a 4.5:1. */
+  --color-badge-primary-text: #79c0f5;
+  /* Texto de error/advertencia: #ef5350 sobre tarjeta da 3.78:1. */
+  --color-danger-text: #ff8a80;
+  --color-success-text: #81c784;
+  --color-accent-text: #ffb300;
+  --color-badge-info-text: #4fc3f7;
+  /* Fondo de .btn-secondary al pasar el mouse (tema oscuro: se aclara). */
+  --color-secondary-hover-bg: #2a3040;
+  /* Fondo de .btn-danger: blanco sobre #ef5350 solo da 3.49:1. */
+  --color-danger-fill: #d32f2f;
+  --color-danger-fill-hover: #b71c1c;
+  --color-on-danger: #ffffff;
+  /* Colores de los gráficos del Dashboard (los lee Chart.js desde JS). */
+  --chart-text: #a0aec0;
+  --chart-grid: rgba(255, 255, 255, 0.08);
   --radius: 8px;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
@@ -29,6 +56,20 @@
   --color-card: #ffffff;
   /* --color-secondary no se redefine en el tema claro: sigue siendo oscuro. */
   --color-on-secondary: #ffffff;
+  /* Azul de texto/enlaces: sobre blanco el #4a8fd4 solo da 3.4:1. */
+  --color-primary-text: #2b6cb0;
+  /* Texto de badges: sobre el fondo teñido al 18% el azul de enlaces
+     queda en 4.47:1, justo bajo del mínimo. */
+  --color-badge-primary-text: #27649f;
+  /* Texto de error/advertencia: #ef5350 sobre blanco da 3.49:1. */
+  --color-danger-text: #c62828;
+  --color-success-text: #1b5e20;
+  --color-accent-text: #8a5a00;
+  --color-badge-info-text: #0b6ba8;
+  /* Fondo de .btn-secondary al pasar el mouse (tema claro: se oscurece). */
+  --color-secondary-hover-bg: #eef2f7;
+  --chart-text: #4a5568;
+  --chart-grid: rgba(0, 0, 0, 0.08);
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -52,7 +93,7 @@ body {
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   text-decoration: none;
 }
 
@@ -75,31 +116,31 @@ button {
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
-  color: var(--color-white);
+  background-color: var(--color-primary-fill);
+  color: var(--color-on-primary);
 }
 
 .btn-primary:hover {
-  background-color: var(--color-primary-dark);
+  background-color: var(--color-primary-fill-hover);
 }
 
 .btn-secondary {
   background-color: var(--color-white);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   border-color: var(--color-border);
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-secondary);
+  background-color: var(--color-secondary-hover-bg);
 }
 
 .btn-danger {
-  background-color: var(--color-danger);
-  color: var(--color-white);
+  background-color: var(--color-danger-fill);
+  color: var(--color-on-danger);
 }
 
 .btn-danger:hover {
-  filter: brightness(1.1);
+  background-color: var(--color-danger-fill-hover);
 }
 
 .btn-block {
@@ -128,14 +169,15 @@ button {
 }
 
 .sidebar-logo {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
-  letter-spacing: 2px;
-  padding: 12px 0 14px;
+  letter-spacing: 1.5px;
+  padding: 12px 44px 14px 12px;
   margin-bottom: 4px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -154,23 +196,39 @@ button {
 }
 
 .sidebar-collapse-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 4px auto 8px;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   background: transparent;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.65);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 
 .sidebar-collapse-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Colapsado: logo y botón apilados en la columna de 60px */
+.sidebar-collapsed .sidebar-logo {
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 0 14px;
+}
+
+.sidebar-collapsed .sidebar-collapse-btn {
+  position: static;
+  transform: none;
+  margin: 0 auto;
 }
 
 .sidebar-nav {
@@ -201,11 +259,11 @@ button {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 8px 16px 4px;
+  padding: 10px 16px 5px;
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.2px;
   text-transform: uppercase;
@@ -214,7 +272,7 @@ button {
 }
 
 .nav-group-header:hover {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .nav-group-chevron {
@@ -321,12 +379,12 @@ button {
 }
 
 .sidebar-footer {
-  padding: 12px 14px;
-  font-size: 10px;
-  line-height: 1.4;
+  padding: 14px 16px;
+  font-size: 11px;
+  line-height: 1.6;
   letter-spacing: 0.02em;
   text-align: center;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.65);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -344,9 +402,9 @@ button {
 
 .topbar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  padding: 16px 24px;
+  padding: 12px 24px;
   background-color: var(--color-white);
   border-bottom: 1px solid var(--color-border);
   gap: 12px;
@@ -378,6 +436,8 @@ button {
 
 .topbar h1 {
   font-size: 20px;
+  line-height: 34px;
+  margin: 0;
 }
 
 .btn-back {
@@ -404,6 +464,7 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .topbar-user {
@@ -507,6 +568,7 @@ button {
 
 .table thead th {
   background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
   border-bottom: 2px solid var(--color-border);
 }
 
@@ -703,6 +765,7 @@ button {
 
 .table th {
   background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
   font-weight: 600;
 }
 

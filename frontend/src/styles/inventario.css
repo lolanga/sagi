@@ -42,38 +42,38 @@
 
 .badge-activo {
   background-color: rgba(76, 175, 80, 0.18);
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 
-.badge-estado-Muy-bueno { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
-.badge-estado-Bueno { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
-.badge-estado-Regular { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
-.badge-estado-Malo { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
+.badge-estado-Muy-bueno { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success-text); }
+.badge-estado-Bueno { background-color: rgba(74, 143, 212, 0.18); color: var(--color-badge-primary-text); }
+.badge-estado-Regular { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent-text); }
+.badge-estado-Malo { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger-text); }
 
 .badge-accion {
   background-color: var(--color-secondary);
-  color: var(--color-text);
+  color: var(--color-on-secondary);
 }
-.badge-login { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
-.badge-crear { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
-.badge-editar { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
-.badge-eliminar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
+.badge-login { background-color: rgba(74, 143, 212, 0.18); color: var(--color-badge-primary-text); }
+.badge-crear { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success-text); }
+.badge-editar { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent-text); }
+.badge-eliminar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger-text); }
 .badge-mover { background-color: var(--color-secondary); color: var(--color-on-secondary); }
-.badge-solicitar { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
-.badge-aprobar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
-.badge-rechazar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
-.badge-desactivar { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
-.badge-activar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
-.badge-alta { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
-.badge-traslado { background-color: rgba(33, 150, 243, 0.18); color: var(--color-info); }
-.badge-baja { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
-.badge-aprobado { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success); }
-.badge-pendiente { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
-.badge-rechazado { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
+.badge-solicitar { background-color: rgba(74, 143, 212, 0.18); color: var(--color-badge-primary-text); }
+.badge-aprobar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success-text); }
+.badge-rechazar { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger-text); }
+.badge-desactivar { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent-text); }
+.badge-activar { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success-text); }
+.badge-alta { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success-text); }
+.badge-traslado { background-color: rgba(33, 150, 243, 0.18); color: var(--color-badge-info-text); }
+.badge-baja { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger-text); }
+.badge-aprobado { background-color: rgba(76, 175, 80, 0.18); color: var(--color-success-text); }
+.badge-pendiente { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent-text); }
+.badge-rechazado { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger-text); }
 
-.badge-prioridad-critica { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger); }
-.badge-prioridad-importante { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent); }
-.badge-prioridad-informativa { background-color: rgba(74, 143, 212, 0.18); color: var(--color-primary); }
+.badge-prioridad-critica { background-color: rgba(239, 83, 80, 0.18); color: var(--color-danger-text); }
+.badge-prioridad-importante { background-color: rgba(212, 160, 23, 0.18); color: var(--color-accent-text); }
+.badge-prioridad-informativa { background-color: rgba(74, 143, 212, 0.18); color: var(--color-badge-primary-text); }
 
 .audit-detalle {
   color: var(--color-muted);
@@ -84,14 +84,14 @@
 .btn-link {
   background: none;
   border: none;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-size: 13px;
   font-weight: 600;
   padding: 2px 4px;
 }
 
 .btn-link-danger {
-  color: var(--color-danger);
+  color: var(--color-danger-text);
 }
 
 .row-actions .btn-link {
@@ -105,11 +105,11 @@
 }
 
 .row-actions .btn-link.btn-link-ver {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .row-actions .btn-link.btn-link-editar {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   background-color: rgba(245, 124, 0, 0.12);
 }
 
@@ -118,7 +118,7 @@
 }
 
 .row-actions .btn-link.btn-link-danger {
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   background-color: rgba(239, 83, 80, 0.12);
 }
 
@@ -152,25 +152,25 @@
 
 .btn-icon-action:hover {
   background: rgba(74, 143, 212, 0.12);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .btn-icon-action--edit {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .btn-icon-action--edit:hover {
   background: rgba(245, 124, 0, 0.12);
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .btn-icon-action--delete {
-  color: var(--color-danger);
+  color: var(--color-danger-text);
 }
 
 .btn-icon-action--delete:hover {
   background: rgba(239, 83, 80, 0.12);
-  color: var(--color-danger);
+  color: var(--color-danger-text);
 }
 
 @media (max-width: 1024px) {
@@ -241,7 +241,7 @@
 }
 
 .sede-id {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 @media (min-width: 640px) {
@@ -310,7 +310,7 @@
 }
 
 .form-error {
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   font-size: 13px;
   margin: 0 0 12px;
   font-weight: 600;
@@ -434,21 +434,21 @@
   align-items: center;
   padding: 12px 16px;
   background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
   border-bottom: 2px solid var(--color-accent);
 }
 
 .unidad-id {
   font-size: 13px;
   font-weight: 700;
-  background-color: var(--color-primary);
-  color: var(--color-white);
+  background-color: var(--color-primary-fill);
+  color: var(--color-on-primary);
   padding: 2px 8px;
   border-radius: 4px;
 }
-
 .unidad-sede {
   font-size: 12px;
-  color: var(--color-primary);
+  color: var(--color-on-secondary);
   font-weight: 500;
 }
 
@@ -507,19 +507,19 @@
 
 /* Motivo de baja */
 .motivo-baja-text {
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   font-size: 12px;
   font-style: italic;
 }
 
 .motivo-baja-label {
   font-weight: 600;
-  color: var(--color-danger);
+  color: var(--color-danger-text);
 }
 
 .item-card-motivo-baja {
   font-size: 12px;
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   font-style: italic;
   padding: 6px 8px;
   background-color: rgba(239, 83, 80, 0.08);
@@ -529,17 +529,17 @@
 
 .badge-estado-activo {
   background-color: rgba(76, 175, 80, 0.18);
-  color: var(--color-success);
+  color: var(--color-success-text);
 }
 
 .badge-estado-pendiente {
   background-color: rgba(212, 160, 23, 0.18);
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .badge-estado-baja {
   background-color: rgba(239, 83, 80, 0.18);
-  color: var(--color-danger);
+  color: var(--color-danger-text);
 }
 
 /* ===== Responsive visibility ===== */
@@ -765,7 +765,7 @@
 .movimiento-flujo-arrow {
   font-size: 24px;
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   flex-shrink: 0;
 }
 
@@ -798,7 +798,7 @@
 }
 
 .item-search-results li.selected {
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-fill);
   color: white;
 }
 
@@ -811,7 +811,7 @@
 .item-pendiente-tag {
   font-size: 11px;
   font-weight: 600;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   white-space: nowrap;
 }
 

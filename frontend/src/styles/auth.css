@@ -83,7 +83,7 @@
 
 .auth-error {
   background-color: rgba(239, 83, 80, 0.15);
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   padding: 10px 12px;
   border-radius: var(--radius);
   font-size: 13px;

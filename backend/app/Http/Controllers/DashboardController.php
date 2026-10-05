@@ -30,6 +30,16 @@ class DashboardController extends Controller
                 'total' => $c->items_count,
             ]);
 
+        $porEstado = collect(['activo', 'pendiente', 'baja'])
+            ->mapWithKeys(fn ($estado) => [
+                $estado => Item::where('estado', $estado)->count(),
+            ]);
+
+        $porConservacion = collect(['Muy bueno', 'Bueno', 'Regular', 'Malo'])
+            ->mapWithKeys(fn ($estado) => [
+                $estado => Item::where('estado_conservacion', $estado)->count(),
+            ]);
+
         return response()->json([
             'stats' => [
                 'total' => $total,
@@ -38,6 +48,8 @@ class DashboardController extends Controller
                 'alertas_activas' => $alertas,
             ],
             'por_categoria' => $porCategoria,
+            'por_estado' => $porEstado,
+            'por_conservacion' => $porConservacion,
         ]);
     }
 

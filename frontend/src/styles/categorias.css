@@ -40,6 +40,12 @@
 
 .categoria-card:hover {
   background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+}
+
+.categoria-card:hover .categoria-card-codigo,
+.categoria-card:hover .categoria-card-meta {
+  color: var(--color-on-secondary);
 }
 
 .categoria-card.active {
@@ -49,7 +55,7 @@
 
 .categoria-card-codigo {
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-size: 14px;
   min-width: 28px;
 }
@@ -186,7 +192,7 @@
   border: 2px dashed var(--color-primary);
   border-radius: var(--radius);
   background: rgba(74, 143, 212, 0.06);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -232,7 +238,7 @@
 .btn-back-inline {
   background: none;
   border: none;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
@@ -337,7 +343,7 @@
 }
 
 .campo-eliminados-label {
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   font-weight: 600;
 }
 
@@ -348,13 +354,13 @@
   padding: 2px 8px;
   background: rgba(239, 83, 80, 0.15);
   border-radius: 10px;
-  color: var(--color-danger);
+  color: var(--color-danger-text);
 }
 
 .campo-eliminado-chip button {
   background: none;
   border: none;
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   cursor: pointer;
   font-size: 12px;
   padding: 0;
@@ -405,7 +411,7 @@
 }
 
 .wizard-step.active {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   background: rgba(74, 143, 212, 0.12);
   font-weight: 600;
 }
@@ -447,7 +453,7 @@
 .campos-fijos-lista {
   display: block;
   font-weight: 600;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   margin: 4px 0 2px;
 }
 
@@ -572,7 +578,7 @@
 }
 
 .preview-required {
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   margin-left: 2px;
 }
 
@@ -613,6 +619,7 @@
 
 .btn-icon:hover:not(:disabled) {
   background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
 }
 
 .btn-icon:disabled {
@@ -621,12 +628,13 @@
 }
 
 .btn-icon.btn-danger {
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   border-color: rgba(239, 83, 80, 0.3);
 }
 
 .btn-icon.btn-danger:hover:not(:disabled) {
   background-color: rgba(239, 83, 80, 0.1);
+  color: var(--color-danger-text);
 }
 
 /* ============================================

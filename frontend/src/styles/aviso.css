@@ -6,7 +6,7 @@
   gap: 10px;
   background-color: rgba(239, 83, 80, 0.15);
   border: 1px solid rgba(239, 83, 80, 0.4);
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   padding: 10px 12px;
   border-radius: var(--radius);
   font-size: 13px;
@@ -22,7 +22,7 @@
 .aviso-cerrar {
   background: none;
   border: none;
-  color: var(--color-danger);
+  color: var(--color-danger-text);
   font-size: 18px;
   line-height: 1;
   padding: 0 2px;
