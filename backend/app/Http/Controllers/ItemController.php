@@ -9,6 +9,7 @@ use App\Models\Item;
 use App\Models\Movimiento;
 use App\Models\TipoItem;
 use App\Models\Unidad;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -194,7 +195,7 @@ if ($request->filled('search')) {
         }
 
         try {
-            DB::transaction(function () use (&$item, $request, $categoria, $user, $valores, $validated) {
+            $this->enTransaccionReintentable(function () use (&$item, $request, $categoria, $user, $valores, $validated) {
                 $codigo = $this->generarCodigoUnico($categoria->codigo, (int) $validated['unidad_id']);
 
                 $item = Item::create([
@@ -340,7 +341,7 @@ if ($request->filled('search')) {
         }
 
         try {
-            $item = DB::transaction(function () use ($item, $datos, $user, $antesRef, $antesNumRef, $antesDinamicos, $cambiaCategoria, $categoriaNueva, $codigoAntes) {
+            $item = $this->enTransaccionReintentable(function () use ($item, $datos, $user, $antesRef, $antesNumRef, $antesDinamicos, $cambiaCategoria, $categoriaNueva, $codigoAntes) {
                 $item->update($datos);
 
                 // El código único lleva la categoría al principio (A5-120-842-…):
@@ -506,14 +507,43 @@ if ($request->filled('search')) {
         }
     }
 
+    /**
+     * Ejecuta la operacion dentro de una transaccion y la repite si la base
+     * la rechazo por `codigo_unico` duplicado.
+     *
+     * Dos altas simultaneas de la misma unidad pueden leer el mismo maximo
+     * antes de insertar: la segunda termina en violacion del unique. Al
+     * reintentar la transaccion entera ya ve el codigo recien confirmado.
+     * Solo se reintenta por ese motivo, nunca por cualquier QueryException.
+     */
+    private function enTransaccionReintentable(callable $operacion, int $intentos = 3): mixed
+    {
+        $intento = 0;
+
+        while (true) {
+            $intento++;
+
+            try {
+                return DB::transaction($operacion);
+            } catch (QueryException $e) {
+                if ($intento >= $intentos || ! str_contains($e->getMessage(), 'codigo_unico')) {
+                    throw $e;
+                }
+            }
+        }
+    }
+
     private function generarCodigoUnico(string $codigoCategoria, int $unidadId): string
     {
         // Formato: {Categoria}-{IdSede 2}-{IdUnidad 2}-{orden 6} -> A1-03-47-000001
         $unidad = Unidad::findOrFail($unidadId);
         $prefijo = sprintf('%s-%02d-%02d-', $codigoCategoria, $unidad->sede_id, $unidadId);
 
+        // FOR UPDATE sobre los codigos ya emitidos: dos transacciones que
+        // calculan el proximo numero no pueden leer el mismo maximo a la vez.
         $ultimo = Item::where('codigo_unico', 'like', $prefijo.'%')
             ->orderByDesc('codigo_unico')
+            ->lockForUpdate()
             ->value('codigo_unico');
 
         $nro = $ultimo ? ((int) substr($ultimo, -6)) + 1 : 1;

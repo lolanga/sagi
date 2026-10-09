@@ -5,6 +5,7 @@ use App\Http\Controllers\AlertaController;
 use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ImportarController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\MovimientoController;
 use App\Http\Controllers\ReporteController;
@@ -51,6 +52,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Reportes
     Route::get('/reportes/resumen', [ReporteController::class, 'resumen'])->middleware('rol:admin,jefe');
     Route::get('/reportes/items', [ReporteController::class, 'items'])->middleware('rol:admin,jefe');
+
+    // Carga masiva de items (fase 1: validación en seco, no escribe nada)
+    Route::get('/importar/plantilla', [ImportarController::class, 'plantilla'])->middleware('rol:admin');
+    Route::post('/importar/validar', [ImportarController::class, 'validar'])->middleware('rol:admin');
+    Route::post('/importar/ejecutar', [ImportarController::class, 'ejecutar'])->middleware('rol:admin');
 
     // Inventario
     Route::get('/items', [ItemController::class, 'index']);
